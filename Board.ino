@@ -9,6 +9,7 @@
 #define DISTANCE_READ_TIMEOUT 30000
 #define ERROR_BLINK_COUNT 10
 #define ERROR_BLINK_DELAY_MS 100
+#define MAX_SENSOR_DISTANCE 20
 
 LiquidCrystal_I2C lcd(0x027, 16, 2);
 
@@ -30,10 +31,16 @@ void setup(){
 void loop(){
   long duration = getDistance();
   if(duration != -1){
-    displayDistance(duration);
+    displayUsage(duration);
   }else{
     displaySensorError();
   }
+}
+
+// Usage percent from MAX_SENSOR_DISTANCE
+float calculateUsagePercentage(float distance){
+  if(distance > MAX_SENSOR_DISTANCE) return 100.0f;
+  return (distance / MAX_SENSOR_DISTANCE) * 100.0f;
 }
 
 // Calculates distance based on sensor readings
@@ -50,19 +57,18 @@ void printCentered(const char* text, unsigned short int columnIndex = 0){
   lcd.print(text);
 };
 
-// Displays distance on the LCD
-void displayDistance(long duration){
+// Displays usage on the LCD
+void displayUsage(long duration){
   float distance = duration * 0.034 / 2;
   lcd.clear();
-  printCentered("Distance");
 
-  char distanceValueBuffer[13];
-  dtostrf(distance, 6, 2, distanceValueBuffer);
-  strcat(distanceValueBuffer, " cm"); 
-  printCentered(distanceValueBuffer, 1);
+  printCentered("Usage"); 
+  float usagePercentage = calculateUsagePercentage(distance);
+  char displayString[30];
+  sprintf(displayString, "%d%% - %d cm", (int)usagePercentage, (int)distance);
+  printCentered(displayString, 1); 
 
-  // Brief indicator LED flash
-  digitalWrite(ERROR_LED_PIN, LOW);
+  digitalWrite(ERROR_LED_PIN, LOW); 
   digitalWrite(BLUE_LED_PIN, HIGH);
   delay(500);
   digitalWrite(BLUE_LED_PIN, LOW);
