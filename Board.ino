@@ -19,8 +19,8 @@
 // Maximum distance the sensor can read (cm)
 #define MAX_SENSOR_DISTANCE 20
 
-// Initialize LCD with I2C address, 16 columns, 2 rows
-LiquidCrystal_I2C lcd(0x027, 16, 2);
+// Optional LCD object - only initialize if it's connected
+LiquidCrystal_I2C *lcdPtr = 0;
 
 // Centers text on a specified line of the LCD display
 //
@@ -32,8 +32,8 @@ void printCentered(const char* text, unsigned short int columnIndex = 0){
     unsigned short int position = (16 - textLength) / 2;
     // Check if text will fit on the LCD
     if(position >= 0){
-        lcd.setCursor(position, columnIndex);
-        lcd.print(text);
+        lcdPtr->setCursor(position, columnIndex);
+        lcdPtr->print(text);
     }
 };
 
@@ -45,7 +45,7 @@ void printCentered(const char* text, unsigned short int columnIndex = 0){
 void displayUsage(long duration){
     // Calculate distance in centimeters
     float distance = duration * 0.034 / 2;
-    lcd.clear();
+    lcdPtr->clear();
     printCentered("Usage");
 
     float usagePercentage = calculateUsagePercentage(distance);
@@ -65,7 +65,7 @@ void displayUsage(long duration){
 // displaySensorError function
 // Displays an error message on the LCD and blinks the error LED
 void displaySensorError(){
-    lcd.clear();
+    lcdPtr->clear();
     printCentered("Sensor Error,");
     printCentered("Nothing to do.", 1);
     
@@ -112,8 +112,10 @@ long getDistance(){
 // setup function
 // Initializes the system and peripherals 
 void setup(){
-    lcd.init();
-    lcd.backlight();
+    // Attempt to initialize the LCD
+    lcdPtr = new LiquidCrystal_I2C(0x027, 16, 2);
+    lcdPtr->init();
+    lcdPtr->backlight();
 
     // Initialize serial communication (for debugging) 
     // Serial.begin(9600);
@@ -134,7 +136,7 @@ void loop(){
         // Display an error message if the sensor failed
         displaySensorError();
     }else{
-        // Display usage information based on distance
-        displayUsage(duration);
+        // Only call displayUsage if the LCD is available
+        if(lcdPtr) displayUsage(duration);
     }
 };
