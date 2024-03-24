@@ -42,8 +42,8 @@ long getDistance(){
   return (duration == 0) ? -1 : duration;
 }
 
-void print(String text, unsigned short int columnIndex = 0){
-  lcd.setCursor((16 - text.length()) / 2, columnIndex);
+void print(const char* text, unsigned short int columnIndex = 0){
+  lcd.setCursor((16 - strlen(text)) / 2, columnIndex);
   lcd.print(text);
 };
 
@@ -51,12 +51,11 @@ void print(String text, unsigned short int columnIndex = 0){
 void displayDistance(long duration){
   float distance = duration * 0.034 / 2;
   lcd.clear();
-  String distanceTitle = "Distance";
-  print(distanceTitle);
-  char distanceValueBuffer[10];
+  print("Distance");
+  char distanceValueBuffer[13];
   dtostrf(distance, 6, 2, distanceValueBuffer);
-  String distanceValueStr = String(distanceValueBuffer) + " cm";
-  print(distanceValueStr, 1);
+  strcat(distanceValueBuffer, " cm"); 
+  print(distanceValueBuffer, 1);
   // Brief indicator LED flash
   digitalWrite(ERROR_LED_PIN, LOW);
   digitalWrite(BLUE_LED_PIN, HIGH);
