@@ -5,7 +5,10 @@
 #define ECHO_PIN 11
 #define ERROR_LED_PIN 7
 #define BLUE_LED_PIN 6
+
 #define DISTANCE_READ_TIMEOUT 30000
+#define ERROR_BLINK_COUNT 10
+#define ERROR_BLINK_DELAY_MS 100
 
 LiquidCrystal_I2C lcd(0x027, 16, 2);
 
@@ -42,7 +45,7 @@ long getDistance(){
   return (duration == 0) ? -1 : duration;
 }
 
-void print(const char* text, unsigned short int columnIndex = 0){
+void printCentered(const char* text, unsigned short int columnIndex = 0){
   lcd.setCursor((16 - strlen(text)) / 2, columnIndex);
   lcd.print(text);
 };
@@ -51,11 +54,13 @@ void print(const char* text, unsigned short int columnIndex = 0){
 void displayDistance(long duration){
   float distance = duration * 0.034 / 2;
   lcd.clear();
-  print("Distance");
+  printCentered("Distance");
+
   char distanceValueBuffer[13];
   dtostrf(distance, 6, 2, distanceValueBuffer);
   strcat(distanceValueBuffer, " cm"); 
-  print(distanceValueBuffer, 1);
+  printCentered(distanceValueBuffer, 1);
+
   // Brief indicator LED flash
   digitalWrite(ERROR_LED_PIN, LOW);
   digitalWrite(BLUE_LED_PIN, HIGH);
@@ -66,15 +71,13 @@ void displayDistance(long duration){
 // Displays a sensor error message on the LCD
 void displaySensorError(){
   lcd.clear();
-  lcd.setCursor(0, 0);
-  lcd.print("Sensor Error!");
-  lcd.setCursor(0, 1);
-  lcd.print("Check connection.");
-  // TODO: Is this the best way of do it?
-  for(int i = 0; i < 10; i++){
+  printCentered("Sensor Error!");
+  printCentered("Check connection.", 1);
+
+  for(int i = 0; i < ERROR_BLINK_COUNT; i++){
     digitalWrite(ERROR_LED_PIN, HIGH);
-    delay(100);
+    delay(ERROR_BLINK_DELAY_MS);
     digitalWrite(ERROR_LED_PIN, LOW);
-    delay(100);
+    delay(ERROR_BLINK_DELAY_MS);
   }
 }
