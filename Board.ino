@@ -5,10 +5,6 @@
 #define TRIGGER_PIN 12
 // Pin connected to the echo input of the sensor
 #define ECHO_PIN 11
-// Pin connected to the error LED
-#define ERROR_LED_PIN 7
-// Pin connected to the "usage OK" LED
-#define BLUE_LED_PIN 6
 
 // Timeout for distance readings (microseconds)
 #define DISTANCE_READ_TIMEOUT 30000
@@ -18,6 +14,10 @@
 #define ERROR_BLINK_DELAY_MS 100
 // Maximum distance the sensor can read (cm)
 #define MAX_SENSOR_DISTANCE 20
+
+#define RED_PIN 3
+#define GREEN_PIN 2
+#define BLUE_PIN 4
 
 // Optional LCD object - only initialize if it's connected
 LiquidCrystal_I2C *lcdPtr = 0;
@@ -55,11 +55,11 @@ void displayUsage(long duration){
 
     const bool isPercentageCorrect = usagePercentage < 100.0f;
     // Light error LED if issue
-    digitalWrite(ERROR_LED_PIN, !isPercentageCorrect);
+    digitalWrite(RED_PIN, !isPercentageCorrect);
     // Light blue LED if OK
-    digitalWrite(BLUE_LED_PIN, isPercentageCorrect);
+    digitalWrite(BLUE_PIN, isPercentageCorrect);
     delay(500);
-    digitalWrite(BLUE_LED_PIN, LOW);
+    digitalWrite(BLUE_PIN, LOW);
 };
 
 // displaySensorError function
@@ -70,9 +70,9 @@ void displaySensorError(){
     printCentered("Nothing to do.", 1);
     
     for(int i = 0; i < ERROR_BLINK_COUNT; i++){
-        digitalWrite(ERROR_LED_PIN, HIGH);
+        digitalWrite(RED_PIN, HIGH);
         delay(ERROR_BLINK_DELAY_MS);
-        digitalWrite(ERROR_LED_PIN, LOW);
+        digitalWrite(RED_PIN, LOW);
         delay(ERROR_BLINK_DELAY_MS);
     }
 };
@@ -122,8 +122,9 @@ void setup(){
 
     pinMode(TRIGGER_PIN, OUTPUT);
     pinMode(ECHO_PIN, INPUT);
-    pinMode(ERROR_LED_PIN, OUTPUT);
-    pinMode(BLUE_LED_PIN, OUTPUT);
+    pinMode(RED_PIN, OUTPUT);
+    pinMode(BLUE_PIN, OUTPUT);
+    pinMode(GREEN_PIN, OUTPUT);
 };
 
 // loop function
