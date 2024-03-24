@@ -64,14 +64,20 @@ void displayUsage(long duration){
 
   printCentered("Usage"); 
   float usagePercentage = calculateUsagePercentage(distance);
+
   char displayString[30];
   sprintf(displayString, "%d%% - %d cm", (int)usagePercentage, (int)distance);
   printCentered(displayString, 1); 
 
-  digitalWrite(ERROR_LED_PIN, LOW); 
-  digitalWrite(BLUE_LED_PIN, HIGH);
-  delay(500);
-  digitalWrite(BLUE_LED_PIN, LOW);
+  if(usagePercentage == 100.0f){
+    digitalWrite(ERROR_LED_PIN, HIGH);
+    delay(500);
+  }else{
+    digitalWrite(ERROR_LED_PIN, LOW); 
+    digitalWrite(BLUE_LED_PIN, HIGH);
+    delay(500);
+    digitalWrite(BLUE_LED_PIN, LOW);
+  }
 }
 
 // Displays a sensor error message on the LCD
