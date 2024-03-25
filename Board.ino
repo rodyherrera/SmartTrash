@@ -23,49 +23,10 @@ const unsigned short int GREEN_PIN = 9;
 const unsigned short int BLUE_PIN = 8;
 
 // Definition of bytes for printing icons on LCD.
-byte SuccessIcon[8] = {
-    B00000,
-    B00001,
-    B00011,
-    B10110,
-    B11100,
-    B01000,
-    B00000,
-    B00000
-};
-
-byte CIcon[8] = {
-    B00000,
-    B00000,
-    B01110,
-    B01000,
-    B01000,
-    B01110,
-    B00000,
-    B00000
-};
-
-byte BIcon[8] = {
-    B00000,
-    B00000,
-    B01000,
-    B01000,
-    B01110,
-    B01110,
-    B00000,
-    B00000
-};
-
-byte ErrorIcon[8] = {
-    B11101,
-    B10001,
-    B11101,
-    B10000,
-    B10001,
-    B00000,
-    B00000,
-    B00000
-};
+byte SuccessIcon[8] = { B00000, B00001, B00011, B10110, B11100, B01000, B00000, B00000 };
+byte CIcon[8] = { B00000, B00000, B01110, B01000, B01000, B01110, B00000, B00000 };
+byte BIcon[8] = { B00000, B00000, B01000, B01000, B01110, B01110, B00000, B00000 };
+byte ErrorIcon[8] = { B11101, B10001, B11101, B10000, B10001, B00000, B00000, B00000 };
 
 // Optional LCD object - only initialize if it's connected
 static LiquidCrystal_I2C *lcdPtr = 0;
