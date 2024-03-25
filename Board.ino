@@ -22,6 +22,29 @@ const unsigned short int RED_PIN = 10;
 const unsigned short int GREEN_PIN = 9;
 const unsigned short int BLUE_PIN = 8;
 
+// Definition of bytes for printing icons on LCD.
+byte SuccessIcon[] = {
+    B00000,
+    B00001,
+    B00011,
+    B10110,
+    B11100,
+    B01000,
+    B00000,
+    B00000
+};
+
+byte ErrorIcon[] = {
+    B11101,
+    B10001,
+    B11101,
+    B10000,
+    B10001,
+    B00000,
+    B00000,
+    B00000
+};
+
 // Optional LCD object - only initialize if it's connected
 static LiquidCrystal_I2C *lcdPtr = 0;
 
@@ -66,16 +89,18 @@ static void displayUsage(unsigned long duration){
     if(lcdPtr != 0){
         lcdPtr->clear();
         printCentered("Usage");
+        lcdPtr->setCursor(15, 0);
+        lcdPtr->write((distance < MAX_SENSOR_DISTANCE) ? (0) : (1));
         char displayStringBuffer[30];
         sprintf(displayStringBuffer, "%d%% - %d cm", usagePercentage, distance);
         printCentered(displayStringBuffer, 1);
     }
 
     const bool isPercentageCorrect = usagePercentage < 100.0f;
-    // Light error LED if issue
+    // Light error/OK LEDs appropriately
     digitalWrite(RED_PIN, !isPercentageCorrect);
-    // Light blue LED if OK
     digitalWrite(BLUE_PIN, isPercentageCorrect);
+
     delay(500);
     digitalWrite(BLUE_PIN, LOW);
 };
@@ -151,7 +176,9 @@ void initializeSystem(){
     lcdPtr = new LiquidCrystal_I2C(0x027, 16, 2);
     lcdPtr->init();
     lcdPtr->backlight();
-    
+    lcdPtr->createChar(1, ErrorIcon);
+    lcdPtr->createChar(0, SuccessIcon);
+
     // Configures hardware pins for the project.
     pinMode(TRIGGER_PIN, OUTPUT);
     pinMode(ECHO_PIN, INPUT);
