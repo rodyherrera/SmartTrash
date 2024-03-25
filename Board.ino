@@ -23,7 +23,7 @@ const unsigned short int GREEN_PIN = 9;
 const unsigned short int BLUE_PIN = 8;
 
 // Definition of bytes for printing icons on LCD.
-byte SuccessIcon[] = {
+byte SuccessIcon[8] = {
     B00000,
     B00001,
     B00011,
@@ -34,7 +34,29 @@ byte SuccessIcon[] = {
     B00000
 };
 
-byte ErrorIcon[] = {
+byte CIcon[8] = {
+    B00000,
+    B00000,
+    B01110,
+    B01000,
+    B01000,
+    B01110,
+    B00000,
+    B00000
+};
+
+byte BIcon[8] = {
+    B00000,
+    B00000,
+    B01000,
+    B01000,
+    B01110,
+    B01110,
+    B00000,
+    B00000
+};
+
+byte ErrorIcon[8] = {
     B11101,
     B10001,
     B11101,
@@ -88,6 +110,10 @@ static void displayUsage(unsigned long duration){
 
     if(lcdPtr != 0){
         lcdPtr->clear();
+        lcdPtr->setCursor(0, 0);
+        lcdPtr->write(2);
+        lcdPtr->setCursor(1, 0);
+        lcdPtr->write(3);
         printCentered("Usage");
         lcdPtr->setCursor(15, 0);
         lcdPtr->write((distance < MAX_SENSOR_DISTANCE) ? (0) : (1));
@@ -176,8 +202,10 @@ void initializeSystem(){
     lcdPtr = new LiquidCrystal_I2C(0x027, 16, 2);
     lcdPtr->init();
     lcdPtr->backlight();
-    lcdPtr->createChar(1, ErrorIcon);
     lcdPtr->createChar(0, SuccessIcon);
+    lcdPtr->createChar(1, ErrorIcon);
+    lcdPtr->createChar(2, CIcon);
+    lcdPtr->createChar(3, BIcon);
 
     // Configures hardware pins for the project.
     pinMode(TRIGGER_PIN, OUTPUT);
