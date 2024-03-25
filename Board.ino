@@ -2,23 +2,22 @@
 #include <LiquidCrystal_I2C.h>
 
 // Pin connected to the trigger output of the sensor
-#define TRIGGER_PIN 3
+const unsigned short int TRIGGER_PIN = 3;
 // Pin connected to the echo input of the sensor
-#define ECHO_PIN 2
-
+const unsigned short int ECHO_PIN = 2;
 // Timeout for distance readings (microseconds)
-#define DISTANCE_READ_TIMEOUT 30000
+const unsigned short int DISTANCE_READ_TIMEOUT = 30000;
 // Error LED blink count
-#define ERROR_BLINK_COUNT 10
+const unsigned short int ERROR_BLINK_COUNT = 10;
 // Error LED blink delay (milliseconds)
-#define ERROR_BLINK_DELAY_MS 100
+const unsigned short int ERROR_BLINK_DELAY_MS = 100;
 // Maximum distance the sensor can read (cm)
-#define MAX_SENSOR_DISTANCE 20
+const unsigned short int MAX_SENSOR_DISTANCE = 20;
 
 // Pins for the RGB LED module
-#define RED_PIN 10
-#define GREEN_PIN 9
-#define BLUE_PIN 8
+const unsigned short int RED_PIN = 10;
+const unsigned short int GREEN_PIN = 9;
+const unsigned short int BLUE_PIN = 8;
 
 // Optional LCD object - only initialize if it's connected
 LiquidCrystal_I2C *lcdPtr = 0;
@@ -45,14 +44,14 @@ void printCentered(const char* text, unsigned short int columnIndex = 0){
 //   duration - Travel time of the ultrasonic pulse (microseconds)
 void displayUsage(long duration){
     // Calculate distance in centimeters
-    float distance = duration * 0.034 / 2;
-    float usagePercentage = calculateUsagePercentage(distance);
+    unsigned short int distance = duration * 0.034 / 2;
+    unsigned short int usagePercentage = calculateUsagePercentage(distance);
 
     if(lcdPtr != 0){
         lcdPtr->clear();
         printCentered("Usage");
         char displayStringBuffer[30];
-        sprintf(displayStringBuffer, "%d%% - %d cm", (int)usagePercentage, (int)distance);
+        sprintf(displayStringBuffer, "%d%% - %d cm", usagePercentage, distance);
         printCentered(displayStringBuffer, 1);
     }
 
@@ -89,9 +88,9 @@ void displaySensorError(){
 //   distance - Distance measured in centimeters
 // Returns:
 //    The usage percentage (0-100)
-float calculateUsagePercentage(float distance){
+unsigned short int calculateUsagePercentage(unsigned short int distance){
     distance = min(distance, MAX_SENSOR_DISTANCE);
-    return (distance / MAX_SENSOR_DISTANCE) * 100.0f;
+    return ((float)distance / MAX_SENSOR_DISTANCE) * 100.0; 
 };
 
 // getDistance function
