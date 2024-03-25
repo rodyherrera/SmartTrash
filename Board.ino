@@ -25,14 +25,21 @@ const unsigned short int BLUE_PIN = 8;
 // Optional LCD object - only initialize if it's connected
 static LiquidCrystal_I2C *lcdPtr = 0;
 
-// Centers text on a specified line of the LCD display
-//
-// Parameters:
-//   text - The text string to display
-//   columnIndex - The row index (0-based) where the text should be placed (default = 0)
+/**
+ * Centers and prints text on a specified line of the LCD display.
+ *
+ * This function calculates the appropriate position to center a given text string on the LCD and prints it.
+ *
+ * @param text The text string to display.
+ * @param columnIndex The row index (0-based) where the text should be placed (default = 0).
+*/
 static void printCentered(const char* text, unsigned short int columnIndex = 0){
     unsigned short int textLength = strlen(text);
+    // The integer value "16" from which the length of the text is 
+    // subtracted, represents the number of characters that 
+    // the screen can hold per column.
     unsigned short int position = (16 - textLength) / 2;
+
     // Check if text will fit on the LCD
     if(position >= 0 && lcdPtr != 0){
         lcdPtr->setCursor(position, columnIndex);
@@ -40,11 +47,17 @@ static void printCentered(const char* text, unsigned short int columnIndex = 0){
     }
 };
 
-// displayUsage function
-// Displays the calculated usage percentage and distance on the LCD
-// 
-// Parameters:
-//   duration - Travel time of the ultrasonic pulse (microseconds)
+/**
+ * Calculates and displays the usage information based on the measured distance.
+ *
+ * This function performs the following actions:
+ * 1. Calculates the distance in centimeters based on echo duration and the speed of sound.
+ * 2. Calculates the usage percentage using the calculateUsagePercentage() function.
+ * 3. Updates the LCD display (if initialized) with the usage percentage and distance.
+ * 4. Controls error and status LEDs based on the calculated usage percentage.
+ *
+ * @param duration The round-trip travel time of the ultrasonic pulse in microseconds.
+*/
 static void displayUsage(unsigned long duration){
     // Calculate distance in centimeters
     unsigned short int distance = duration * SPEED_OF_SOUND_CM_PER_US;
@@ -67,8 +80,13 @@ static void displayUsage(unsigned long duration){
     digitalWrite(BLUE_PIN, LOW);
 };
 
-// displaySensorError function
-// Displays an error message on the LCD and blinks the error LED
+/**
+ * Displays a sensor error message and blinks the error LED. 
+ *
+ * This function does the following:
+ * 1. Checks if the LCD is initialized, and if so, displays a "Sensor Error"  message on the display.
+ * 2. Blinks the error LED (presumably a red LED) a specified number of times with a defined delay.
+*/
 static void displaySensorError(){
     if(lcdPtr != 0){
         lcdPtr->clear();
@@ -84,23 +102,28 @@ static void displaySensorError(){
     }
 };
 
-// calculateUsagePercentage function
-// Calculates the usage percentage based on distance
-//
-// Parameters:
-//   distance - Distance measured in centimeters
-// Returns:
-//    The usage percentage (0-100)
+/**
+ * Calculates the usage percentage based on distance.
+ * 
+ * This function takes a distance measurement and determines the percentage of the maximum sensor range that distance represents.
+ * 
+ * @param distance The distance measured in centimeters.
+ * @return The usage percentage (0-100). 
+*/
 static unsigned short int calculateUsagePercentage(unsigned short int distance){
     return min(distance, MAX_SENSOR_DISTANCE) * 100 / MAX_SENSOR_DISTANCE;  
 };
 
-// getDistance function
-// Measures distance using the ultrasonic sensor
-//
-// Returns: 
-//   Distance in microseconds if successful
-//   -1 if the sensor times out or an error occurs 
+/**
+ * Measures the distance using an ultrasonic sensor. 
+ * 
+ * This function performs the following steps:
+ * 1. Triggers the ultrasonic sensor by sending a brief high pulse on the TRIGGER_PIN.
+ * 2. Measures the round-trip time of the echo pulse on the ECHO_PIN.
+ * 3. Calculates the distance based on the measured echo time and the speed of sound.
+ *
+ * @return The distance in microseconds, or -1 if an error or timeout occurs. 
+*/
 static unsigned long getDistance(){
     // Send a brief high pulse to trigger the sensor
     digitalWrite(TRIGGER_PIN, HIGH);
@@ -137,14 +160,24 @@ void initializeSystem(){
     pinMode(GREEN_PIN, OUTPUT);
 };
 
-// setup function
-// Initializes the system and peripherals 
+/**
+ * The setup function runs once at the start of the program.
+ * 
+ * This function initializes the system by calling the initializeSystem() function, 
+ * which configures the necessary hardware and peripherals.
+*/
 void setup(){
     initializeSystem();
 };
 
-// loop function
-// Main program loop - reads distance and updates display
+/**
+ * The main program loop, executed repeatedly after setup().
+ * 
+ * This function performs the following actions:
+ * 1. Reads the distance from the ultrasonic sensor using the getDistance() function.
+ * 2. Handles potential sensor errors by calling displaySensorError() if the distance reading is invalid.
+ * 3. Updates the display with the measured distance and usage information using the displayUsage() function.
+*/
 void loop(){
     // Get distance reading from the sensor
     unsigned long duration = getDistance();
