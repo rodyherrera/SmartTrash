@@ -2,9 +2,9 @@
 #include <LiquidCrystal_I2C.h>
 
 // Pin connected to the trigger output of the sensor
-#define TRIGGER_PIN 12
+#define TRIGGER_PIN 3
 // Pin connected to the echo input of the sensor
-#define ECHO_PIN 11
+#define ECHO_PIN 2
 
 // Timeout for distance readings (microseconds)
 #define DISTANCE_READ_TIMEOUT 30000
@@ -15,9 +15,10 @@
 // Maximum distance the sensor can read (cm)
 #define MAX_SENSOR_DISTANCE 20
 
-#define RED_PIN 3
-#define GREEN_PIN 2
-#define BLUE_PIN 4
+// Pins for the RGB LED module
+#define RED_PIN 10
+#define GREEN_PIN 9
+#define BLUE_PIN 8
 
 // Optional LCD object - only initialize if it's connected
 LiquidCrystal_I2C *lcdPtr = 0;
@@ -31,7 +32,7 @@ void printCentered(const char* text, unsigned short int columnIndex = 0){
     unsigned short int textLength = strlen(text);
     unsigned short int position = (16 - textLength) / 2;
     // Check if text will fit on the LCD
-    if(position >= 0){
+    if(position >= 0 && lcdPtr != 0){
         lcdPtr->setCursor(position, columnIndex);
         lcdPtr->print(text);
     }
@@ -45,13 +46,15 @@ void printCentered(const char* text, unsigned short int columnIndex = 0){
 void displayUsage(long duration){
     // Calculate distance in centimeters
     float distance = duration * 0.034 / 2;
-    lcdPtr->clear();
-    printCentered("Usage");
-
     float usagePercentage = calculateUsagePercentage(distance);
-    char displayStringBuffer[30];
-    sprintf(displayStringBuffer, "%d%% - %d cm", (int)usagePercentage, (int)distance);
-    printCentered(displayStringBuffer, 1);
+
+    if(lcdPtr != 0){
+        lcdPtr->clear();
+        printCentered("Usage");
+        char displayStringBuffer[30];
+        sprintf(displayStringBuffer, "%d%% - %d cm", (int)usagePercentage, (int)distance);
+        printCentered(displayStringBuffer, 1);
+    }
 
     const bool isPercentageCorrect = usagePercentage < 100.0f;
     // Light error LED if issue
@@ -65,9 +68,11 @@ void displayUsage(long duration){
 // displaySensorError function
 // Displays an error message on the LCD and blinks the error LED
 void displaySensorError(){
-    lcdPtr->clear();
-    printCentered("Sensor Error,");
-    printCentered("Nothing to do.", 1);
+    if(lcdPtr != 0){
+        lcdPtr->clear();
+        printCentered("Sensor Error,");
+        printCentered("Nothing to do.", 1);
+    }
     
     for(int i = 0; i < ERROR_BLINK_COUNT; i++){
         digitalWrite(RED_PIN, HIGH);
@@ -109,22 +114,36 @@ long getDistance(){
     return (duration <= 0) ? (-1) : (duration);
 };
 
-// setup function
-// Initializes the system and peripherals 
-void setup(){
+// Initializes the LCD display (optional).
+//
+// This function attempts to initialize the LiquidCrystal_I2C object. 
+// The program can function with or without the LCD connected, it 
+// can potentially be used for debugging.
+void initializeLCD(){
     // Attempt to initialize the LCD
+    // Note: Uses dynamic allocation
     lcdPtr = new LiquidCrystal_I2C(0x027, 16, 2);
     lcdPtr->init();
     lcdPtr->backlight();
+};
 
-    // Initialize serial communication (for debugging) 
-    // Serial.begin(9600);
-
+// Configures hardware pins for the project.
+//
+// This function sets the mode (INPUT or OUTPUT) of the pins 
+// used to control the ultrasonic sensor and RGB LED.
+void initializePins(){
     pinMode(TRIGGER_PIN, OUTPUT);
     pinMode(ECHO_PIN, INPUT);
     pinMode(RED_PIN, OUTPUT);
     pinMode(BLUE_PIN, OUTPUT);
     pinMode(GREEN_PIN, OUTPUT);
+};
+
+// setup function
+// Initializes the system and peripherals 
+void setup(){
+    initializeLCD();
+    initializePins();
 };
 
 // loop function
@@ -136,8 +155,8 @@ void loop(){
     if(duration == -1){
         // Display an error message if the sensor failed
         displaySensorError();
-    }else{
-        // Only call displayUsage if the LCD is available
-        if(lcdPtr) displayUsage(duration);
+        return;
     }
+    
+    displayUsage(duration);
 };
