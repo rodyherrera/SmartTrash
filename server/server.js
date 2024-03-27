@@ -4,6 +4,7 @@ const port = 5430;
 
 // Basic route for testing
 app.post('/', (req, res) => {
+    console.log('x');
     res.status(200).json({ status: 'ok' });
 });
 
