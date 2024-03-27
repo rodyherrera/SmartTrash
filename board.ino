@@ -1,15 +1,24 @@
 #include <ESP8266WiFi.h>
+#include <ESP8266WebServer.h>
 #include <ESP8266HTTPClient.h>
 #include <ArduinoJson.h>
 
-const char* WIFI_SSID = "rodyherrera";
-const char* WIFI_PASSWORD = "12345678";
+const char* ESP8266_AP_SSID = "CleverBin-AP";
+const char* ESP8266_AP_PASSWORD = "toortoor";
+const unsigned short int WEB_SERVER_PORT = 80;
+
+IPAddress localIp(192, 168, 1, 1);
+IPAddress gateway(192, 168, 1, 1);
+IPAddress subnet(255, 255, 255, 0);
+
+ESP8266WebServer httpServer(WEB_SERVER_PORT);
+
 const char* SERVER_ENDPOINT = "http://172.20.10.3:5430";
 
 // Pin connected to the trigger output of the sensor
-const unsigned short int TRIGGER_PIN = D7;
+const unsigned short int TRIGGER_PIN = D6;
 // Pin connected to the echo input of the sensor
-const unsigned short int ECHO_PIN = D6;
+const unsigned short int ECHO_PIN = D7;
 // Timeout for distance readings (microseconds)
 const unsigned short int DISTANCE_READ_TIMEOUT = 30000;
 
@@ -45,7 +54,7 @@ void sendData(unsigned short int distance){
         Serial.println("WiFi not connected.");
         return;
     }
-    WifiClient client;
+    WiFiClient client;
     HTTPClient http;
     DynamicJsonDocument body(100);
     body["measuredDistance"] = distance;
@@ -55,7 +64,7 @@ void sendData(unsigned short int distance){
         Serial.println("Error connecting to the server.");
         return;
     }
-    http.addHeader("Content-Type". "application/json");
+    http.addHeader("Content-Type", "application/json");
     unsigned short int httpResponseCode = http.POST(jsonPayload);
     if(httpResponseCode == HTTP_CODE_OK){
         Serial.println("Data sent successfully.");
@@ -63,6 +72,10 @@ void sendData(unsigned short int distance){
         Serial.print("Error sending data. HTTP code: ");
         Serial.println(httpResponseCode);
     }
+};
+
+void homeController(){
+    httpServer.send(200, "text/plain", "Hello world");
 };
 
 void setup(){
@@ -75,19 +88,16 @@ void setup(){
     pinMode(BLUE_PIN, OUTPUT);
     pinMode(GREEN_PIN, OUTPUT);
 
-    WiFi.mode(WIFI_STA);
-    WiFi.begin(WIFI_SSID, WIFI_PASSWORD);
-    while(WiFi.status() != WL_CONNECTED){
-        delay(500);
-        Serial.print('.');
-    }
-    Serial.println("");
-    Serial.println("Connected to WiFi!");
-    Serial.print("IP Address: ");
-    Serial.println(WiFi.localIP());
+    WiFi.softAP(ESP8266_AP_SSID, ESP8266_AP_PASSWORD);
+    WiFi.softAPConfig(localIp, gateway, subnet);
+
+    httpServer.on("/", homeController);
+    httpServer.begin();
+    Serial.println("HTTP Server Started.");
 };
 
 void loop(){
+    httpServer.handleClient();
     digitalWrite(GREEN_PIN, HIGH);
     unsigned long currentTime = millis();
     if(currentTime - lastTime > MEASUREMENT_DELAY_MS){
