@@ -1,3 +1,7 @@
 server/node_modules/
 server/package-lock.json
+
 .vscode/
+
+board/admin-portal/node_modules/
+board/admin-portal/package-lock.json
