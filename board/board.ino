@@ -1,7 +1,7 @@
 #include <ESP8266WiFi.h>
 #include <ESP8266WebServer.h>
 #include <ESP8266HTTPClient.h>
-#include <FS.h>
+#include <LittleFS.h>
 #include <ArduinoJson.h>
 
 const char* ESP8266_AP_SSID = "CleverBin-AP";
@@ -83,7 +83,7 @@ void sendData(unsigned short int distance){
 };
 
 void saveWiFiCredentials(const WiFiCredentials& credentials){
-    File file = SPIFFS.open(CREDENTIALS_FILE, "w");
+    File file = LittleFS.open(CREDENTIALS_FILE, "w"); 
     if(!file){
         Serial.println("Failed to open file for writing");
         return;
@@ -100,7 +100,7 @@ void saveWiFiCredentials(const WiFiCredentials& credentials){
 
 WiFiCredentials loadWiFiCredentials(){
     WiFiCredentials credentials;
-    File file = SPIFFS.open(CREDENTIALS_FILE, "r");
+    File file = LittleFS.open(CREDENTIALS_FILE, "r"); 
     if(!file){
         Serial.println("Failed to open file for reading");
         return credentials;
@@ -119,63 +119,62 @@ WiFiCredentials loadWiFiCredentials(){
     return credentials;
 };
 
-String getNetworksHTML(){
-    String networksHTML = "<form id='networkForm' action='/save_credentials' method='post'><ul>";
+String getAvailableNetworks(){
     unsigned short int totalNetworks = WiFi.scanNetworks();
+    DynamicJsonDocument doc(256);
+    JsonArray networks = doc.createNestedArray("data");
+    String jsonResponse;
     if(totalNetworks == 0){
-        networksHTML = "<p>No networks found</p>";
+        doc["status"] = "error";
+        serializeJson(doc, jsonResponse);
+        return jsonResponse;
     }
     for(unsigned short int i = 0; i < totalNetworks; i++){
-        networksHTML += "<li><button type='button' onclick='selectNetwork(\"" + WiFi.SSID(i) + "\")'>" + WiFi.SSID(i) + "</button></li>";
+        JsonObject network = networks.createNestedObject();
+        network["ssid"] = WiFi.SSID(i);
+        network["rssi"] = WiFi.RSSI(i);
     }
-    networksHTML += "</ul>";
-    networksHTML += "<input type='password' id='passwordInput' name='password' style='display:none;'>";
-    networksHTML += "<input type='hidden' id='selectedSSID' name='ssid'>";
-    networksHTML += "<input type='submit' value='Connect'></form>";
-    networksHTML += "<script>function selectNetwork(ssid) { document.getElementById('passwordInput').style.display = 'block'; document.getElementById('selectedSSID').value = ssid; }</script>";
-    return networksHTML;
+    doc["status"] = "success";
+    serializeJson(doc, jsonResponse);
+    return jsonResponse;
 };
 
 void networkSaveController(){
-    if(httpServer.method() == HTTP_POST){
-        String ssid = httpServer.arg("ssid");
-        String password = httpServer.arg("password");
-        WiFiCredentials credentials;
-        credentials.ssid = ssid;
-        credentials.password = password;
-        saveWiFiCredentials(credentials);
-
-        Serial.println("Connecting to WiFi...");
-        WiFi.begin(ssid.c_str(), password.c_str());
-        unsigned short int attemps = 0;
-        Serial.println(ssid);
-        Serial.println(password);
-        while(WiFi.status() != WL_CONNECTED && attemps < 10){
-            delay(1000);
-            Serial.print(".");
-            attemps++;
-        }
-        if(WiFi.status() == WL_CONNECTED){
-            Serial.println("Connected to WiFi.");
-            httpServer.send(200, "text/plain", "Credentials saved and connected to WiFi.");
-        }else{
-            Serial.println("Failed to connect to WiFi.");
-            httpServer.send(200, "text/plain", "Credentials saved but failed to connect to WiFi.");
-        }
-    }else{
-        httpServer.send(405, "text/plain", "Method Not Allowed");
+    DynamicJsonDocument doc(128);
+    String ssid = httpServer.arg("ssid");
+    String password = httpServer.arg("password");
+    WiFiCredentials credentials;
+    credentials.ssid = ssid;
+    credentials.password = password;
+    saveWiFiCredentials(credentials);
+    Serial.println("Connecting to WiFi...");
+    WiFi.begin(ssid, password);
+    unsigned short int connectionAttemps = 0;
+    while(WiFi.status() != WL_CONNECTED && connectionAttemps < 10){
+        delay(1000);
+        connectionAttemps++;
     }
+    if(WiFi.status() == WL_CONNECTED){
+        doc["status"] = "success";
+        doc["data"]["message"] = "WIFI_SAVED_CREDENTIALS_AND_CONNECTED";
+    }else{
+        doc["status"] = "error";
+        doc["data"]["message"] = "WIFI_SAVED_CREDENTIALS_BUT_NOT_CONNECTED";
+    }
+    String jsonResponse;
+    serializeJson(doc, jsonResponse);
+    httpServer.send(200, "application/json", jsonResponse);
 };
 
 void homeController(){
-    httpServer.send(200, "text/html", getNetworksHTML());
+    httpServer.send(200, "application/json", getAvailableNetworks());
 };
 
 void setup(){
     Serial.begin(9600);
 
-    if(!SPIFFS.begin()){
-        Serial.println("Failed to initialize SPIFFS");
+    if(!LittleFS.begin()){ 
+        Serial.println("Failed to initialize LittleFS");
         return;
     }
 
@@ -189,9 +188,10 @@ void setup(){
     WiFi.softAP(ESP8266_AP_SSID, ESP8266_AP_PASSWORD);
     WiFi.softAPConfig(localIp, gateway, subnet);
 
-    httpServer.on("/", homeController);
-    httpServer.on("/save_credentials", HTTP_POST, networkSaveController);
     httpServer.begin();
+    httpServer.serveStatic("/admin-portal/", LittleFS, "/admin-portal/");
+    httpServer.on("/api/v1/network/", HTTP_GET, homeController);
+    httpServer.on("/api/v1/network/", HTTP_POST, networkSaveController);
     Serial.println("HTTP Server Started.");
 
     WiFiCredentials credentials = loadWiFiCredentials();
