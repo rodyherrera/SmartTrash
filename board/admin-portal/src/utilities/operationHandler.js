@@ -12,7 +12,7 @@
  * =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 ****/
 
-//import { globalErrorHandler } from '@services/core/operations';
+import { globalErrorHandler } from '@services/core/operations';
 
 /**
  * This class manages API operations, including loading states, error handling,

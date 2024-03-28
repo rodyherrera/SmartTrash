@@ -13,7 +13,8 @@
 ****/
 
 import { configureStore } from '@reduxjs/toolkit';
-import NetworkReducer from '@services/network/slice';
+import networkReducer from '@services/network/slice';
+import coreReducer from '@services/core/slice';
 
 /**
  * @function configureStore 
@@ -24,7 +25,8 @@ import NetworkReducer from '@services/network/slice';
 */
 const store = configureStore({
     reducer: {
-        network: NetworkReducer
+        network: networkReducer,
+        core: coreReducer
     }
 });
 
