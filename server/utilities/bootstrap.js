@@ -1,0 +1,23 @@
+const { capitalizeToLowerCaseWithDelimitier } = require('@utilities/algorithms');
+
+/**
+ * Configures the Express application with provided routes, middlewares, and settings.
+ *
+ * @param {Object} options - Configuration options
+ * @param {Object} options.app - The Express application instance.
+ * @param {Array} options.routes - Array of route names.
+ * @param {string} options.suffix - Base route suffix for the configured routes.
+ * @param {Array} options.middlewares - Array of middleware functions.
+ * @param {Object} options.settings - Settings for enabling/disabling app features.
+*/
+exports.configureApp = ({ app, routes, suffix, middlewares, settings }) => {
+    middlewares.forEach((middleware) => app.use(middleware));
+    routes.forEach((route) => {
+        const path = suffix + capitalizeToLowerCaseWithDelimitier(route);
+        const router = require(`../routes/${route}`);
+        app.use(path, router);
+    });
+    settings.deactivated.forEach((deactivated) => app.disabled(deactivated));
+};
+
+module.exports = exports;

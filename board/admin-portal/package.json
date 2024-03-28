@@ -1,7 +1,6 @@
 {
-  "name": "admin-portal",
-  "private": true,
-  "version": "0.0.0",
+  "name": "cleverbin-adminportal",
+  "version": "1.0.0",
   "type": "module",
   "scripts": {
     "dev": "vite",

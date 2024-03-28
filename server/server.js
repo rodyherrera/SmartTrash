@@ -1,14 +1,43 @@
-const express = require('express');
-const app = express();
-const port = 5430;
+require('./aliases');
 
-// Basic route for testing
-app.post('/', (req, res) => {
-    console.log('x');
-    res.status(200).json({ status: 'ok' });
+const { httpServer } = require('@config/express'); 
+const mongoConnector = require('@utilities/mongoConnector');
+
+// Server configuration
+const SERVER_PORT = process.env.SERVER_PORT || 8000;
+const SERVER_HOST = process.env.SERVER_HOSTNAME || '0.0.0.0';
+
+/**
+ * Handles uncaught exceptions, cleans the environment, and restarts the server. 
+ * @param {Error} err - The uncaught exception.
+*/
+process.on('uncaughtException', async (error) => {
+    console.error('[CleverBin Cloud Server]: Uncaught Exception:', error);
 });
 
-// Start the server
-app.listen(port, () => {
-    console.log(`Express server listening on port ${port}`);
+/**
+ * Handles unhandledRejection and print in console.
+ * @param {String} reason - The unhandled rejection.
+*/
+process.on('unhandledRejection', (reason) => {
+    console.error('[CleverBin Cloud Server]: Unhandled Promise Rejection, reason:', reason);
+});
+
+/**
+ * Handles SIGINT (Ctrl-C) for graceful shutdown.
+*/
+process.on('SIGINT', async () => {
+    console.log('[CleverBin Cloud Server]: SIGINT signal received, shutting down...');
+    process.exit(0);
+});
+
+// Starts the HTTP Server
+httpServer.listen(SERVER_PORT, SERVER_HOST, async () => {
+    try{
+        await mongoConnector();
+        console.log(`[CleverBin Cloud Server]: Server running at http://${SERVER_HOST}:${SERVER_PORT}/.`);
+    }catch(error){
+        console.error('[CleverBin Cloud Server]: Error during server initialization:', error);
+        process.exit(1);
+    }
 });
