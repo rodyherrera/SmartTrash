@@ -40,6 +40,7 @@ const unsigned short int BLUE_PIN = D3;
 const float SPEED_OF_SOUND_CM_PER_US = 0.034 / 2;
 
 const unsigned int MEASUREMENT_DELAY_MS = 3000;  
+const unsigned int MAX_WIFI_CONNECTION_ATTEMPS = 10;
 
 unsigned long lastTime = 0;
 
@@ -64,16 +65,14 @@ void sendData(unsigned short int distance){
     }
     WiFiClient client;
     HTTPClient http;
-    DynamicJsonDocument body(100);
+    DynamicJsonDocument body(64);
     body["measuredDistance"] = distance;
-    String jsonPayload;
-    serializeJson(body, jsonPayload);
     if(!http.begin(client, SERVER_ENDPOINT)){
         Serial.println("Error connecting to the server.");
         return;
     }
     http.addHeader("Content-Type", "application/json");
-    unsigned short int httpResponseCode = http.POST(jsonPayload);
+    unsigned short int httpResponseCode = http.POST(body.as<String>());
     if(httpResponseCode == HTTP_CODE_OK){
         Serial.println("Data sent successfully.");
     }else{
@@ -82,11 +81,11 @@ void sendData(unsigned short int distance){
     }
 };
 
-void saveWiFiCredentials(const WiFiCredentials& credentials){
+const bool saveWiFiCredentials(const WiFiCredentials& credentials){
     File file = LittleFS.open(CREDENTIALS_FILE, "w"); 
     if(!file){
         Serial.println("Failed to open file for writing");
-        return;
+        return false;
     }
 
     DynamicJsonDocument doc(128);
@@ -94,8 +93,10 @@ void saveWiFiCredentials(const WiFiCredentials& credentials){
     doc["password"] = credentials.password;
     if(serializeJson(doc, file) == 0){
         Serial.println("Failed to write to file");
+        return false;
     }
     file.close();
+    return true;
 };
 
 WiFiCredentials loadWiFiCredentials(){
@@ -107,84 +108,107 @@ WiFiCredentials loadWiFiCredentials(){
     }
 
     DynamicJsonDocument doc(128);
-    DeserializationError error = deserializeJson(doc, file);
-    if(error){
-        Serial.println("Failed to parse file");
-    }else{
-        credentials.ssid = doc["ssid"].as<String>();
-        credentials.password = doc["password"].as<String>();
-    }
+    credentials.ssid = doc["ssid"].as<String>();
+    credentials.password = doc["password"].as<String>();
 
     file.close();
     return credentials;
 };
 
-String getAvailableNetworks(){
-    unsigned short int totalNetworks = WiFi.scanNetworks();
-    DynamicJsonDocument doc(256);
-    JsonArray networks = doc.createNestedArray("data");
-    String jsonResponse;
-    if(totalNetworks == 0){
-        doc["status"] = "error";
-        serializeJson(doc, jsonResponse);
-        return jsonResponse;
+const bool tryWiFiConnection(){
+    WiFiCredentials credentials = loadWiFiCredentials();
+    if(credentials.ssid == "") return false;
+    Serial.println(credentials.ssid);
+    // Try to connect to the stored WiFi 
+    Serial.println("Connecting to the WiFi...");
+    WiFi.begin(credentials.ssid.c_str(), credentials.password.c_str());
+    unsigned short int connectionAttempts = 0;
+    while(WiFi.status() != WL_CONNECTED && connectionAttempts < MAX_WIFI_CONNECTION_ATTEMPS){
+        delay(1000);
+        Serial.print(".");
+        connectionAttempts++;
     }
-    for(unsigned short int i = 0; i < totalNetworks; i++){
-        JsonObject network = networks.createNestedObject();
-        network["ssid"] = WiFi.SSID(i);
-        network["rssi"] = WiFi.RSSI(i);
+    if(WiFi.status() == WL_CONNECTED){
+        Serial.println("Connected to WiFi.");
+    }else{
+        Serial.println("Failed to connect to WiFi. Deleting credentials.");
+        credentials.ssid = "";
+        credentials.password = "";
+        saveWiFiCredentials(credentials);
     }
-    doc["status"] = "success";
-    serializeJson(doc, jsonResponse);
-    return jsonResponse;
+    return WiFi.status() == WL_CONNECTED;
 };
 
 void networkSaveController(){
     DynamicJsonDocument doc(128);
     String ssid = httpServer.arg("ssid");
     String password = httpServer.arg("password");
+    
+    if(ssid.isEmpty() || password.isEmpty()){
+        doc["status"] = "error";
+        doc["data"]["message"] = "Wifi::RequiredPasswordOrSSID";
+        httpServer.send(400, "application/json", doc.as<String>());
+        return;
+    }
+
     WiFiCredentials credentials;
     credentials.ssid = ssid;
     credentials.password = password;
-    saveWiFiCredentials(credentials);
-    Serial.println("Connecting to WiFi...");
-    WiFi.begin(ssid, password);
-    unsigned short int connectionAttemps = 0;
-    while(WiFi.status() != WL_CONNECTED && connectionAttemps < 10){
-        delay(1000);
-        connectionAttemps++;
-    }
-    if(WiFi.status() == WL_CONNECTED){
-        doc["status"] = "success";
-        doc["data"]["message"] = "WIFI_SAVED_CREDENTIALS_AND_CONNECTED";
-    }else{
+
+    const bool credentialsSaved = saveWiFiCredentials(credentials);
+    if(!credentialsSaved){
         doc["status"] = "error";
-        doc["data"]["message"] = "WIFI_SAVED_CREDENTIALS_BUT_NOT_CONNECTED";
+        doc["data"]["message"] = "Wifi::ErrorSavingCredentials";
+        httpServer.send(500, "application/json", doc.as<String>());
+        return;
     }
-    String jsonResponse;
-    serializeJson(doc, jsonResponse);
-    httpServer.send(200, "application/json", jsonResponse);
+
+    const bool isConnected = tryWiFiConnection();
+    if(!isConnected){
+        doc["status"] = "error";
+        doc["data"]["message"] = "Wifi::SavedCredentialsButNotConnected";
+        return;
+    }
+
+    doc["status"] = "success";
+    httpServer.send(200, "application/json", doc.as<String>());
 };
 
 void homeController(){
-    httpServer.send(200, "application/json", getAvailableNetworks());
+    unsigned short int totalNetworks = WiFi.scanNetworks();
+    DynamicJsonDocument doc(128);
+    doc["status"] = "success";
+    JsonObject data = doc.createNestedObject("data");
+    JsonArray networks = data.createNestedArray("networks");
+    if(totalNetworks == 0){
+        doc["status"] = "error";
+        doc["data"]["message"] = "Wifi::NoNetworksFound";
+    }
+    // This is not encapsulated within an else because, if 
+    // the number of networks found is "0", the loop will 
+    // simply not be executed.
+    for(unsigned short int i = 0; i < totalNetworks; i++){
+        JsonObject network = networks.createNestedObject();
+        network["ssid"] = WiFi.SSID(i);
+        network["rssi"] = WiFi.RSSI(i);
+    }
+    httpServer.send(200, "application/json", doc.as<String>());
 };
 
-void setup(){
-    Serial.begin(9600);
-
+void configureHardware(){
     if(!LittleFS.begin()){ 
         Serial.println("Failed to initialize LittleFS");
         return;
     }
 
-    // Configures hardware pins for the project.
     pinMode(TRIGGER_PIN, OUTPUT);
     pinMode(ECHO_PIN, INPUT);
     pinMode(RED_PIN, OUTPUT);
     pinMode(BLUE_PIN, OUTPUT);
     pinMode(GREEN_PIN, OUTPUT);
+};
 
+void setupWiFiServices(){
     WiFi.softAP(ESP8266_AP_SSID, ESP8266_AP_PASSWORD);
     WiFi.softAPConfig(localIp, gateway, subnet);
 
@@ -193,38 +217,23 @@ void setup(){
     httpServer.on("/api/v1/network/", HTTP_GET, homeController);
     httpServer.on("/api/v1/network/", HTTP_POST, networkSaveController);
     Serial.println("HTTP Server Started.");
+};
 
-    WiFiCredentials credentials = loadWiFiCredentials();
-    Serial.println(credentials.ssid);
-    if(credentials.ssid != ""){
-        // Try to connect to the stored WiFi
-        Serial.println("Connecting to the WiFi...");
-        WiFi.begin(credentials.ssid.c_str(), credentials.password.c_str());
-        unsigned short int attempts = 0;
-        while(WiFi.status() != WL_CONNECTED && attempts < 10){
-            delay(1000);
-            Serial.print(".");
-            attempts++;
-        }
-        if(WiFi.status() == WL_CONNECTED){
-            Serial.println("Connected to WiFi.");
-        }else{
-            Serial.println("Failed to connect to WiFi. Deleting credentials.");
-            credentials.ssid = "";
-            credentials.password = "";
-            saveWiFiCredentials(credentials);
-        }
-    }
+void setup(){
+    Serial.begin(9600);
+    configureHardware();
+    setupWiFiServices();
+    tryWiFiConnection();
 };
 
 void loop(){
     httpServer.handleClient();
-    digitalWrite(GREEN_PIN, HIGH);
+    digitalWrite(BLUE_PIN, HIGH);
     unsigned long currentTime = millis();
     if(currentTime - lastTime > MEASUREMENT_DELAY_MS){
         unsigned short int distance = getDistance();
         sendData(distance);
         lastTime = currentTime;
     }
-    digitalWrite(GREEN_PIN, LOW);
+    digitalWrite(BLUE_PIN, LOW);
 };
