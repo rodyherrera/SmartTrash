@@ -213,6 +213,7 @@ void setupWiFiServices(){
     WiFi.softAPConfig(localIp, gateway, subnet);
 
     httpServer.begin();
+    httpServer.enableCORS(true);
     httpServer.serveStatic("/admin-portal/", LittleFS, "/admin-portal/");
     httpServer.on("/api/v1/network/", HTTP_GET, homeController);
     httpServer.on("/api/v1/network/", HTTP_POST, networkSaveController);
