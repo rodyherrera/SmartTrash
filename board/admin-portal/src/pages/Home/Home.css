@@ -1,0 +1,20 @@
+#Home-Header-Title{
+    font-size: 1.6rem;
+    font-weight: 350;
+}
+
+#Home-Navigation-Container{
+    display: flex;
+    gap: 1rem;
+}
+
+@media screen and (max-width: 768px){
+    #Home-Main{
+        max-width: unset;
+        padding: 1rem;
+    }
+
+    #Home-Navigation-Container{
+        flex-direction: column;
+    }
+}

@@ -47,9 +47,8 @@ class APIRequestBuilder{
      * @param {object} queryParams - An object containing query parameters (e.g., ?fields=name).
      * @returns {string} - The constructed URL.
     */
-    buildUrl(path, params = {}, queryParams = {}, isESP8266Endpoint = false){
-        const endpoint = (isESP8266Endpoint) ? (import.meta.env.VITE_ESP8266_SERVER) : (import.meta.env.VITE_SERVER);
-        const url = new URL(`${endpoint}${import.meta.env.VITE_API_SUFFIX}${this.baseEndpoint}${path}`);
+    buildUrl(path, params = {}, queryParams = {}){
+        const url = new URL(`${import.meta.env.VITE_SERVER}${import.meta.env.VITE_API_SUFFIX}${this.baseEndpoint}${path}`);
         // Path parameters (more robust than string manipulation)
         url.pathname.split('/').forEach((part) => {
             if(part.startsWith(':')){
@@ -75,9 +74,9 @@ class APIRequestBuilder{
      * @param {string} [config.method='GET'] - The HTTP method (GET, POST, PUT, etc.).
      * @returns {function} -  A function to further customize and execute the request.
     */ 
-    register({ path, method = 'GET', isESP8266Endpoint = false }){
+    register({ path, method = 'GET' }){
         return ({ query = {}, body = {}}) => {
-            const url = this.buildUrl(path, query?.params, query?.queryParams, isESP8266Endpoint);
+            const url = this.buildUrl(path, query?.params, query?.queryParams);
             const args = [url, body];
             this.setAuthorizationHeader();
             return new ServerRequestBuilder()

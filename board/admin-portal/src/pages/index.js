@@ -1,7 +1,9 @@
-import everybody from './everybody';
+import Home from './Home';
+import WiFiConnection from './WiFiConnection';
 
 const pages = {
-    everybody
+    Home,
+    WiFiConnection
 };
 
 export default pages;

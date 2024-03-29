@@ -1,0 +1,41 @@
+.Card-Container{
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    border: 1px solid #dfdfdf;
+    border-radius: .5rem;
+    padding: 1rem;
+    cursor: pointer;
+    height: 130px;
+    width: 280px;
+}
+
+.Card-Container:hover{
+    border-color: #0f62fe;
+}
+
+.Card-Container:hover .Card-Footer-Arrow-Container{
+    color: #0f62fe;
+}
+
+.Card-Footer-Container{
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+}
+
+.Card-Footer-Title{
+    font-size: .95rem;
+    font-weight: 350;
+}
+
+.Card-Header-Icon-Container{
+    font-size: 1.5rem;
+}
+
+@media screen and (max-width: 768px){
+    .Card-Container{
+        width: 100%;
+    }
+}

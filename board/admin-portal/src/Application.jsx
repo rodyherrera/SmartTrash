@@ -13,7 +13,8 @@ const Application = () => {
     return (
         <Routes location={location} key={location.pathname}>
             <Route element={<Layout />}>
-                <Route index element={<pages.everybody.Home />} />
+                <Route index element={<pages.Home />} />
+                <Route path='/wifi-connection/' element={<pages.WiFiConnection />} />
             </Route>
         </Routes>
     );
