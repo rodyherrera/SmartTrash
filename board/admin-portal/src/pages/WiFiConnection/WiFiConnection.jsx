@@ -19,7 +19,7 @@ const WiFiConnection = () => {
             <Breadcrumbs
                 items={[
                     { title: 'Home', to: '/' },
-                    { title: 'Connect to the Internet', to: '/wifi-connection/' }
+                    { title: 'Connect to the Internet', to: '/wifi/networks/' }
                 ]}
             />
             <section id='WiFi-Connection-Header'>

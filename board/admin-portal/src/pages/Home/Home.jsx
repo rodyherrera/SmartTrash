@@ -12,7 +12,7 @@ const HomePage = () => {
             <section id='Home-Body-Container'>
                 <article id='Home-Navigation-Container'>
                     {[
-                        ['Connect to the Internet', '/wifi-connection/', CiWifiOn],
+                        ['Connect to the Internet', '/wifi/networks/', CiWifiOn],
                         ['Link device to Cloud Service', '', CiCloudOn]
                     ].map(([ title, to, Icon ], index) => (
                         <Card title={title} Icon={Icon} to={to} key={index} />

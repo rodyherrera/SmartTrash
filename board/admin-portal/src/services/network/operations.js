@@ -10,3 +10,16 @@ export const getAvailableNetworks = () => async (dispatch) => {
         responseState: networkSlice.setNetworks
     });
 };
+
+export const saveNetworkConnection = (body, navigate) => async (dispatch) => {
+    const operation = new OperationHandler(networkSlice, dispatch);
+    operation.on('response', (data) => {
+        console.log(data);
+        navigate('/');
+    });
+    operation.use({
+        api: networkService.saveNetworkConnection,
+        loaderState: networkSlice.setIsLoading,
+        query: { body }
+    });
+};

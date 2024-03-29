@@ -139,12 +139,36 @@ const bool tryWiFiConnection(){
     return WiFi.status() == WL_CONNECTED;
 };
 
+void networkController(){
+    httpServer.sendHeader("Access-Control-Allow-Origin", "*");
+    httpServer.sendHeader("Access-Control-Allow-Methods", "GET, POST, PATCH, PUT, DELETE, OPTIONS");
+    httpServer.sendHeader("Access-Control-Allow-Headers", "Content-Type, Authorization");
+    httpServer.sendHeader("Access-Control-Max-Age", "600");
+
+    if(httpServer.method() == HTTP_OPTIONS){
+        httpServer.send(200);
+    }else if(httpServer.method() == HTTP_POST){
+        networkSaveController();
+    }else if(httpServer.method() == HTTP_GET){
+        homeController();
+    }
+};
+
 void networkSaveController(){
     DynamicJsonDocument doc(128);
-    String ssid = httpServer.arg("ssid");
-    String password = httpServer.arg("password");
-    
-    if(ssid.isEmpty() || password.isEmpty()){
+    String plainBody = httpServer.arg("plain");
+    DynamicJsonDocument body(128);
+    DeserializationError error = deserializeJson(body, plainBody);
+    if(error){
+        Serial.print("deserializeJson() failed: ");
+        Serial.println(error.c_str());
+        httpServer.send(400, "text/plain", "Bad Request");
+        return;
+    }
+    const char* ssid = doc["ssid"];
+    const char* password = doc["password"];
+
+    if(ssid == "" || password == ""){
         doc["status"] = "error";
         doc["data"]["message"] = "Wifi::RequiredPasswordOrSSID";
         httpServer.send(400, "application/json", doc.as<String>());
@@ -178,6 +202,7 @@ void homeController(){
     unsigned short int totalNetworks = WiFi.scanNetworks();
     DynamicJsonDocument doc(128);
     doc["status"] = "success";
+
     JsonArray networks = doc.createNestedArray("data");
     if(totalNetworks == 0){
         doc["status"] = "error";
@@ -211,10 +236,8 @@ void setupWiFiServices(){
     WiFi.softAPConfig(localIp, gateway, subnet);
 
     httpServer.begin();
-    httpServer.enableCORS(true);
     httpServer.serveStatic("/admin-portal/", LittleFS, "/admin-portal/");
-    httpServer.on("/api/v1/network/", HTTP_GET, homeController);
-    httpServer.on("/api/v1/network/", HTTP_POST, networkSaveController);
+    httpServer.on("/api/v1/network/", networkController);
     Serial.println("HTTP Server Started.");
 };
 

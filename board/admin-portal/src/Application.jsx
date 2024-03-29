@@ -14,7 +14,8 @@ const Application = () => {
         <Routes location={location} key={location.pathname}>
             <Route element={<Layout />}>
                 <Route index element={<pages.Home />} />
-                <Route path='/wifi-connection/' element={<pages.WiFiConnection />} />
+                <Route path='/wifi/networks/' element={<pages.WiFiConnection />} />
+                <Route path='/wifi/setup-network/' element={<pages.SetupWiFiConnection />} />
             </Route>
         </Routes>
     );

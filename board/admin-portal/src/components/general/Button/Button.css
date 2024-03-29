@@ -1,0 +1,21 @@
+.Button{
+    padding: .5rem 1rem;
+    background-color: #0f62fe;
+    color: #FFFFFF;
+    width: 200px;
+    height: 40px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    cursor: pointer;
+}
+
+.Button .MuiCircularProgress-root{
+    color: #FFFFFF !important;
+    width: 1.2rem !important;
+    height: 1.2rem !important;
+}
+
+.Button:hover{
+    opacity: .7;
+}

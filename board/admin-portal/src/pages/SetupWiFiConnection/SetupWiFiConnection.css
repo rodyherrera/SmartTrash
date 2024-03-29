@@ -1,0 +1,11 @@
+#Setup-WiFi-Connection-Title{
+    font-size: 1.6rem;
+    font-weight: 300;
+}
+
+#Setup-WiFi-Connection-Body{
+    width: 500px;
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
