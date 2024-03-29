@@ -2,3 +2,14 @@
     font-size: 1.6rem;
     font-weight: 300;
 }
+
+#WiFi-Connection-Available-List{
+    border-radius: .5rem;
+    padding: 1rem;
+    display: flex;
+    flex-direction: column;
+    gap: .5rem;
+    height: auto;
+    width: 550px;
+    overflow-y: scroll;
+}

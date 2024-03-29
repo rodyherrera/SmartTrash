@@ -178,8 +178,7 @@ void homeController(){
     unsigned short int totalNetworks = WiFi.scanNetworks();
     DynamicJsonDocument doc(128);
     doc["status"] = "success";
-    JsonObject data = doc.createNestedObject("data");
-    JsonArray networks = data.createNestedArray("networks");
+    JsonArray networks = doc.createNestedArray("data");
     if(totalNetworks == 0){
         doc["status"] = "error";
         doc["data"]["message"] = "Wifi::NoNetworksFound";
@@ -190,7 +189,6 @@ void homeController(){
     for(unsigned short int i = 0; i < totalNetworks; i++){
         JsonObject network = networks.createNestedObject();
         network["ssid"] = WiFi.SSID(i);
-        network["rssi"] = WiFi.RSSI(i);
     }
     httpServer.send(200, "application/json", doc.as<String>());
 };

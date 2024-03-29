@@ -1,0 +1,18 @@
+.WiFi-SSID-Container{
+    display: flex;
+    cursor: pointer;
+    width: 500px;
+    cursor: pointer;
+    padding: .5rem 1rem;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.WiFi-SSID-Container:hover{
+    background-color: #0f62fe;
+    color: #FFFFFF;
+}
+
+.WiFi-SSID{
+    font-weight: 300;
+}
