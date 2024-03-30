@@ -35,15 +35,28 @@ class ServerRequestBuilder{
      * @param {array} [config.args=[]] - Arguments to be passed to the callback function.
      * @returns {Promise<any>} - Resolves with the response data or rejects with a `ServerRequestError`.
     */
-    async register({ callback, args = [] }){
+    async register({ callback, args = [] }, attempts = 0){
         try{
-            const response = await callback(...args);
-            // Asumming SmartTrash Backend API consitency
+            let response = await callback(...args);
+            // Check for 'pending' status before returning
+            if (response.data.status === 'pending'){
+                // I seriously have to put this shit 
+                // up because the ESP8266 is incapable 
+                // of doing this right...
+                if(attempts < 5){
+                    await new Promise(resolve => setTimeout(resolve, 500));
+                    return this.register({ callback, args }, attempts + 1);
+                }else{
+                    throw new Error('Core::MaxRetryAttempts');
+                }
+            }
+            // Assuming SmartTrash Backend API consistency
             return response.data || response;
-        }catch(error){
+        }catch (error){
             throw this.handleRejection(error);
         }
     };
+    
 };
 
 export default ServerRequestBuilder;

@@ -11,12 +11,12 @@
 ****/
 
 #include <ESP8266WiFi.h>
-#include <ESP8266WebServer.h>
+#include <ESPAsyncWebServer.h>
 #include <ESP8266HTTPClient.h>
 #include <LittleFS.h>
 #include <ArduinoJson.h>
 
-const char* DEFAULT_ESP8266_AP_SSID = "SmartTrash AP";
+const char* DEFAULT_ESP8266_AP_SSID = "SmartTrash-AP";
 const char* DEFAULT_ESP8266_AP_PASSWORD = "toortoor";
 
 const unsigned short int WEB_SERVER_PORT = 80;
@@ -28,7 +28,7 @@ IPAddress localIp(192, 168, 1, 1);
 IPAddress gateway(192, 168, 1, 1);
 IPAddress subnet(255, 255, 255, 0);
 
-ESP8266WebServer httpServer(WEB_SERVER_PORT);
+AsyncWebServer httpServer(WEB_SERVER_PORT);
 
 const char* SERVER_ENDPOINT = "http://172.20.10.3:5430";
 
@@ -190,9 +190,23 @@ const bool tryWiFiConnection(){
     return WiFi.status() == WL_CONNECTED;
 };
 
-void networkSaveController(){
+void isConnectedToWiFi(AsyncWebServerRequest *request){
     DynamicJsonDocument doc(128);
-    String plainBody = httpServer.arg("plain");
+    doc["status"] = "success";
+    if(WiFi.status() != WL_CONNECTED){
+        doc["status"] = "error";
+        doc["data"]["message"] = "WiFi::NotConnected";
+        request->send(200, "application/json", doc.as<String>());
+        return;
+    }
+    DynamicJsonDocument currentWiFiCredentials = loadWiFiCredentials();
+    doc["data"]["ssid"] = currentWiFiCredentials["ssid"];
+    request->send(200, "application/json", doc.as<String>());
+};
+
+void networkSaveController(AsyncWebServerRequest *request){
+    DynamicJsonDocument doc(128);
+    String plainBody = request->getParam("plain", true)->value(); 
 
     DynamicJsonDocument body(128);
     DeserializationError error = deserializeJson(body, plainBody);
@@ -200,7 +214,7 @@ void networkSaveController(){
     if(error){
         Serial.print("deserializeJson() failed: ");
         Serial.println(error.c_str());
-        httpServer.send(400, "text/plain", "Bad Request");
+        request->send(400, "application/json", "Bad Request");
         return;
     }
 
@@ -210,7 +224,7 @@ void networkSaveController(){
     if(!strlen(ssid) || !strlen(password)){
         doc["status"] = "error";
         doc["data"]["message"] = "Wifi::RequiredPasswordOrSSID";
-        httpServer.send(400, "application/json", doc.as<String>());
+        request->send(400, "application/json", doc.as<String>());
         return;
     }
 
@@ -219,7 +233,7 @@ void networkSaveController(){
     if(!credentialsSaved){
         doc["status"] = "error";
         doc["data"]["message"] = "Wifi::ErrorSavingCredentials";
-        httpServer.send(500, "application/json", doc.as<String>());
+        request->send(500, "application/json", doc.as<String>());
         return;
     }
 
@@ -227,34 +241,33 @@ void networkSaveController(){
     if(!isConnected){
         doc["status"] = "error";
         doc["data"]["message"] = "Wifi::SavedCredentialsButNotConnected";
-        httpServer.send(200, "application/json", doc.as<String>());
+        request->send(200, "application/json", doc.as<String>());
         return;
     }
 
     doc["status"] = "success";
-    httpServer.send(200, "application/json", doc.as<String>());
+    request->send(200, "application/json", doc.as<String>());
 };
 
-void availableWiFiNetworks(){
-    unsigned short int totalNetworks = WiFi.scanNetworks();
-    DynamicJsonDocument doc(128);
+void availableWiFiNetworks(AsyncWebServerRequest *request){
+    DynamicJsonDocument doc(256);
     doc["status"] = "success";
-
     JsonArray networks = doc.createNestedArray("data");
-    if(totalNetworks == 0){
-        doc["status"] = "error";
-        doc["data"]["message"] = "Wifi::NoNetworksFound";
+    int totalNetworks = WiFi.scanComplete();
+    if(totalNetworks == WIFI_SCAN_RUNNING){
+        doc["status"] = "pending";
+    }else if(totalNetworks == WIFI_SCAN_FAILED){
+        doc["status"] = "pending";
+        WiFi.scanNetworks(true);
+    }else if(totalNetworks > 0){
+        for(unsigned short int i = 0; i < totalNetworks; i++){
+            JsonObject network = networks.createNestedObject();
+            network["ssid"] = WiFi.SSID(i);
+        }
+        WiFi.scanDelete();
     }
-    // This is not encapsulated within an else because, if 
-    // the number of networks found is "0", the loop will 
-    // simply not be executed.
-    for(unsigned short int i = 0; i < totalNetworks; i++){
-        JsonObject network = networks.createNestedObject();
-        network["ssid"] = WiFi.SSID(i);
-    }
-    httpServer.send(200, "application/json", doc.as<String>());
+    request->send(200, "application/json", doc.as<String>());
 };
-
 
 void configureHardware(){
     if(!LittleFS.begin()){ 
@@ -269,14 +282,16 @@ void configureHardware(){
     pinMode(GREEN_PIN, OUTPUT);
 };
 
-void notFoundHandler(){
-    if(httpServer.method() == HTTP_OPTIONS){
-        httpServer.sendHeader("Access-Control-Max-Age", "10000");
-        httpServer.sendHeader("Access-Control-Allow-Methods", "PUT,POST,GET,DELETE");
-        httpServer.sendHeader("Access-Control-Allow-Headers", "*");
-        httpServer.send(200);
-    }
-};
+void notFoundHandler(AsyncWebServerRequest *request){
+    // Cors preflight
+    if(request->method() == HTTP_OPTIONS){
+        request->send(200);
+    }else{
+        // Handle other types of not-found requests
+        request->send(404, "text/plain", "Not Found"); 
+    } 
+}
+
 
 void setupWiFiServices(){
     // NOTE: Here, you obtain the "ssid" and "password" 
@@ -287,13 +302,16 @@ void setupWiFiServices(){
 
     WiFi.softAP(ssid, password);
     WiFi.softAPConfig(localIp, gateway, subnet);
+  
+    DefaultHeaders::Instance().addHeader("Access-Control-Allow-Origin", "*");
+    DefaultHeaders::Instance().addHeader("Access-Control-Allow-Methods", "GET, POST, PUT");
+    DefaultHeaders::Instance().addHeader("Access-Control-Allow-Headers", "Content-Type");
 
     httpServer.serveStatic("/admin-portal/", LittleFS, "/admin-portal/");
-    httpServer.enableCORS(true);
     httpServer.on("/api/v1/network/", HTTP_POST, networkSaveController);
-    httpServer.on("/api/v1/network/", HTTP_GET, availableWiFiNetworks);
+    httpServer.on("/api/v1/network/", HTTP_GET, availableWiFiNetworks); 
+    httpServer.on("/api/v1/network/is-connected/", HTTP_GET, isConnectedToWiFi);
     httpServer.onNotFound(notFoundHandler);
-    httpServer.enableCORS(true);
 
     httpServer.begin();
     Serial.println("HTTP Server Started.");
@@ -307,13 +325,6 @@ void setup(){
 };
 
 void loop(){
-    httpServer.handleClient();
     digitalWrite(BLUE_PIN, HIGH);
-    unsigned long currentTime = millis();
-    if(currentTime - lastTime > MEASUREMENT_DELAY_MS){
-        unsigned short int distance = getDistance();
-        sendData(distance);
-        lastTime = currentTime;
-    }
     digitalWrite(BLUE_PIN, LOW);
 };
