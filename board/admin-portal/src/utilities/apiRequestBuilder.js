@@ -75,7 +75,9 @@ class APIRequestBuilder{
     register({ path, method = 'GET' }){
         return ({ query = {}, body = {}}) => {
             const url = this.buildUrl(path, query?.params, query?.queryParams);
-            const args = [url, body];
+            const data = new URLSearchParams();
+            data.append('plain', JSON.stringify(body));
+            const args = [url, data];
             this.setAuthorizationHeader();
             return new ServerRequestBuilder()
                 .register({ callback: axios[method.toLowerCase()], args });

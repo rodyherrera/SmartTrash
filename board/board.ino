@@ -18,39 +18,28 @@
 
 const char* DEFAULT_ESP8266_AP_SSID = "SmartTrash-AP";
 const char* DEFAULT_ESP8266_AP_PASSWORD = "toortoor";
-
-const unsigned short int WEB_SERVER_PORT = 80;
-
 const char* ESP8266_CONFIG_FILE = "/ESP8266Config.json";
 const char* CREDENTIALS_FILE = "/WiFiCredentials.json";
+const char* SERVER_ENDPOINT = "http://172.20.10.3:5430";
 
 IPAddress localIp(192, 168, 1, 1);
 IPAddress gateway(192, 168, 1, 1);
 IPAddress subnet(255, 255, 255, 0);
 
+const uint8_t TRIGGER_PIN = D6;
+const uint8_t ECHO_PIN = D7;
+const uint8_t RED_PIN = D1;
+const uint8_t GREEN_PIN = D2;
+const uint8_t BLUE_PIN = D3;
+const uint8_t MAX_WIFI_CONNECTION_ATTEMPS = 15;
+
+const uint16_t WEB_SERVER_PORT = 80;
+const uint32_t DISTANCE_READ_TIMEOUT = 30000;
+const uint32_t MEASUREMENT_DELAY_MS = 3000;  
+
 AsyncWebServer httpServer(WEB_SERVER_PORT);
 
-const char* SERVER_ENDPOINT = "http://172.20.10.3:5430";
-
-// Pin connected to the trigger output of the sensor
-const unsigned short int TRIGGER_PIN = D6;
-// Pin connected to the echo input of the sensor
-const unsigned short int ECHO_PIN = D7;
-// Timeout for distance readings (microseconds)
-const unsigned short int DISTANCE_READ_TIMEOUT = 30000;
-
-// Pins for the RGB LED module
-const unsigned short int RED_PIN = D1;
-const unsigned short int GREEN_PIN = D2;
-const unsigned short int BLUE_PIN = D3;
-
-// Speed of sound in centimeters per microsecond.
-// This constant is used for distance calculations in sensor measurements.
 const float SPEED_OF_SOUND_CM_PER_US = 0.034 / 2;
-
-const unsigned int MEASUREMENT_DELAY_MS = 3000;  
-const unsigned int MAX_WIFI_CONNECTION_ATTEMPS = 15;
-
 unsigned long lastTime = 0;
 
 static unsigned short int getDistance(){
@@ -81,7 +70,7 @@ void sendData(unsigned short int distance){
         return;
     }
     http.addHeader("Content-Type", "application/json");
-    unsigned short int httpResponseCode = http.POST(body.as<String>());
+    unsigned short int httpResponseCode = http.POST(body.as<const char*>());
     if(httpResponseCode == HTTP_CODE_OK){
         Serial.println("Data sent successfully.");
     }else{
@@ -152,7 +141,7 @@ DynamicJsonDocument getESP8266Config(){
 };
 
 DynamicJsonDocument loadWiFiCredentials(){
-    DynamicJsonDocument credentials(256);
+    DynamicJsonDocument credentials(128);
     File file = LittleFS.open(CREDENTIALS_FILE, "r"); 
     if(!file){
         Serial.println("Failed to open file for reading");
@@ -182,12 +171,13 @@ const bool tryWiFiConnection(){
         Serial.print(".");
         connectionAttempts++;
     }
-    if(WiFi.status() == WL_CONNECTED){
+    const bool isConnected = WiFi.status() == WL_CONNECTED;
+    if(isConnected){
         Serial.println("Connected to WiFi.");
     }else{
         Serial.println("Failed to connect to WiFi.");
     }
-    return WiFi.status() == WL_CONNECTED;
+    return isConnected;
 };
 
 void handleWiFiConnectionStatus(AsyncWebServerRequest *request){
@@ -206,7 +196,7 @@ void handleWiFiConnectionStatus(AsyncWebServerRequest *request){
 
 void handleAccessPointConfigUpdate(AsyncWebServerRequest *request){
     DynamicJsonDocument doc(128);
-    String plainBody = request->getParam("plain", true)->value();
+    const char* plainBody = request->getParam("plain", true)->value().c_str();
     DynamicJsonDocument body(128);
     DeserializationError error = deserializeJson(body, plainBody);
     if(error){
@@ -215,7 +205,6 @@ void handleAccessPointConfigUpdate(AsyncWebServerRequest *request){
         request->send(400, "application/json", "Bad Request");
         return;
     }
-    Serial.println("4");
     const char* ssid = body["ssid"];
     const char* password = body["password"];
     if(!strlen(ssid) || !strlen(password)){
@@ -244,10 +233,10 @@ void handleAccessPointConfig(AsyncWebServerRequest *request){
 };
 
 void handleWiFiCredentialsSave(AsyncWebServerRequest *request){
-    DynamicJsonDocument doc(256);
-    String plainBody = request->getParam("plain", true)->value(); 
+    DynamicJsonDocument doc(128);
+    const char* plainBody = request->getParam("plain", true)->value().c_str(); 
 
-    DynamicJsonDocument body(512);
+    DynamicJsonDocument body(128);
     DeserializationError error = deserializeJson(body, plainBody);
     
     if(error){
