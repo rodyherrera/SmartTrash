@@ -190,7 +190,7 @@ const bool tryWiFiConnection(){
     return WiFi.status() == WL_CONNECTED;
 };
 
-void isConnectedToWiFi(AsyncWebServerRequest *request){
+void handleWiFiConnectionStatus(AsyncWebServerRequest *request){
     DynamicJsonDocument doc(128);
     doc["status"] = "success";
     if(WiFi.status() != WL_CONNECTED){
@@ -204,11 +204,46 @@ void isConnectedToWiFi(AsyncWebServerRequest *request){
     request->send(200, "application/json", doc.as<String>());
 };
 
-void networkSaveController(AsyncWebServerRequest *request){
-    DynamicJsonDocument doc(128);
+void handleAccessPointConfigUpdate(AsyncWebServerRequest *request){
+    DynamicJsonDocument doc(256);
+    String plainBody = request->getParam("plain", true)->value();
+    DynamicJsonDocument body(512);
+    DeserializationError error = deserializeJson(body, plainBody);
+    if(error){
+        Serial.print("deserializeJson() failed: ");
+        Serial.println(error.c_str());
+        request->send(400, "application/json", "Bad Request");
+        return;
+    }
+    const char* ssid = body["ssid"];
+    const char* password = body["password"];
+    if(!strlen(ssid) || !strlen(password)){
+        doc["status"] = "error";
+        doc["data"]["message"] = "Server::AP::RequiredPasswordOrSSID";
+        request->send(400, "application/json", doc.as<String>());
+        return;
+    }
+    const bool configSaved = saveESP8266Config(body);
+    if(!configSaved){
+        doc["status"] = "error";
+        doc["data"]["message"] = "Server::AP::ErrorSavingConfig";
+        request->send(500, "application/json", doc.as<String>());
+        return;
+    }
+    doc["status"] = "success";
+    request->send(200, "application/json", doc.as<String>());
+};
+
+void handleAccessPointConfig(AsyncWebServerRequest *request){
+    DynamicJsonDocument currentESPConfig = getESP8266Config();
+    request->send(200, "application/json", currentESPConfig.as<String>());
+};
+
+void handleWiFiCredentialsSave(AsyncWebServerRequest *request){
+    DynamicJsonDocument doc(256);
     String plainBody = request->getParam("plain", true)->value(); 
 
-    DynamicJsonDocument body(128);
+    DynamicJsonDocument body(512);
     DeserializationError error = deserializeJson(body, plainBody);
     
     if(error){
@@ -223,7 +258,7 @@ void networkSaveController(AsyncWebServerRequest *request){
 
     if(!strlen(ssid) || !strlen(password)){
         doc["status"] = "error";
-        doc["data"]["message"] = "Wifi::RequiredPasswordOrSSID";
+        doc["data"]["message"] = "WiFi::RequiredPasswordOrSSID";
         request->send(400, "application/json", doc.as<String>());
         return;
     }
@@ -250,7 +285,7 @@ void networkSaveController(AsyncWebServerRequest *request){
 };
 
 // NOTE: do this better in future versions...
-void availableWiFiNetworks(AsyncWebServerRequest *request){
+void handleAvailableWiFiNetworks(AsyncWebServerRequest *request){
     DynamicJsonDocument doc(256);
     doc["status"] = "success";
     JsonArray networks = doc.createNestedArray("data");
@@ -293,7 +328,6 @@ void notFoundHandler(AsyncWebServerRequest *request){
     } 
 }
 
-
 void setupWiFiServices(){
     // NOTE: Here, you obtain the "ssid" and "password" 
     // related to the access point that is created from the ESP8266.
@@ -309,9 +343,12 @@ void setupWiFiServices(){
     DefaultHeaders::Instance().addHeader("Access-Control-Allow-Headers", "Content-Type");
 
     httpServer.serveStatic("/admin-portal/", LittleFS, "/admin-portal/");
-    httpServer.on("/api/v1/network/", HTTP_POST, networkSaveController);
-    httpServer.on("/api/v1/network/", HTTP_GET, availableWiFiNetworks); 
-    httpServer.on("/api/v1/network/is-connected/", HTTP_GET, isConnectedToWiFi);
+    httpServer.on("/api/v1/network/", HTTP_POST, handleWiFiCredentialsSave);
+    httpServer.on("/api/v1/network/", HTTP_GET, handleAvailableWiFiNetworks); 
+    httpServer.on("/api/v1/network/is-connected/", HTTP_GET, handleWiFiConnectionStatus);
+
+    httpServer.on("/api/v1/server/ap-config/", HTTP_GET, handleAccessPointConfig);
+    httpServer.on("/api/v1/server/ap-config/", HTTP_PUT, handleAccessPointConfigUpdate);
     httpServer.onNotFound(notFoundHandler);
 
     httpServer.begin();
