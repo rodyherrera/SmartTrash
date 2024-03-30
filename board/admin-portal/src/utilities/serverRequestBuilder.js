@@ -5,7 +5,7 @@
  *
  * =+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+
  *
- * For related information - https://github.com/rodyherrera/CleverBin/
+ * For related information - https://github.com/rodyherrera/SmartTrash/
  *
  * All your applications, just in one place. 
  *
@@ -40,7 +40,7 @@ class ServerRequestBuilder{
     async register({ callback, args = [] }){
         try{
             const response = await callback(...args);
-            // Asumming CleverBin Backend API consitency
+            // Asumming SmartTrash Backend API consitency
             return response.data || response;
         }catch(error){
             throw this.handleRejection(error);

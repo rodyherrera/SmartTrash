@@ -5,7 +5,7 @@
  *
  * =+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+
  *
- * For related information - https://github.com/rodyherrera/CleverBin/
+ * For related information - https://github.com/rodyherrera/SmartTrash/
  *
  * All your applications, just in one place. 
  *
@@ -18,7 +18,7 @@ import coreReducer from '@services/core/slice';
 
 /**
  * @function configureStore 
- * @description Configures the Redux store for the CleverBin Admin Portal application.
+ * @description Configures the Redux store for the SmartTrash Admin Portal application.
  * @param {Object} options - Configuration options for the Redux store.
  * @param {Object} options.reducer - A combined reducer object containing slices of state for different application areas.
  * @returns {Store} The configured Redux store.

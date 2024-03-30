@@ -5,7 +5,7 @@
  *
  * =+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+
  *
- * For related information - https://github.com/rodyherrera/CleverBin/
+ * For related information - https://github.com/rodyherrera/SmartTrash/
  *
  * All your applications, just in one place. 
  *

@@ -4,7 +4,7 @@
 #include <LittleFS.h>
 #include <ArduinoJson.h>
 
-const char* ESP8266_AP_SSID = "CleverBin-AP";
+const char* ESP8266_AP_SSID = "SmartTrash AP";
 const char* ESP8266_AP_PASSWORD = "toortoor";
 const unsigned short int WEB_SERVER_PORT = 80;
 
@@ -40,7 +40,7 @@ const unsigned short int BLUE_PIN = D3;
 const float SPEED_OF_SOUND_CM_PER_US = 0.034 / 2;
 
 const unsigned int MEASUREMENT_DELAY_MS = 3000;  
-const unsigned int MAX_WIFI_CONNECTION_ATTEMPS = 10;
+const unsigned int MAX_WIFI_CONNECTION_ATTEMPS = 15;
 
 unsigned long lastTime = 0;
 
@@ -81,20 +81,23 @@ void sendData(unsigned short int distance){
     }
 };
 
-const bool saveWiFiCredentials(const WiFiCredentials& credentials){
+const bool saveWiFiCredentials(const char* ssid, const char* password){
     File file = LittleFS.open(CREDENTIALS_FILE, "w"); 
     if(!file){
         Serial.println("Failed to open file for writing");
         return false;
     }
 
-    DynamicJsonDocument doc(128);
-    doc["ssid"] = credentials.ssid;
-    doc["password"] = credentials.password;
+    DynamicJsonDocument doc(256);
+    doc["ssid"] = ssid;
+    doc["password"] = password;
+
     if(serializeJson(doc, file) == 0){
         Serial.println("Failed to write to file");
+        file.close();
         return false;
     }
+
     file.close();
     return true;
 };
@@ -107,9 +110,16 @@ WiFiCredentials loadWiFiCredentials(){
         return credentials;
     }
 
-    DynamicJsonDocument doc(128);
-    credentials.ssid = doc["ssid"].as<String>();
-    credentials.password = doc["password"].as<String>();
+    DynamicJsonDocument doc(256);
+    DeserializationError error = deserializeJson(doc, file);
+    if(error){
+        Serial.println("Failed to read from file");
+        file.close();
+        return credentials;
+    }
+
+    credentials.ssid = doc["ssid"].as<const char*>();
+    credentials.password = doc["password"].as<const char*>();
 
     file.close();
     return credentials;
@@ -117,11 +127,8 @@ WiFiCredentials loadWiFiCredentials(){
 
 const bool tryWiFiConnection(){
     WiFiCredentials credentials = loadWiFiCredentials();
-    if(credentials.ssid == "") return false;
-    Serial.println(credentials.ssid);
-    // Try to connect to the stored WiFi 
-    Serial.println("Connecting to the WiFi...");
-    WiFi.begin(credentials.ssid.c_str(), credentials.password.c_str());
+    WiFi.begin(credentials.ssid, credentials.password);
+    Serial.println("Connecting to WiFi...");
     unsigned short int connectionAttempts = 0;
     while(WiFi.status() != WL_CONNECTED && connectionAttempts < MAX_WIFI_CONNECTION_ATTEMPS){
         delay(1000);
@@ -131,55 +138,36 @@ const bool tryWiFiConnection(){
     if(WiFi.status() == WL_CONNECTED){
         Serial.println("Connected to WiFi.");
     }else{
-        Serial.println("Failed to connect to WiFi. Deleting credentials.");
-        credentials.ssid = "";
-        credentials.password = "";
-        saveWiFiCredentials(credentials);
+        Serial.println("Failed to connect to WiFi.");
     }
     return WiFi.status() == WL_CONNECTED;
-};
-
-void networkController(){
-    httpServer.sendHeader("Access-Control-Allow-Origin", "*");
-    httpServer.sendHeader("Access-Control-Allow-Methods", "GET, POST, PATCH, PUT, DELETE, OPTIONS");
-    httpServer.sendHeader("Access-Control-Allow-Headers", "Content-Type, Authorization");
-    httpServer.sendHeader("Access-Control-Max-Age", "600");
-
-    if(httpServer.method() == HTTP_OPTIONS){
-        httpServer.send(200);
-    }else if(httpServer.method() == HTTP_POST){
-        networkSaveController();
-    }else if(httpServer.method() == HTTP_GET){
-        homeController();
-    }
 };
 
 void networkSaveController(){
     DynamicJsonDocument doc(128);
     String plainBody = httpServer.arg("plain");
+
     DynamicJsonDocument body(128);
     DeserializationError error = deserializeJson(body, plainBody);
+    
     if(error){
         Serial.print("deserializeJson() failed: ");
         Serial.println(error.c_str());
         httpServer.send(400, "text/plain", "Bad Request");
         return;
     }
-    const char* ssid = doc["ssid"];
-    const char* password = doc["password"];
 
-    if(ssid == "" || password == ""){
+    const char* ssid = body["ssid"];
+    const char* password = body["password"];
+
+    if(!strlen(ssid) || !strlen(password)){
         doc["status"] = "error";
         doc["data"]["message"] = "Wifi::RequiredPasswordOrSSID";
         httpServer.send(400, "application/json", doc.as<String>());
         return;
     }
 
-    WiFiCredentials credentials;
-    credentials.ssid = ssid;
-    credentials.password = password;
-
-    const bool credentialsSaved = saveWiFiCredentials(credentials);
+    const bool credentialsSaved = saveWiFiCredentials(ssid, password);
     if(!credentialsSaved){
         doc["status"] = "error";
         doc["data"]["message"] = "Wifi::ErrorSavingCredentials";
@@ -191,6 +179,7 @@ void networkSaveController(){
     if(!isConnected){
         doc["status"] = "error";
         doc["data"]["message"] = "Wifi::SavedCredentialsButNotConnected";
+        httpServer.send(200, "application/json", doc.as<String>());
         return;
     }
 
@@ -198,7 +187,7 @@ void networkSaveController(){
     httpServer.send(200, "application/json", doc.as<String>());
 };
 
-void homeController(){
+void availableWiFiNetworks(){
     unsigned short int totalNetworks = WiFi.scanNetworks();
     DynamicJsonDocument doc(128);
     doc["status"] = "success";
@@ -218,6 +207,7 @@ void homeController(){
     httpServer.send(200, "application/json", doc.as<String>());
 };
 
+
 void configureHardware(){
     if(!LittleFS.begin()){ 
         Serial.println("Failed to initialize LittleFS");
@@ -231,13 +221,27 @@ void configureHardware(){
     pinMode(GREEN_PIN, OUTPUT);
 };
 
+void notFoundHandler(){
+    if(httpServer.method() == HTTP_OPTIONS){
+        httpServer.sendHeader("Access-Control-Max-Age", "10000");
+        httpServer.sendHeader("Access-Control-Allow-Methods", "PUT,POST,GET,DELETE");
+        httpServer.sendHeader("Access-Control-Allow-Headers", "*");
+        httpServer.send(200);
+    }
+};
+
 void setupWiFiServices(){
     WiFi.softAP(ESP8266_AP_SSID, ESP8266_AP_PASSWORD);
     WiFi.softAPConfig(localIp, gateway, subnet);
 
-    httpServer.begin();
     httpServer.serveStatic("/admin-portal/", LittleFS, "/admin-portal/");
-    httpServer.on("/api/v1/network/", networkController);
+    httpServer.enableCORS(true);
+    httpServer.on("/api/v1/network/", HTTP_POST, networkSaveController);
+    httpServer.on("/api/v1/network/", HTTP_GET, availableWiFiNetworks);
+    httpServer.onNotFound(notFoundHandler);
+    httpServer.enableCORS(true);
+
+    httpServer.begin();
     Serial.println("HTTP Server Started.");
 };
 
