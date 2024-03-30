@@ -6,3 +6,8 @@
     padding: 1rem 2rem;
     height: 60px;
 }
+
+.Header-ESP-Related-Container{
+    display: flex;
+    gap: 1rem;
+}

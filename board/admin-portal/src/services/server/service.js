@@ -10,3 +10,8 @@ export const updateAPConfig = ServerAPI.register({
     path: '/ap-config/',
     method: 'PUT'
 });
+
+export const restartESP = ServerAPI.register({
+    path: '/restart/',
+    method: 'GET'
+});

@@ -1,0 +1,25 @@
+.Restart-ESP-Button-Container{
+    border: 1px solid #121212;
+    padding: .3rem 1rem;
+    font-size: .85rem;
+    cursor: pointer;
+    border-radius: 1rem;
+    display: flex;
+    align-items: center;
+    gap: .5rem;
+}
+
+.Restart-ESP-Button-Container .MuiCircularProgress-root{
+    width: 1rem !important;
+    height: 1rem !important;
+    color: #121212 !important;
+}
+
+.Restart-ESP-Button-Container:hover{
+    border-color: #0f62fe;
+    color: #0f62fe;
+}
+
+.Restart-ESP-Button-Container:hover .MuiCircularProgress-root{
+    color: #0f62fe !important;
+}

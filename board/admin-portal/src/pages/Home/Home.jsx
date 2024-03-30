@@ -1,5 +1,5 @@
 import React from 'react';
-import { CiWifiOn, CiCloudOn } from 'react-icons/ci';
+import { CiWifiOn, CiCloudOn, CiStreamOn } from 'react-icons/ci';
 import Card from '@components/general/Card';
 import './Home.css';
 
@@ -13,7 +13,8 @@ const HomePage = () => {
                 <article id='Home-Navigation-Container'>
                     {[
                         ['Connect to the Internet', '/wifi/networks/', CiWifiOn],
-                        ['Link device to Cloud Service', '', CiCloudOn]
+                        ['Link device to Cloud Service', '', CiCloudOn],
+                        ['Access Point Configuration ', '/server/ap-config/', CiStreamOn]
                     ].map(([ title, to, Icon ], index) => (
                         <Card title={title} Icon={Icon} to={to} key={index} />
                     ))}

@@ -162,7 +162,7 @@ DynamicJsonDocument loadWiFiCredentials(){
 const bool tryWiFiConnection(){
     DynamicJsonDocument credentials = loadWiFiCredentials();
 
-    if(!credentials.containsKey("ssid") || !credentials.contains("password")){
+    if(!credentials.containsKey("ssid") || !credentials.containsKey("password")){
         Serial.println("Missing WiFi credentials.");
         return false;
     }
@@ -202,15 +202,16 @@ void handleWiFiConnectionStatus(AsyncWebServerRequest *request){
     request->send(200, "application/json", doc.as<String>());
 };
 
+void handleESPRestart(AsyncWebServerRequest *request){
+    DynamicJsonDocument doc(64);
+    doc["status"] = "success";
+    request->send(200, "application/json", doc.as<String>());
+    delay(100);
+    ESP.reset();
+};
+
 void handleAccessPointConfigUpdate(AsyncWebServerRequest *request){
     DynamicJsonDocument doc(128);
-
-    if(!request->hasParam("plain")){
-        doc["status"] = "error";
-        doc["data"]["message"] = "Core::MissingPlainParam";
-        request->send(400, "application/json", doc.as<String>());
-        return;
-    }
 
     const char* plainBody = request->getParam("plain", true)->value().c_str();
     DeserializationError error = deserializeJson(doc, plainBody);
@@ -251,13 +252,6 @@ void handleAccessPointConfig(AsyncWebServerRequest *request){
 
 void handleWiFiCredentialsSave(AsyncWebServerRequest *request){
     DynamicJsonDocument doc(128);
-
-    if(!request->hasParam("plain")){
-        doc["status"] = "error";
-        doc["data"]["message"] = "Core::MisingPlainParam";
-        request->send(400, "application/json", doc.as<String>());
-        return;
-    }
 
     const char* plainBody = request->getParam("plain", true)->value().c_str(); 
     DeserializationError error = deserializeJson(doc, plainBody);
@@ -363,6 +357,7 @@ void registerServerEndpoints(){
     httpServer.on("/api/v1/network/", HTTP_GET, handleAvailableWiFiNetworks); 
     httpServer.on("/api/v1/network/is-connected/", HTTP_GET, handleWiFiConnectionStatus);
 
+    httpServer.on("/api/v1/server/restart/", HTTP_GET, handleESPRestart);
     httpServer.on("/api/v1/server/ap-config/", HTTP_GET, handleAccessPointConfig);
     httpServer.on("/api/v1/server/ap-config/", HTTP_PUT, handleAccessPointConfigUpdate);
     httpServer.onNotFound(notFoundHandler);

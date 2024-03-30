@@ -20,3 +20,11 @@ export const updateAPConfig = (body, navigate) => async (dispatch) => {
         query: { body }
     });
 };
+
+export const restartESP = () => async (dispatch) => {
+    const operation = new OperationHandler(serverSlice, dispatch);
+    operation.use({
+        api: serverService.restartESP,
+        loaderState: serverSlice.setIsRestarting
+    });
+};
