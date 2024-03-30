@@ -16,6 +16,7 @@ const Application = () => {
                 <Route index element={<pages.Home />} />
                 <Route path='/wifi/networks/' element={<pages.WiFiConnection />} />
                 <Route path='/wifi/setup-network/' element={<pages.SetupWiFiConnection />} />
+                <Route path='/server/ap-config/' element={<pages.AccessPointConfig />} />
             </Route>
         </Routes>
     );
