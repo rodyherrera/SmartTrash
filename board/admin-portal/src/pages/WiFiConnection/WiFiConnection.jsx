@@ -23,7 +23,7 @@ const WiFiConnection = () => {
                 ]}
             />
             <section id='WiFi-Connection-Header'>
-                <h3 id='WiFi-Connection-Title'>Connecting your device to WiFi</h3>
+                <h3 id='WiFi-Connection-Title'>Connecting your SmartTrash to WiFi</h3>
             </section>
             {(isLoading) ? (
                 <CircularProgress />

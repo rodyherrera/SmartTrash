@@ -1,19 +1,28 @@
+/***
+ * Copyright (C) Rodolfo Herrera Hernandez. All rights reserved.
+ * Licensed under the MIT license. See LICENSE file in the project root
+ * for full license information.
+ *
+ * =+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+
+ *
+ * For related information - https://github.com/rodyherrera/SmartTrash/
+ *
+ * =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+****/
+
 #include <ESP8266WiFi.h>
 #include <ESP8266WebServer.h>
 #include <ESP8266HTTPClient.h>
 #include <LittleFS.h>
 #include <ArduinoJson.h>
 
-const char* ESP8266_AP_SSID = "SmartTrash AP";
-const char* ESP8266_AP_PASSWORD = "toortoor";
+const char* DEFAULT_ESP8266_AP_SSID = "SmartTrash AP";
+const char* DEFAULT_ESP8266_AP_PASSWORD = "toortoor";
+
 const unsigned short int WEB_SERVER_PORT = 80;
 
+const char* ESP8266_CONFIG_FILE = "/ESP8266Config.json";
 const char* CREDENTIALS_FILE = "/WiFiCredentials.json";
-
-struct WiFiCredentials {
-    String ssid;
-    String password;
-};
 
 IPAddress localIp(192, 168, 1, 1);
 IPAddress gateway(192, 168, 1, 1);
@@ -81,18 +90,14 @@ void sendData(unsigned short int distance){
     }
 };
 
-const bool saveWiFiCredentials(const char* ssid, const char* password){
+const bool saveWiFiCredentials(DynamicJsonDocument credentials){
     File file = LittleFS.open(CREDENTIALS_FILE, "w"); 
     if(!file){
         Serial.println("Failed to open file for writing");
         return false;
     }
 
-    DynamicJsonDocument doc(256);
-    doc["ssid"] = ssid;
-    doc["password"] = password;
-
-    if(serializeJson(doc, file) == 0){
+    if(serializeJson(credentials, file) == 0){
         Serial.println("Failed to write to file");
         file.close();
         return false;
@@ -102,32 +107,74 @@ const bool saveWiFiCredentials(const char* ssid, const char* password){
     return true;
 };
 
-WiFiCredentials loadWiFiCredentials(){
-    WiFiCredentials credentials;
+const bool saveESP8266Config(DynamicJsonDocument config){
+    File file = LittleFS.open(ESP8266_CONFIG_FILE, "w");
+    if(!file){
+        Serial.println("Can't open the ESP8266 configuration file.");
+        return false;
+    }
+    if(serializeJson(config, file) == 0){
+        Serial.println("Error trying to write inside the ESP8266 configuration file.");
+        file.close();
+        return false;
+    }
+    file.close();
+    return true;
+};
+
+DynamicJsonDocument loadDefaultESP8266Config(){
+    DynamicJsonDocument defaultConfig(256);
+    defaultConfig["ssid"] = DEFAULT_ESP8266_AP_SSID;
+    defaultConfig["password"] = DEFAULT_ESP8266_AP_PASSWORD;
+    saveESP8266Config(defaultConfig);
+    return defaultConfig;
+};
+
+DynamicJsonDocument getESP8266Config(){
+    File file = LittleFS.open(ESP8266_CONFIG_FILE, "r");
+    if(!file){
+        // I don't know if this is correct but, we will assume that if 
+        // these lines of code are executed, it will be because the 
+        // file does not exist, this way we will create it and add default values
+        return loadDefaultESP8266Config();
+    }
+    DynamicJsonDocument config(256);
+    // If the configuration file exists, so deserialize
+    DeserializationError error = deserializeJson(config, file);
+    if(error){
+        Serial.println("Error trying to deserialize ESP8266 configuration file.");
+        Serial.println(error.c_str());
+        file.close();
+        return loadDefaultESP8266Config();
+    }
+    file.close();
+    return config;
+};
+
+DynamicJsonDocument loadWiFiCredentials(){
+    DynamicJsonDocument credentials(256);
     File file = LittleFS.open(CREDENTIALS_FILE, "r"); 
     if(!file){
         Serial.println("Failed to open file for reading");
         return credentials;
     }
 
-    DynamicJsonDocument doc(256);
-    DeserializationError error = deserializeJson(doc, file);
+    DeserializationError error = deserializeJson(credentials, file);
     if(error){
         Serial.println("Failed to read from file");
         file.close();
         return credentials;
     }
 
-    credentials.ssid = doc["ssid"].as<const char*>();
-    credentials.password = doc["password"].as<const char*>();
-
     file.close();
     return credentials;
 };
 
 const bool tryWiFiConnection(){
-    WiFiCredentials credentials = loadWiFiCredentials();
-    WiFi.begin(credentials.ssid, credentials.password);
+    DynamicJsonDocument credentials = loadWiFiCredentials();
+    const char* ssid = credentials["ssid"].as<const char*>();
+    const char* password = credentials["password"].as<const char*>();
+    WiFi.begin(ssid, password);
     Serial.println("Connecting to WiFi...");
     unsigned short int connectionAttempts = 0;
     while(WiFi.status() != WL_CONNECTED && connectionAttempts < MAX_WIFI_CONNECTION_ATTEMPS){
@@ -167,7 +214,8 @@ void networkSaveController(){
         return;
     }
 
-    const bool credentialsSaved = saveWiFiCredentials(ssid, password);
+    // TODO: remove potential additional parameters from the request body.
+    const bool credentialsSaved = saveWiFiCredentials(body);
     if(!credentialsSaved){
         doc["status"] = "error";
         doc["data"]["message"] = "Wifi::ErrorSavingCredentials";
@@ -231,7 +279,13 @@ void notFoundHandler(){
 };
 
 void setupWiFiServices(){
-    WiFi.softAP(ESP8266_AP_SSID, ESP8266_AP_PASSWORD);
+    // NOTE: Here, you obtain the "ssid" and "password" 
+    // related to the access point that is created from the ESP8266.
+    DynamicJsonDocument ESP8266Config = getESP8266Config();
+    const char* ssid = ESP8266Config["ssid"].as<const char*>();
+    const char* password = ESP8266Config["password"].as<const char*>();
+
+    WiFi.softAP(ssid, password);
     WiFi.softAPConfig(localIp, gateway, subnet);
 
     httpServer.serveStatic("/admin-portal/", LittleFS, "/admin-portal/");
