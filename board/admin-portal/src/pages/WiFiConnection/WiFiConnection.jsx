@@ -30,8 +30,8 @@ const WiFiConnection = () => {
             ) : (
                 <React.Fragment>
                     <section id='WiFi-Connection-Available-List'>
-                        {networks.map(({ ssid }, index) => (
-                            <WiFiConnectionCard ssid={ssid} key={index} />
+                        {networks.map(({ ssid, isCurrent }, index) => (
+                            <WiFiConnectionCard ssid={ssid} key={index} isCurrent={isCurrent} />
                         ))}
                     </section>
                 </React.Fragment>

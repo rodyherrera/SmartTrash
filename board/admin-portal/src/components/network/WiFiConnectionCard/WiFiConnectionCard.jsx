@@ -3,7 +3,7 @@ import { HiOutlineArrowRight } from 'react-icons/hi2';
 import { useNavigate } from 'react-router-dom';
 import './WiFiConnectionCard.css';
 
-const WiFiConnectionCard = ({ ssid }) => {
+const WiFiConnectionCard = ({ ssid, isCurrent }) => {
     const navigate = useNavigate();
 
     const onClickHandler = () => {
@@ -12,7 +12,14 @@ const WiFiConnectionCard = ({ ssid }) => {
 
     return (
         <div className='WiFi-SSID-Container' onClick={onClickHandler}>
-            <h4 className='WiFi-SSID'>{ssid}</h4>
+            <div className='WiFi-Info-Container'>
+                <h4 className='WiFi-SSID'>{ssid}</h4>
+                {(isCurrent) && (
+                    <div className='WiFi-IsCurrent-Container'>
+                        <p className='WiFi-IsCurrent'>Current Connection</p>
+                    </div>
+                )}
+            </div>
 
             <div className='WiFi-Actions-Container'>
                 <i className='WiFi-Arrow-Right-Container'>

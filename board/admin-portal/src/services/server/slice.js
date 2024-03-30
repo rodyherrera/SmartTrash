@@ -4,7 +4,6 @@ const state = {
     error: null,
     isLoading: false,
     isAPUpdateLoading: false,
-    isRestarting: false,
     apConfig: {}
 };
 
@@ -15,9 +14,6 @@ const serverSlice = createSlice({
         setError: (state, action) => {
             state.error = action.payload;
         },
-        setIsRestarting: (state, action) => {
-            state.isRestarting = action.payload;
-        },  
         setIsLoading: (state, action) => {
             state.isLoading = action.payload;
         },
@@ -33,7 +29,6 @@ const serverSlice = createSlice({
 export const {
     setError,
     setIsLoading,
-    setIsRestarting,
     setAPConfig,
     setIsAPUpdateLoading
 } = serverSlice.actions;
