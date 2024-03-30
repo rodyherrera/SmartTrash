@@ -205,9 +205,9 @@ void handleWiFiConnectionStatus(AsyncWebServerRequest *request){
 };
 
 void handleAccessPointConfigUpdate(AsyncWebServerRequest *request){
-    DynamicJsonDocument doc(256);
+    DynamicJsonDocument doc(128);
     String plainBody = request->getParam("plain", true)->value();
-    DynamicJsonDocument body(512);
+    DynamicJsonDocument body(128);
     DeserializationError error = deserializeJson(body, plainBody);
     if(error){
         Serial.print("deserializeJson() failed: ");
@@ -215,6 +215,7 @@ void handleAccessPointConfigUpdate(AsyncWebServerRequest *request){
         request->send(400, "application/json", "Bad Request");
         return;
     }
+    Serial.println("4");
     const char* ssid = body["ssid"];
     const char* password = body["password"];
     if(!strlen(ssid) || !strlen(password)){
@@ -235,8 +236,11 @@ void handleAccessPointConfigUpdate(AsyncWebServerRequest *request){
 };
 
 void handleAccessPointConfig(AsyncWebServerRequest *request){
+    DynamicJsonDocument doc(256);
     DynamicJsonDocument currentESPConfig = getESP8266Config();
-    request->send(200, "application/json", currentESPConfig.as<String>());
+    doc["status"] = "success";
+    doc["data"] = currentESPConfig;
+    request->send(200, "application/json", doc.as<String>());
 };
 
 void handleWiFiCredentialsSave(AsyncWebServerRequest *request){

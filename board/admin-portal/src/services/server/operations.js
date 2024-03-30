@@ -16,7 +16,7 @@ export const updateAPConfig = (body, navigate) => async (dispatch) => {
     operation.on('response', () => navigate('/'));
     operation.use({
         api: serverService.updateAPConfig,
-        loaderState: serverSlice.setIsLoading,
+        loaderState: serverSlice.setIsAPUpdateLoading,
         query: { body }
     });
 };

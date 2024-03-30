@@ -1,0 +1,17 @@
+#Access-Point-Config-Header-Title{
+    font-size: 1.6rem;
+    font-weight: 300;
+}
+
+#Access-Point-Config-Body{
+    width: 500px;
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+@media screen and (max-width: 768px){
+    #Access-Point-Config-Body{
+        width: 100%;
+    }
+}

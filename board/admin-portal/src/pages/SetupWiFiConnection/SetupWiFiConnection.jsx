@@ -1,10 +1,10 @@
 import React, { useEffect, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
+import { saveNetworkConnection } from '@services/network/operations';
 import Breadcrumbs from '@components/general/Breadcrumbs';
 import Input from '@components/general/Input';
 import Button from '@components/general/Button';
-import { saveNetworkConnection } from '@services/network/operations';
 import './SetupWiFiConnection.css';
 
 const SetupWiFiConnection = () => {

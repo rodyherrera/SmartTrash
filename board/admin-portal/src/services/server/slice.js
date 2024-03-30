@@ -3,6 +3,7 @@ import { createSlice } from '@reduxjs/toolkit';
 const state = {
     error: null,
     isLoading: false,
+    isAPUpdateLoading: false,
     apConfig: {}
 };
 
@@ -16,6 +17,9 @@ const serverSlice = createSlice({
         setIsLoading: (state, action) => {
             state.isLoading = action.payload;
         },
+        setIsAPUpdateLoading: (state, action) => {
+            state.isAPUpdateLoading = action.payload;
+        },
         setAPConfig: (state, action) => {
             state.apConfig = action.payload;
         }
@@ -25,7 +29,8 @@ const serverSlice = createSlice({
 export const {
     setError,
     setIsLoading,
-    setAPConfig
+    setAPConfig,
+    setIsAPUpdateLoading
 } = serverSlice.actions;
 
 export default serverSlice.reducer;
