@@ -112,7 +112,7 @@ const bool saveESP8266Config(DynamicJsonDocument config){
 };
 
 DynamicJsonDocument loadDefaultESP8266Config(){
-    DynamicJsonDocument defaultConfig(256);
+    DynamicJsonDocument defaultConfig(128);
     defaultConfig["ssid"] = DEFAULT_ESP8266_AP_SSID;
     defaultConfig["password"] = DEFAULT_ESP8266_AP_PASSWORD;
     saveESP8266Config(defaultConfig);
@@ -127,7 +127,7 @@ DynamicJsonDocument getESP8266Config(){
         // file does not exist, this way we will create it and add default values
         return loadDefaultESP8266Config();
     }
-    DynamicJsonDocument config(256);
+    DynamicJsonDocument config(128);
     // If the configuration file exists, so deserialize
     DeserializationError error = deserializeJson(config, file);
     if(error){
@@ -161,16 +161,24 @@ DynamicJsonDocument loadWiFiCredentials(){
 
 const bool tryWiFiConnection(){
     DynamicJsonDocument credentials = loadWiFiCredentials();
-    const char* ssid = credentials["ssid"].as<const char*>();
-    const char* password = credentials["password"].as<const char*>();
+
+    if(!credentials.containsKey("ssid") || !credentials.contains("password")){
+        Serial.println("Missing WiFi credentials.");
+        return false;
+    }
+
+    const char* ssid = credentials["ssid"];
+    const char* password = credentials["password"];
     WiFi.begin(ssid, password);
     Serial.println("Connecting to WiFi...");
+
     unsigned short int connectionAttempts = 0;
     while(WiFi.status() != WL_CONNECTED && connectionAttempts < MAX_WIFI_CONNECTION_ATTEMPS){
         delay(1000);
         Serial.print(".");
         connectionAttempts++;
     }
+
     const bool isConnected = WiFi.status() == WL_CONNECTED;
     if(isConnected){
         Serial.println("Connected to WiFi.");
@@ -182,13 +190,13 @@ const bool tryWiFiConnection(){
 
 void handleWiFiConnectionStatus(AsyncWebServerRequest *request){
     DynamicJsonDocument doc(128);
-    doc["status"] = "success";
     if(WiFi.status() != WL_CONNECTED){
         doc["status"] = "error";
         doc["data"]["message"] = "WiFi::NotConnected";
         request->send(200, "application/json", doc.as<String>());
         return;
     }
+    doc["status"] = "success";
     DynamicJsonDocument currentWiFiCredentials = loadWiFiCredentials();
     doc["data"]["ssid"] = currentWiFiCredentials["ssid"];
     request->send(200, "application/json", doc.as<String>());
@@ -196,60 +204,75 @@ void handleWiFiConnectionStatus(AsyncWebServerRequest *request){
 
 void handleAccessPointConfigUpdate(AsyncWebServerRequest *request){
     DynamicJsonDocument doc(128);
-    const char* plainBody = request->getParam("plain", true)->value().c_str();
-    DynamicJsonDocument body(128);
-    DeserializationError error = deserializeJson(body, plainBody);
-    if(error){
-        Serial.print("deserializeJson() failed: ");
-        Serial.println(error.c_str());
-        request->send(400, "application/json", "Bad Request");
+
+    if(!request->hasParam("plain")){
+        doc["status"] = "error";
+        doc["data"]["message"] = "Core::MissingPlainParam";
+        request->send(400, "application/json", doc.as<String>());
         return;
     }
-    const char* ssid = body["ssid"];
-    const char* password = body["password"];
-    if(!strlen(ssid) || !strlen(password)){
+
+    const char* plainBody = request->getParam("plain", true)->value().c_str();
+    DeserializationError error = deserializeJson(doc, plainBody);
+    if(error){
+        doc["status"] = "error";
+        doc["data"]["message"] = "Core::InvalidJSONFormat";
+        request->send(400, "application/json", doc.as<String>());
+        return;
+    }
+
+    const char* ssid = doc["ssid"];
+    const char* password = doc["password"];
+    if(!strlen(ssid) || !strlen(password) || !ssid || !password){
+        doc.clear();
         doc["status"] = "error";
         doc["data"]["message"] = "Server::AP::RequiredPasswordOrSSID";
         request->send(400, "application/json", doc.as<String>());
         return;
     }
-    const bool configSaved = saveESP8266Config(body);
-    if(!configSaved){
+
+    if(!saveESP8266Config(doc)){
         doc["status"] = "error";
         doc["data"]["message"] = "Server::AP::ErrorSavingConfig";
         request->send(500, "application/json", doc.as<String>());
         return;
     }
+
     doc["status"] = "success";
     request->send(200, "application/json", doc.as<String>());
 };
 
 void handleAccessPointConfig(AsyncWebServerRequest *request){
-    DynamicJsonDocument doc(256);
-    DynamicJsonDocument currentESPConfig = getESP8266Config();
+    DynamicJsonDocument doc(128);
     doc["status"] = "success";
-    doc["data"] = currentESPConfig;
+    doc["data"] = getESP8266Config();
     request->send(200, "application/json", doc.as<String>());
 };
 
 void handleWiFiCredentialsSave(AsyncWebServerRequest *request){
     DynamicJsonDocument doc(128);
-    const char* plainBody = request->getParam("plain", true)->value().c_str(); 
 
-    DynamicJsonDocument body(128);
-    DeserializationError error = deserializeJson(body, plainBody);
-    
-    if(error){
-        Serial.print("deserializeJson() failed: ");
-        Serial.println(error.c_str());
-        request->send(400, "application/json", "Bad Request");
+    if(!request->hasParam("plain")){
+        doc["status"] = "error";
+        doc["data"]["message"] = "Core::MisingPlainParam";
+        request->send(400, "application/json", doc.as<String>());
         return;
     }
 
-    const char* ssid = body["ssid"];
-    const char* password = body["password"];
+    const char* plainBody = request->getParam("plain", true)->value().c_str(); 
+    DeserializationError error = deserializeJson(doc, plainBody);
+    if(error){
+        doc.clear();
+        doc["status"] = "error";
+        doc["status"]["message"] = "Core::InvalidJSONFormat";
+        request->send(400, "application/json", doc.as<String>());
+        return;
+    }
 
-    if(!strlen(ssid) || !strlen(password)){
+    const char* ssid = doc["ssid"];
+    const char* password = doc["password"];
+    if(!strlen(ssid) || !strlen(password) || !ssid || !password){
+        doc.clear();
         doc["status"] = "error";
         doc["data"]["message"] = "WiFi::RequiredPasswordOrSSID";
         request->send(400, "application/json", doc.as<String>());
@@ -257,16 +280,16 @@ void handleWiFiCredentialsSave(AsyncWebServerRequest *request){
     }
 
     // TODO: remove potential additional parameters from the request body.
-    const bool credentialsSaved = saveWiFiCredentials(body);
-    if(!credentialsSaved){
+    if(!saveWiFiCredentials(doc)){
+        doc.clear();
         doc["status"] = "error";
         doc["data"]["message"] = "Wifi::ErrorSavingCredentials";
         request->send(500, "application/json", doc.as<String>());
         return;
     }
 
-    const bool isConnected = tryWiFiConnection();
-    if(!isConnected){
+    if(!tryWiFiConnection()){
+        doc.clear();
         doc["status"] = "error";
         doc["data"]["message"] = "Wifi::SavedCredentialsButNotConnected";
         request->send(200, "application/json", doc.as<String>());
@@ -277,9 +300,8 @@ void handleWiFiCredentialsSave(AsyncWebServerRequest *request){
     request->send(200, "application/json", doc.as<String>());
 };
 
-// NOTE: do this better in future versions...
 void handleAvailableWiFiNetworks(AsyncWebServerRequest *request){
-    DynamicJsonDocument doc(256);
+    DynamicJsonDocument doc(128);
     doc["status"] = "success";
     JsonArray networks = doc.createNestedArray("data");
     int totalNetworks = WiFi.scanComplete();
@@ -319,22 +341,23 @@ void notFoundHandler(AsyncWebServerRequest *request){
         // Handle other types of not-found requests
         request->send(404, "text/plain", "Not Found"); 
     } 
-}
+};
 
-void setupWiFiServices(){
-    // NOTE: Here, you obtain the "ssid" and "password" 
-    // related to the access point that is created from the ESP8266.
+void configureAccessPoint(){
     DynamicJsonDocument ESP8266Config = getESP8266Config();
     const char* ssid = ESP8266Config["ssid"].as<const char*>();
     const char* password = ESP8266Config["password"].as<const char*>();
-
     WiFi.softAP(ssid, password);
     WiFi.softAPConfig(localIp, gateway, subnet);
-  
+};
+
+void setupDefaultHeaders(){
     DefaultHeaders::Instance().addHeader("Access-Control-Allow-Origin", "*");
     DefaultHeaders::Instance().addHeader("Access-Control-Allow-Methods", "GET, POST, PUT");
     DefaultHeaders::Instance().addHeader("Access-Control-Allow-Headers", "Content-Type");
+};
 
+void registerServerEndpoints(){
     httpServer.serveStatic("/admin-portal/", LittleFS, "/admin-portal/");
     httpServer.on("/api/v1/network/", HTTP_POST, handleWiFiCredentialsSave);
     httpServer.on("/api/v1/network/", HTTP_GET, handleAvailableWiFiNetworks); 
@@ -343,9 +366,13 @@ void setupWiFiServices(){
     httpServer.on("/api/v1/server/ap-config/", HTTP_GET, handleAccessPointConfig);
     httpServer.on("/api/v1/server/ap-config/", HTTP_PUT, handleAccessPointConfigUpdate);
     httpServer.onNotFound(notFoundHandler);
-
     httpServer.begin();
-    Serial.println("HTTP Server Started.");
+};
+
+void setupWiFiServices(){
+    configureAccessPoint(); 
+    setupDefaultHeaders();
+    registerServerEndpoints();
 };
 
 void setup(){
@@ -356,6 +383,4 @@ void setup(){
 };
 
 void loop(){
-    digitalWrite(BLUE_PIN, HIGH);
-    digitalWrite(BLUE_PIN, LOW);
 };
