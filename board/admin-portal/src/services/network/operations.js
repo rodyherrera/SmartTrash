@@ -11,12 +11,18 @@ export const getAvailableNetworks = () => async (dispatch) => {
     });
 };
 
+export const isESPConnectedToWiFi = () => async (dispatch) => {
+    const operation = new OperationHandler(networkSlice, dispatch);
+    operation.use({
+        api: networkService.isESPConnectedToWiFi,
+        loaderState: networkSlice.setIsConnectedToWiFiLoading,
+        responseState: networkSlice.setIsConnectedToWiFi
+    });
+};
+
 export const saveNetworkConnection = (body, navigate) => async (dispatch) => {
     const operation = new OperationHandler(networkSlice, dispatch);
-    operation.on('response', (data) => {
-        console.log(data);
-        navigate('/');
-    });
+    operation.on('response', () => navigate('/'));
     operation.use({
         api: networkService.saveNetworkConnection,
         loaderState: networkSlice.setIsLoading,

@@ -249,6 +249,7 @@ void networkSaveController(AsyncWebServerRequest *request){
     request->send(200, "application/json", doc.as<String>());
 };
 
+// NOTE: do this better in future versions...
 void availableWiFiNetworks(AsyncWebServerRequest *request){
     DynamicJsonDocument doc(256);
     doc["status"] = "success";

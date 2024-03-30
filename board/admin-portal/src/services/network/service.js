@@ -10,3 +10,8 @@ export const saveNetworkConnection = NetworkAPI.register({
     path: '/',
     method: 'POST'
 });
+
+export const isESPConnectedToWiFi = NetworkAPI.register({
+    path: '/is-connected/',
+    method: 'GET'
+});

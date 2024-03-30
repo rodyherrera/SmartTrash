@@ -1,0 +1,16 @@
+.Current-WiFi-Connection-Container{
+    display: flex;
+    align-items: center;
+    gap: .5rem;
+}
+
+.Current-WiFi-Connection-Container .MuiCircularProgress-root{
+    width: 1rem !important;
+    height: 1rem !important;
+    color: #000000 !important;
+}
+
+.Current-WiFi-Connection-Content{
+    font-weight: 350;
+    font-size: .75rem;
+}

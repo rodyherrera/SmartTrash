@@ -62,7 +62,6 @@ class OperationHandler{
         try{
             if(loaderState) this.dispatch(loaderState(true));
             const { data } = await api(query);
-            console.log(data);
             this.emit('response', data);
             if(responseState) this.dispatch(responseState(data));
         }catch(error){
