@@ -29,3 +29,12 @@ export const saveNetworkConnection = (body, navigate) => async (dispatch) => {
         query: { body }
     });
 };
+
+export const deleteCurrentWiFiNetwork = (navigate) => async (dispatch) => {
+    const operation = new OperationHandler(networkSlice, dispatch);
+    operation.on('response', () => navigate('/'));
+    operation.use({
+        api: networkService.deleteCurrentWiFiNetwork,
+        loaderState: networkSlice.setIsCurrentWiFiRemoveLoading
+    });
+};

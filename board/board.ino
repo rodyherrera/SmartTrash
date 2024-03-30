@@ -300,6 +300,22 @@ void handleWiFiCredentialsSave(AsyncWebServerRequest *request){
     request->send(200, "application/json", doc.as<String>());
 };
 
+void removeCurrentWiFiNetwork(AsyncWebServerRequest *request){
+    DynamicJsonDocument doc(128);
+    doc["ssid"] = "";
+    doc["password"] = "";
+    const bool isDeleted = saveWiFiCredentials(doc);
+    if(!isDeleted){
+        doc.clear();
+        doc["status"] = "error";
+        doc["data"]["message"] = "WiFi::RemoveCurrentNetworkError";
+        request->send(500, "application/json", doc.as<String>());
+        return;
+    }
+    doc["status"] = "success";
+    request->send(200, "application/json", doc.as<String>());
+};
+
 void handleAvailableWiFiNetworks(AsyncWebServerRequest *request){
     DynamicJsonDocument doc(128);
     DynamicJsonDocument currentWiFiCredentials = loadWiFiCredentials();
@@ -356,7 +372,7 @@ void configureAccessPoint(){
 
 void setupDefaultHeaders(){
     DefaultHeaders::Instance().addHeader("Access-Control-Allow-Origin", "*");
-    DefaultHeaders::Instance().addHeader("Access-Control-Allow-Methods", "GET, POST, PUT");
+    DefaultHeaders::Instance().addHeader("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE");
     DefaultHeaders::Instance().addHeader("Access-Control-Allow-Headers", "Content-Type");
 };
 
@@ -364,6 +380,7 @@ void registerServerEndpoints(){
     httpServer.serveStatic("/admin-portal/", LittleFS, "/admin-portal/");
     httpServer.on("/api/v1/network/", HTTP_POST, handleWiFiCredentialsSave);
     httpServer.on("/api/v1/network/", HTTP_GET, handleAvailableWiFiNetworks); 
+    httpServer.on("/api/v1/network/", HTTP_DELETE, removeCurrentWiFiNetwork);
     httpServer.on("/api/v1/network/is-connected/", HTTP_GET, handleWiFiConnectionStatus);
 
     httpServer.on("/api/v1/server/restart/", HTTP_GET, handleESPRestart);

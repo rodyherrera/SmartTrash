@@ -11,6 +11,11 @@ export const saveNetworkConnection = NetworkAPI.register({
     method: 'POST'
 });
 
+export const deleteCurrentWiFiNetwork = NetworkAPI.register({
+    path: '/',
+    method: 'DELETE'
+});
+
 export const isESPConnectedToWiFi = NetworkAPI.register({
     path: '/is-connected/',
     method: 'GET'
