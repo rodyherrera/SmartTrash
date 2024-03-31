@@ -1,0 +1,15 @@
+#Linking-Device-Title{
+    font-size: 1.6rem;
+    font-weight: 300;
+}
+
+#Linking-Device-Navigation-Container{
+    display: flex;
+    gap: 1rem;
+}
+
+@media screen and (max-width: 768px){
+    #Linking-Device-Navigation-Container{
+        flex-direction: column;
+    }
+}
