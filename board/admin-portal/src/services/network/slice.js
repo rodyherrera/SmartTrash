@@ -6,6 +6,7 @@ const state = {
     networks: [],
     isConnectedToWiFiLoading: true,
     isCurrentWiFiRemoveLoading: false,
+    isCurrentWiFiDisconnectLoading: false,
     isConnectedToWiFi: {}
 };
 
@@ -15,6 +16,9 @@ const networkSlice = createSlice({
     reducers: {
         setIsConnectedToWiFi: (state, action) => {
             state.isConnectedToWiFi = action.payload;
+        },
+        setIsCurrentWiFiDisconnectLoading: (state, action) => {
+            state.isCurrentWiFiDisconnectLoading = action.payload;
         },
         setIsCurrentWiFiRemoveLoading: (state, action) => {
             state.isCurrentWiFiRemoveLoading = action.payload;
@@ -41,7 +45,8 @@ export const {
     setNetworks,
     setIsCurrentWiFiRemoveLoading,
     setIsConnectedToWiFi,
-    setIsConnectedToWiFiLoading
+    setIsConnectedToWiFiLoading,
+    setIsCurrentWiFiDisconnectLoading
 } = networkSlice.actions;
 
 export default networkSlice.reducer;

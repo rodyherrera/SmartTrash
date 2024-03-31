@@ -1,19 +1,27 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import Breadcrumbs from '@components/general/Breadcrumbs';
 import RectangleCard from '@components/general/RectangleCard';
-import { deleteCurrentWiFiNetwork } from '@services/network/operations';
+import { disconnectCurrentWiFiNetwork, deleteCurrentWiFiNetwork } from '@services/network/operations';
 import { useSelector, useDispatch } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import './CurrentWiFiConnection.css';
 
 const CurrentWiFiConnection = () => {
-    const { isConnectedToWiFi, isCurrentWiFiRemoveLoading } = useSelector((state) => state.network);
+    const { isConnectedToWiFi, isCurrentWiFiRemoveLoading, isCurrentWiFiDisconnectLoading } = useSelector((state) => state.network);
     const dispatch = useDispatch();
     const navigate = useNavigate();
 
     const disconnectFromNetworkHandler = () => {
+        dispatch(disconnectCurrentWiFiNetwork(navigate));
+    };
+
+    const forgetNetworkHandler = () => {
         dispatch(deleteCurrentWiFiNetwork(navigate));
     };
+
+    useEffect(() => {
+        if(!isConnectedToWiFi?.ssid) navigate('/wifi/networks/');
+    }, []);
 
     return (
         <main id='Current-WiFi-Connection-Main'>
@@ -32,7 +40,10 @@ const CurrentWiFiConnection = () => {
                     onClick={disconnectFromNetworkHandler}
                     title='Disconnect from the network' 
                     isLoading={isCurrentWiFiRemoveLoading} />
-                <RectangleCard title='Forget network' />
+                <RectangleCard 
+                    onClick={forgetNetworkHandler}
+                    title='Forget network' 
+                    isLoading={isCurrentWiFiDisconnectLoading} />
             </section>
         </main>
     );

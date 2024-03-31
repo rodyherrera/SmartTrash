@@ -36,7 +36,7 @@ export const deleteCurrentWiFiNetwork = (navigate) => async (dispatch) => {
     operation.use({
         api: networkService.deleteCurrentWiFiNetwork,
         loaderState: networkSlice.setIsCurrentWiFiRemoveLoading,
-        query: { query: { params: { operation: 'FORGET' } } }
+        query: { query: { queryParams: { operation: 'FORGET' } } }
     });
 };
 
@@ -45,7 +45,7 @@ export const disconnectCurrentWiFiNetwork = (navigate) => async (dispatch) => {
     operation.on('response', () => navigate('/'));
     operation.use({
         api: networkService.deleteCurrentWiFiNetwork,
-        loaderState: networkSlice.setIsCurrentWiFiRemoveLoading,
-        query: { query: { params: { operation: 'DISCONNECT' } } }
+        loaderState: networkSlice.setIsCurrentWiFiDisconnectLoading,
+        query: { query: { queryParams: { operation: 'DISCONNECT' } } }
     });
 };

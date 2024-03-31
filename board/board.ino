@@ -169,6 +169,7 @@ const bool tryWiFiConnection(){
 
     const char* ssid = credentials["ssid"];
     const char* password = credentials["password"];
+    
     WiFi.begin(ssid, password);
     Serial.println("Connecting to WiFi...");
 
@@ -288,7 +289,13 @@ void handleWiFiCredentialsSave(AsyncWebServerRequest *request){
         return;
     }
 
-    WiFi.reconnect(ssid, password);
+    if(!tryWiFiConnection()){
+        doc.clear();
+        doc["status"] = "error";
+        doc["data"]["message"] = "Wifi::SavedCredentialsButNotConnected";
+        request->send(200, "application/json", doc.as<String>());
+        return;
+    }
 
     doc["status"] = "success";
     request->send(200, "application/json", doc.as<String>());
@@ -296,9 +303,9 @@ void handleWiFiCredentialsSave(AsyncWebServerRequest *request){
 
 void removeCurrentWiFiNetwork(AsyncWebServerRequest *request){
     DynamicJsonDocument doc(128);
+    WiFi.disconnect();
     if(request->hasParam("operation") && request->getParam("operation")->value() == "DISCONNECT"){
         doc["status"] = "success";
-        WiFi.disconnect();
         request->send(200, "application/json", doc.as<String>());
         return;
     }
