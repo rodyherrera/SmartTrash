@@ -17,7 +17,10 @@ const CurrentWiFiConnection = () => {
     }, []);
 
     const onClickHandler = () => {
-        if(!isConnectedToWiFi?.ssid) return;
+        if(!isConnectedToWiFi?.ssid){
+            navigate('/wifi/networks/');
+            return;
+        }
         navigate('/wifi/current-network/');
     };
 
