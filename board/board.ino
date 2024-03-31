@@ -182,12 +182,6 @@ const bool tryWiFiConnection(){
     return isConnected;
 };
 
-void handleServerHealth(AsyncWebServerRequest *request){
-    DynamicJsonDocument doc(64);
-    doc["status"] = "success";
-    request->send(200, "application/json", doc.as<String>());
-};
-
 void handleAccessPointReset(AsyncWebServerRequest *request){
     DynamicJsonDocument doc(128);
     doc["status"] = "success";
@@ -391,7 +385,6 @@ void registerServerEndpoints(){
     httpServer.on("/api/v1/network/is-connected/", HTTP_GET, handleWiFiConnectionStatus);
 
     httpServer.on("/api/v1/server/restart/", HTTP_GET, handleESPRestart);
-    httpServer.on("/api/v1/server/health/", HTTP_GET, handleServerHealth);
     httpServer.on("/api/v1/server/ap-config/", HTTP_GET, handleAccessPointConfig);
     httpServer.on("/api/v1/server/ap-config/", HTTP_PUT, handleAccessPointConfigUpdate);
     httpServer.on("/api/v1/server/ap-config/reset/", HTTP_GET, handleAccessPointReset);
