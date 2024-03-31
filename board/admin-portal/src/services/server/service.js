@@ -15,3 +15,8 @@ export const restartESP = ServerAPI.register({
     path: '/restart/',
     method: 'GET'
 });
+
+export const resetAPConfig = ServerAPI.register({
+    path: '/ap-config/reset/',
+    method: 'GET'
+});

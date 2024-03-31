@@ -1,4 +1,4 @@
-.Restart-ESP-Button-Container{
+.Reset-AP-Config-Button-Container{
     border: 1px solid #121212;
     padding: .3rem 1rem;
     font-size: .75rem;
@@ -9,17 +9,17 @@
     gap: .5rem;
 }
 
-.Restart-ESP-Button-Container .MuiCircularProgress-root{
+.Reset-AP-Config-Button-Container .MuiCircularProgress-root{
     width: 1rem !important;
     height: 1rem !important;
     color: #121212 !important;
 }
 
-.Restart-ESP-Button-Container:hover{
+.Reset-AP-Config-Button-Container:hover{
     border-color: #0f62fe;
     color: #0f62fe;
 }
 
-.Restart-ESP-Button-Container:hover .MuiCircularProgress-root{
+.Reset-AP-Config-Button-Container:hover .MuiCircularProgress-root{
     color: #0f62fe !important;
 }

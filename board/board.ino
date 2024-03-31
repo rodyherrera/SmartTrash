@@ -172,13 +172,6 @@ const bool tryWiFiConnection(){
     WiFi.begin(ssid, password);
     Serial.println("Connecting to WiFi...");
 
-    unsigned short int connectionAttempts = 0;
-    while(WiFi.status() != WL_CONNECTED && connectionAttempts < MAX_WIFI_CONNECTION_ATTEMPS){
-        delay(1000);
-        Serial.print(".");
-        connectionAttempts++;
-    }
-
     const bool isConnected = WiFi.status() == WL_CONNECTED;
     if(isConnected){
         Serial.println("Connected to WiFi.");
@@ -191,6 +184,13 @@ const bool tryWiFiConnection(){
 void handleServerHealth(AsyncWebServerRequest *request){
     DynamicJsonDocument doc(64);
     doc["status"] = "success";
+    request->send(200, "application/json", doc.as<String>());
+};
+
+void handleAccessPointReset(AsyncWebServerRequest *request){
+    DynamicJsonDocument doc(128);
+    doc["status"] = "success";
+    doc["data"] = loadDefaultESP8266Config();
     request->send(200, "application/json", doc.as<String>());
 };
 
@@ -244,7 +244,7 @@ void handleAccessPointConfigUpdate(AsyncWebServerRequest *request){
         request->send(500, "application/json", doc.as<String>());
         return;
     }
-
+  
     doc["status"] = "success";
     request->send(200, "application/json", doc.as<String>());
 };
@@ -288,13 +288,7 @@ void handleWiFiCredentialsSave(AsyncWebServerRequest *request){
         return;
     }
 
-    if(!tryWiFiConnection()){
-        doc.clear();
-        doc["status"] = "error";
-        doc["data"]["message"] = "Wifi::SavedCredentialsButNotConnected";
-        request->send(200, "application/json", doc.as<String>());
-        return;
-    }
+    WiFi.reconnect(ssid, password);
 
     doc["status"] = "success";
     request->send(200, "application/json", doc.as<String>());
@@ -302,6 +296,12 @@ void handleWiFiCredentialsSave(AsyncWebServerRequest *request){
 
 void removeCurrentWiFiNetwork(AsyncWebServerRequest *request){
     DynamicJsonDocument doc(128);
+    if(request->hasParam("operation") && request->getParam("operation")->value() == "DISCONNECT"){
+        doc["status"] = "success";
+        WiFi.disconnect();
+        request->send(200, "application/json", doc.as<String>());
+        return;
+    }
     doc["ssid"] = "";
     doc["password"] = "";
     const bool isDeleted = saveWiFiCredentials(doc);
@@ -318,8 +318,8 @@ void removeCurrentWiFiNetwork(AsyncWebServerRequest *request){
 
 void handleAvailableWiFiNetworks(AsyncWebServerRequest *request){
     DynamicJsonDocument doc(128);
-    DynamicJsonDocument currentWiFiCredentials = loadWiFiCredentials();
-    const char* currentWiFiSSID = currentWiFiCredentials["ssid"];
+    String currentWiFiSSID = WiFi.SSID();
+    const bool isConnected = WiFi.status() == WL_CONNECTED;
     doc["status"] = "success";
     JsonArray networks = doc.createNestedArray("data");
     int totalNetworks = WiFi.scanComplete();
@@ -332,7 +332,7 @@ void handleAvailableWiFiNetworks(AsyncWebServerRequest *request){
         for(unsigned short int i = 0; i < totalNetworks; i++){
             JsonObject network = networks.createNestedObject();
             network["ssid"] = WiFi.SSID(i);
-            network["isCurrent"] = currentWiFiSSID == network["ssid"];
+            network["isCurrent"] = currentWiFiSSID == network["ssid"] && isConnected;
         }
         WiFi.scanDelete();
     }
@@ -387,6 +387,7 @@ void registerServerEndpoints(){
     httpServer.on("/api/v1/server/health/", HTTP_GET, handleServerHealth);
     httpServer.on("/api/v1/server/ap-config/", HTTP_GET, handleAccessPointConfig);
     httpServer.on("/api/v1/server/ap-config/", HTTP_PUT, handleAccessPointConfigUpdate);
+    httpServer.on("/api/v1/server/ap-config/reset/", HTTP_GET, handleAccessPointReset);
     httpServer.onNotFound(notFoundHandler);
     httpServer.begin();
 };

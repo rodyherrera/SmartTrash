@@ -27,3 +27,11 @@ export const restartESP = () => async (dispatch) => {
         api: serverService.restartESP
     });
 };
+
+export const resetAPConfig = () => async (dispatch) => {
+    const operation = new OperationHandler(serverSlice, dispatch);
+    operation.use({
+        api: serverService.resetAPConfig,
+        loaderState: serverSlice.setIsAPUpdateLoading
+    });
+};

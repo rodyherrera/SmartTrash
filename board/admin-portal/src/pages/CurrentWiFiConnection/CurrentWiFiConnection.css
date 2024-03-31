@@ -1,0 +1,10 @@
+#Current-WiFi-Connection-Title{
+    font-size: 1.6rem;
+    font-weight: 300;
+}
+
+#Current-WiFi-Connection-Body{
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}

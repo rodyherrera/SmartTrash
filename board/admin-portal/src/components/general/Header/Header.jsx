@@ -1,6 +1,7 @@
 import React from 'react';
 import CurrentWiFiConnection from '@components/network/CurrentWiFiConnection';
 import RestartESPButton from '@components/server/RestartESPButton';
+import ResetAPConfigButton from '@components/server/ResetAPConfigButton';
 import './Header.css';
 
 const Header = () => {
@@ -10,6 +11,7 @@ const Header = () => {
             <section className='Header-Brand-Container'>
             </section>
             <section className='Header-ESP-Related-Container'>
+                <ResetAPConfigButton />
                 <RestartESPButton />
                 <CurrentWiFiConnection />
             </section>
