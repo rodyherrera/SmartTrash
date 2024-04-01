@@ -11,8 +11,8 @@
 ****/
 
 #include <ESP8266WiFi.h>
+#include <ESPAsyncTCP.h>
 #include <ESPAsyncWebServer.h>
-#include <ESP8266HTTPClient.h>
 #include <LittleFS.h>
 #include <ArduinoJson.h>
 
@@ -20,7 +20,7 @@ const char* DEFAULT_ESP8266_AP_SSID = "SmartTrash-AP";
 const char* DEFAULT_ESP8266_AP_PASSWORD = "toortoor";
 const char* ESP8266_CONFIG_FILE = "/ESP8266Config.json";
 const char* CREDENTIALS_FILE = "/WiFiCredentials.json";
-const char* SERVER_ENDPOINT = "http://172.20.10.3:5430";
+const char* CLOUD_SERVER_ADDRESS = "82.208.22.71";
 
 IPAddress localIp(192, 168, 1, 1);
 IPAddress gateway(192, 168, 1, 1);
@@ -33,14 +33,80 @@ const uint8_t GREEN_PIN = D2;
 const uint8_t BLUE_PIN = D3;
 const uint8_t MAX_WIFI_CONNECTION_ATTEMPS = 15;
 
+const uint16_t CLOUD_SERVER_PORT = 3140;
 const uint16_t WEB_SERVER_PORT = 80;
 const uint32_t DISTANCE_READ_TIMEOUT = 30000;
 const uint32_t MEASUREMENT_DELAY_MS = 3000;  
 
 AsyncWebServer httpServer(WEB_SERVER_PORT);
-
 const float SPEED_OF_SOUND_CM_PER_US = 0.034 / 2;
 unsigned long lastTime = 0;
+
+void handleSmartTrashCloudAccountCreation(AsyncWebServerRequest *request){
+    if(WiFi.status() != WL_CONNECTED){
+        DynamicJsonDocument doc(64);
+        doc["status"] = "error";
+        doc["data"]["message"] = "WiFi::NotConnected";
+        request->send(400, "application/json", doc.as<String>());
+        return;
+    }
+
+    AsyncClient *client = new AsyncClient;
+    client->onConnect([](void *arg, AsyncClient *client) {
+        AsyncWebServerRequest* request = (AsyncWebServerRequest *)arg;
+        ESP.wdtFeed();
+        
+        String body = request->getParam("plain", true)->value();
+        String path = "/api/v1/auth/sign-up/";
+
+        String httpRequest =
+            "POST " + path + " HTTP/1.1\r\n" +
+            "Host: " + CLOUD_SERVER_ADDRESS + ":" + CLOUD_SERVER_PORT + "\r\n" +
+            "Connection: close\r\n" +
+            "Content-Type: application/json\r\n" +
+            "Content-Length: " + String(body.length()) + "\r\n\r\n" +
+            body;
+        
+        client->write(httpRequest.c_str());
+
+        client->onData([](void *arg, AsyncClient *client, void *data, size_t len){
+            ESP.wdtFeed();
+            AsyncWebServerRequest* request = (AsyncWebServerRequest *)arg;
+            DynamicJsonDocument doc(256);
+            uint8_t* bytes = (uint8_t *)data;
+            String responseBuffer = String((char*)bytes);
+            short int jsonStartIndex = responseBuffer.indexOf("\r\n\r\n");
+            if(jsonStartIndex != -1){
+                ESP.wdtFeed();
+                String jsonString = responseBuffer.substring(jsonStartIndex + 4);
+                DeserializationError error = deserializeJson(doc, jsonString);
+                if(!error){
+                    client->close();
+                    Serial.println("SUCCESSFULLY DESERIALIZED");
+                    request->send(200, "application/json", doc.as<String>());
+                }else{
+                    doc.clear();
+                    doc["status"] = "error";
+                    doc["data"]["message"] = "Core::InvalidJSONFormat";
+                    Serial.println("PROBLEMS");
+                    request->send(400, "application/json", doc.as<String>());
+                }
+            }
+        }, arg);
+    }, request);
+
+    client->onError([](void *arg, AsyncClient *client, int8_t error){
+        ESP.wdtFeed();
+        DynamicJsonDocument doc(64);
+        doc["status"] = "error";
+        doc["data"]["message"] = "Core::ServerConnectionError";
+        AsyncWebServerRequest* request = (AsyncWebServerRequest *)arg;
+        request->send(500, "application/json", doc.as<String>());
+    }, request);
+
+    client->connect(CLOUD_SERVER_ADDRESS, CLOUD_SERVER_PORT);
+    ESP.wdtFeed();
+}
 
 static unsigned short int getDistance(){
     // Send a brief high pulse to trigger the sensor
@@ -57,6 +123,7 @@ static unsigned short int getDistance(){
 
 // Sends distance data to the server
 void sendData(unsigned short int distance){
+  /*
     if(WiFi.status() != WL_CONNECTED){
         Serial.println("WiFi not connected.");
         return;
@@ -76,7 +143,7 @@ void sendData(unsigned short int distance){
     }else{
         Serial.print("Error sending data. HTTP code: ");
         Serial.println(httpResponseCode);
-    }
+    }*/
 };
 
 const bool saveWiFiCredentials(DynamicJsonDocument credentials){
@@ -173,7 +240,16 @@ const bool tryWiFiConnection(){
     WiFi.begin(ssid, password);
     Serial.println("Connecting to WiFi...");
 
+    unsigned short int connectionAttempts = 0;
+
+    while(WiFi.status() != WL_CONNECTED && connectionAttempts < MAX_WIFI_CONNECTION_ATTEMPS){
+        delay(500);
+        connectionAttempts++;
+        ESP.wdtFeed();
+    }
+
     const bool isConnected = WiFi.status() == WL_CONNECTED;
+    
     if(isConnected){
         Serial.println("Connected to WiFi.");
     }else{
@@ -217,6 +293,7 @@ void handleAccessPointConfigUpdate(AsyncWebServerRequest *request){
     const char* plainBody = request->getParam("plain", true)->value().c_str();
     DeserializationError error = deserializeJson(doc, plainBody);
     if(error){
+        doc.clear();
         doc["status"] = "error";
         doc["data"]["message"] = "Core::InvalidJSONFormat";
         request->send(400, "application/json", doc.as<String>());
@@ -345,7 +422,6 @@ void configureHardware(){
         Serial.println("Failed to initialize LittleFS");
         return;
     }
-
     pinMode(TRIGGER_PIN, OUTPUT);
     pinMode(ECHO_PIN, INPUT);
     pinMode(RED_PIN, OUTPUT);
@@ -367,7 +443,7 @@ void configureAccessPoint(){
     DynamicJsonDocument ESP8266Config = getESP8266Config();
     const char* ssid = ESP8266Config["ssid"].as<const char*>();
     const char* password = ESP8266Config["password"].as<const char*>();
-    WiFi.softAP(ssid, password);
+    WiFi.softAP(ssid, password, 1, false, 8);
     WiFi.softAPConfig(localIp, gateway, subnet);
 };
 
@@ -378,7 +454,7 @@ void setupDefaultHeaders(){
 };
 
 void registerServerEndpoints(){
-    httpServer.serveStatic("/admin-portal/", LittleFS, "/admin-portal/");
+    httpServer.serveStatic("/", LittleFS, "/").setDefaultFile("index.html");
     httpServer.on("/api/v1/network/", HTTP_POST, handleWiFiCredentialsSave);
     httpServer.on("/api/v1/network/", HTTP_GET, handleAvailableWiFiNetworks); 
     httpServer.on("/api/v1/network/", HTTP_DELETE, removeCurrentWiFiNetwork);
@@ -388,6 +464,8 @@ void registerServerEndpoints(){
     httpServer.on("/api/v1/server/ap-config/", HTTP_GET, handleAccessPointConfig);
     httpServer.on("/api/v1/server/ap-config/", HTTP_PUT, handleAccessPointConfigUpdate);
     httpServer.on("/api/v1/server/ap-config/reset/", HTTP_GET, handleAccessPointReset);
+
+    httpServer.on("/api/v1/auth/sign-up/", HTTP_POST, handleSmartTrashCloudAccountCreation);
     httpServer.onNotFound(notFoundHandler);
     httpServer.begin();
 };

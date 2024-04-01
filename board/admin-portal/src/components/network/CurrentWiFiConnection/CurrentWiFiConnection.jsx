@@ -4,7 +4,6 @@ import { CircularProgress } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
 import { FiWifiOff, FiWifi } from 'react-icons/fi';
 import { isESPConnectedToWiFi } from '@services/network/operations';
-import Button from '@components/general/Button';
 import './CurrentWiFiConnection.css';
 
 const CurrentWiFiConnection = () => {

@@ -2,6 +2,8 @@ import React, { useEffect, useState } from 'react';
 import Breadcrumbs from '@components/general/Breadcrumbs';
 import Button from '@components/general/Button';
 import Input from '@components/general/Input';
+import { useSelector, useDispatch } from 'react-redux';
+import { signUp } from '@services/auth/operations';
 import './SignUp.css';
 
 const SignUp = () => {
@@ -10,6 +12,13 @@ const SignUp = () => {
     const [passwordConfirm, setPasswordConfirm] = useState('');
     const [email, setEmail] = useState('');
     const [fullname, setFullname] = useState('');
+    const dispatch = useDispatch();
+    const { isLoading } = useSelector((state) => state.auth);
+
+    const formSubmitHandler = (e) => {
+        e.preventDefault();
+        dispatch(signUp({ username, password, passwordConfirm, email, fullname }));
+    };
 
     useEffect(() => {
         return () => {
@@ -33,7 +42,7 @@ const SignUp = () => {
             <section id='SignUp-Header-Container'>
                 <h3 id='SignUp-Header-Title'>Let's start creating your account!</h3>
             </section>
-            <form id='SignUp-Body-Container'>
+            <form id='SignUp-Body-Container' onSubmit={formSubmitHandler}>
                 <Input
                     value={username}
                     onChange={(e) => setUsername(e.target.value)}
@@ -60,6 +69,7 @@ const SignUp = () => {
                     type='password'
                     placeholder='Confirm the password previously entered.' />
                 <Button
+                    isLoading={isLoading}
                     type='submit'
                     title='Create account' />
             </form>

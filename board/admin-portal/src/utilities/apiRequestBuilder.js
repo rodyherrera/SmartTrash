@@ -78,7 +78,6 @@ class APIRequestBuilder{
             const data = new URLSearchParams();
             data.append('plain', JSON.stringify(body));
             const args = [url, data];
-            console.log(url);
             this.setAuthorizationHeader();
             return new ServerRequestBuilder()
                 .register({ callback: axios[method.toLowerCase()], args });
