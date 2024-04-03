@@ -15,6 +15,7 @@
 #include <ESPAsyncWebServer.h>
 #include <LittleFS.h>
 #include <ArduinoJson.h>
+#include <sstream>
 
 const char* DEFAULT_ESP8266_AP_SSID = "SmartTrash-AP";
 const char* DEFAULT_ESP8266_AP_PASSWORD = "toortoor";
@@ -42,6 +43,26 @@ AsyncWebServer httpServer(WEB_SERVER_PORT);
 const float SPEED_OF_SOUND_CM_PER_US = 0.034 / 2;
 unsigned long lastTime = 0;
 
+const char* buildHTTPRequest(
+    const char* path, 
+    const char* method = "GET", 
+    const char* body = "",
+    const char* contentType = "application/json"
+){
+    std::stringstream request;
+    request.reserve(128);
+    request << method << " " << path << " HTTP/1.1\r\n"
+            << "Host: " << CLOUD_SERVER_ADDRESS << ":" << CLOUD_SERVER_PORT << "\r\n"
+            << "Connection: close\r\n"
+            << "Content-Type: " << contentType << "\r\n";
+    unsigned int bodyLength = strlen(body);
+    if(bodyLength >= 1){
+        request << "Content-Length: " << bodyLength << "\r\n\r\n"
+                << body;
+    }
+    return request.c_str();
+};
+
 void handleSmartTrashCloudAccountCreation(AsyncWebServerRequest *request){
     if(WiFi.status() != WL_CONNECTED){
         DynamicJsonDocument doc(64);
@@ -56,18 +77,9 @@ void handleSmartTrashCloudAccountCreation(AsyncWebServerRequest *request){
         AsyncWebServerRequest* request = (AsyncWebServerRequest *)arg;
         ESP.wdtFeed();
         
-        String body = request->getParam("plain", true)->value();
-        String path = "/api/v1/auth/sign-up/";
-
-        String httpRequest =
-            "POST " + path + " HTTP/1.1\r\n" +
-            "Host: " + CLOUD_SERVER_ADDRESS + ":" + CLOUD_SERVER_PORT + "\r\n" +
-            "Connection: close\r\n" +
-            "Content-Type: application/json\r\n" +
-            "Content-Length: " + String(body.length()) + "\r\n\r\n" +
-            body;
-        
-        client->write(httpRequest.c_str());
+        const char* body = request->getParam("plain", true)->value().c_str();
+        const char* httpRequest = buildHTTPRequest("/api/v1/auth/sign-up/", "POST", body);
+        client->write(httpRequest);
 
         client->onData([](void *arg, AsyncClient *client, void *data, size_t len){
             ESP.wdtFeed();
@@ -76,25 +88,15 @@ void handleSmartTrashCloudAccountCreation(AsyncWebServerRequest *request){
             uint8_t* bytes = (uint8_t *)data;
             String responseBuffer = String((char*)bytes);
             short int jsonStartIndex = responseBuffer.indexOf("\r\n\r\n");
+            Serial.println(responseBuffer);
             if(jsonStartIndex != -1){
-                ESP.wdtFeed();
                 String jsonString = responseBuffer.substring(jsonStartIndex + 4);
-                DeserializationError error = deserializeJson(doc, jsonString);
-                if(!error){
-                    client->close();
-                    Serial.println("SUCCESSFULLY DESERIALIZED");
-                    request->send(200, "application/json", doc.as<String>());
-                }else{
-                    doc.clear();
-                    doc["status"] = "error";
-                    doc["data"]["message"] = "Core::InvalidJSONFormat";
-                    Serial.println("PROBLEMS");
-                    request->send(400, "application/json", doc.as<String>());
-                }
+                Serial.println(jsonString);
+                request->send(200, "application/json", jsonString);
             }
         }, arg);
     }, request);
-
+  
     client->onError([](void *arg, AsyncClient *client, int8_t error){
         ESP.wdtFeed();
         DynamicJsonDocument doc(64);
