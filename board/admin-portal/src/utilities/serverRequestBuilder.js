@@ -39,7 +39,8 @@ class ServerRequestBuilder{
         try{
             let response = await callback(...args);
             // Check for 'pending' status before returning
-            if (response.data.status === 'pending'){
+            console.log('Response ->', response);
+            if(response.data.status === 'pending'){
                 // I seriously have to put this shit 
                 // up because the ESP8266 is incapable 
                 // of doing this right...

@@ -34,7 +34,7 @@ process.on('SIGINT', async () => {
 // Starts the HTTP Server
 httpServer.listen(SERVER_PORT, SERVER_HOST, async () => {
     try{
-        await mongoConnector();
+        mongoConnector();
         console.log(`[SmartTrash Cloud Server]: Server running at http://${SERVER_HOST}:${SERVER_PORT}/.`);
     }catch(error){
         console.error('[SmartTrash Cloud Server]: Error during server initialization:', error);

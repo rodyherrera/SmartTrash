@@ -27,18 +27,6 @@ bootstrap.configureApp({
     }
 });
 
-app.all('*', (req, res) => {
-    if(req.path.startsWith('/api/v1/')){
-        return res.status(404).json({
-            status: 'error',
-            data: {
-                message: 'INVALID_API_REQUEST',
-                url: req.originalUrl
-            }
-        })
-    }
-    res.redirect(process.env.CLIENT_HOST);
-});
 
 app.use(globalErrorHandler);
 
