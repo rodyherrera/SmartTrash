@@ -11,11 +11,11 @@
 #include "utilities.h"
 #include "network.h"
 #include "controllers/auth.h"
-#include "controllers/network.h"
+#include "controllers/neltwork.h"
 #include "controllers/server.h"
 
 WiFiClient wifiClient;
-PubSubClient psClient(wifiClient);
+PubSubClient mqttClient(wifiClient);
 AsyncWebServer httpServer(WEB_SERVER_PORT);
 
 void configureHardware(){
@@ -32,18 +32,18 @@ void configureHardware(){
 
 void connectToMQTT(){
     if(WiFi.status() != WL_CONNECTED) return;
-    psClient.setServer(MQTT_SERVER, MQTT_SERVER_PORT);
-    while(!psClient.connected()){
+    mqttClient.setServer(MQTT_SERVER, MQTT_SERVER_PORT);
+    while(!mqttClient.connected()){
         ESP.wdtFeed();
         Serial.print("Attempting MQTT connection...");
         String clientId = "SmartTrashClient-";
         clientId += String(random(0xffff), HEX);
-        if(psClient.connect(clientId.c_str(), MQTT_USERNAME, MQTT_PASSWORD)){
+        if(mqttClient.connect(clientId.c_str(), MQTT_USERNAME, MQTT_PASSWORD)){
             Serial.println("Connected to MQTT server.");
-            psClient.subscribe(MQTT_USENSOR_TOPIC);
+            mqttClient.subscribe(MQTT_USENSOR_TOPIC);
         }else{
             Serial.print(" failed, rc=");
-            Serial.print(psClient.state());
+            Serial.print(mqttClient.state());
             Serial.println("Trying again in 5 seconds...");
             delay(5000);
         }

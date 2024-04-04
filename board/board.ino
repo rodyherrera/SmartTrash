@@ -21,7 +21,7 @@
 #include "network.h"
 #include "bootstrap.h"
 
-static unsigned short int getDistance(){
+long getDistance(){
     // Send a brief high pulse to trigger the sensor
     digitalWrite(TRIGGER_PIN, HIGH);
     // 10 microsecond pulse as per sensor requirements
@@ -30,7 +30,7 @@ static unsigned short int getDistance(){
     digitalWrite(TRIGGER_PIN, LOW);
     
     // Measure round-trip echo time
-    unsigned long duration = pulseIn(ECHO_PIN, HIGH, DISTANCE_READ_TIMEOUT);
+    long duration = pulseIn(ECHO_PIN, HIGH, DISTANCE_READ_TIMEOUT);
     return duration * SPEED_OF_SOUND_CM_PER_US;
 };
 
@@ -44,13 +44,13 @@ void setup(){
 void sendDistance(){
     DynamicJsonDocument jsonDoc(1024);
     jsonDoc["status"] = "success";
-    jsonDoc["data"]["measuredDistance"] = "0";
+    jsonDoc["data"]["measuredDistance"] = getDistance();
     char jsonBuffer[512];
     serializeJson(jsonDoc, jsonBuffer);
-    psClient.publish(MQTT_USENSOR_TOPIC, jsonBuffer);
+    mqttClient.publish(MQTT_USENSOR_TOPIC, jsonBuffer);
 };
 
 void loop(){
-    if(!psClient.connected()) connectToMQTT();
+    if(!mqttClient.connected()) connectToMQTT();
     sendDistance();
 };

@@ -10,7 +10,7 @@ const char* CREDENTIALS_FILE = "/WiFiCredentials.json";
 const char* MQTT_USENSOR_TOPIC = "sensors/ultrasonic";
 
 const char* CLOUD_SERVER_ADDRESS = "";
-const char* MQTT_SERVER = "mqtt.rodyherrera.com";
+const char* MQTT_SERVER = "";
 const char* MQTT_USERNAME = "";
 const char* MQTT_PASSWORD = "";
 const uint16_t MQTT_SERVER_PORT = 1883;

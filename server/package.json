@@ -16,6 +16,7 @@
     "jsonwebtoken": "^9.0.2",
     "module-alias": "^2.2.3",
     "mongoose": "^8.2.4",
+    "mqtt": "^5.5.0",
     "notenv": "^2.0.3",
     "validator": "^13.11.0"
   }
