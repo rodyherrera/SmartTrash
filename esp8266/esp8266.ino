@@ -15,11 +15,11 @@
 #include <LittleFS.h>
 #include <ArduinoJson.h>
 
-#include "config.h"
-#include "hardware.h"
-#include "utilities.h"
-#include "network.h"
-#include "bootstrap.h"
+#include "src/config/config.hpp"
+#include "src/hardware/hardware.hpp"
+#include "src/utilities/utilities.hpp"
+#include "src/network/network.hpp"
+#include "src/bootstrap/bootstrap.hpp"
 
 long getDistance(){
     // Send a brief high pulse to trigger the sensor
@@ -36,9 +36,9 @@ long getDistance(){
 
 void setup(){
     Serial.begin(9600);
-    configureHardware();
-    setupWiFiServices();
-    tryWiFiConnection();
+    Bootstrap::configureHardware();
+    Bootstrap::setupWiFiServices();
+    Network::tryWiFiConnection();
 };
 
 void sendDistance(){
@@ -51,6 +51,6 @@ void sendDistance(){
 };
 
 void loop(){
-    if(!mqttClient.connected()) connectToMQTT();
+    if(!mqttClient.connected()) Bootstrap::connectToMQTT();
     sendDistance();
 };

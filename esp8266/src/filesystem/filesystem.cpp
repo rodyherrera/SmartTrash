@@ -1,11 +1,6 @@
-#ifndef FILESYSTEM_H
-#define FILESYSTEM_H
+#include "filesystem.hpp"
 
-#include <LittleFS.h>
-#include <ArduinoJson.h>
-#include "config.h" 
-
-const bool saveWiFiCredentials(DynamicJsonDocument credentials){
+const bool FileSystem::saveWiFiCredentials(DynamicJsonDocument credentials){
     File file = LittleFS.open(CREDENTIALS_FILE, "w"); 
     if(!file){
         Serial.println("Failed to open file for writing");
@@ -22,7 +17,8 @@ const bool saveWiFiCredentials(DynamicJsonDocument credentials){
     return true;
 };
 
-const bool saveESP8266Config(DynamicJsonDocument config){
+
+const bool FileSystem::saveESP8266Config(DynamicJsonDocument config){
     File file = LittleFS.open(ESP8266_CONFIG_FILE, "w");
     if(!file){
         Serial.println("Can't open the ESP8266 configuration file.");
@@ -37,7 +33,7 @@ const bool saveESP8266Config(DynamicJsonDocument config){
     return true;
 };
 
-DynamicJsonDocument loadDefaultESP8266Config(){
+DynamicJsonDocument FileSystem::loadDefaultESP8266Config(){
     DynamicJsonDocument defaultConfig(128);
     defaultConfig["ssid"] = DEFAULT_ESP8266_AP_SSID;
     defaultConfig["password"] = DEFAULT_ESP8266_AP_PASSWORD;
@@ -45,7 +41,7 @@ DynamicJsonDocument loadDefaultESP8266Config(){
     return defaultConfig;
 };
 
-DynamicJsonDocument getESP8266Config(){
+DynamicJsonDocument FileSystem::getESP8266Config(){
     File file = LittleFS.open(ESP8266_CONFIG_FILE, "r");
     if(!file){
         // I don't know if this is correct but, we will assume that if 
@@ -66,7 +62,7 @@ DynamicJsonDocument getESP8266Config(){
     return config;
 };
 
-DynamicJsonDocument loadWiFiCredentials(){
+DynamicJsonDocument FileSystem::loadWiFiCredentials(){
     DynamicJsonDocument credentials(128);
     File file = LittleFS.open(CREDENTIALS_FILE, "r"); 
     if(!file){
@@ -84,5 +80,3 @@ DynamicJsonDocument loadWiFiCredentials(){
     file.close();
     return credentials;
 };
-
-#endif

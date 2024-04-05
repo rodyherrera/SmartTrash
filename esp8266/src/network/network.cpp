@@ -1,13 +1,7 @@
-#ifndef NETWORK_H
-#define NETWORK_H
+#include "network.hpp"
 
-#include <WiFiClient.h>
-
-#include "config.h"
-#include "filesystem.h"
-
-const bool tryWiFiConnection(){
-    DynamicJsonDocument credentials = loadWiFiCredentials();
+const bool Network::tryWiFiConnection(){
+    DynamicJsonDocument credentials = FileSystem::loadWiFiCredentials();
 
     if(!credentials.containsKey("ssid") || !credentials.containsKey("password")){
         Serial.println("Missing WiFi credentials.");
@@ -38,12 +32,10 @@ const bool tryWiFiConnection(){
     return isConnected;
 };
 
-void configureAccessPoint(){
-    DynamicJsonDocument ESP8266Config = getESP8266Config();
+void Network::configureAccessPoint(){
+    DynamicJsonDocument ESP8266Config = FileSystem::getESP8266Config();
     const char* ssid = ESP8266Config["ssid"].as<const char*>();
     const char* password = ESP8266Config["password"].as<const char*>();
     WiFi.softAP(ssid, password, 1, false, 8);
     WiFi.softAPConfig(localIp, gateway, subnet);
 };
-
-#endif

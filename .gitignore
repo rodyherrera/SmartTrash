@@ -4,5 +4,5 @@ server/.env
 
 .vscode/
 
-board/admin-portal/node_modules/
-board/admin-portal/package-lock.json
+esp8266/admin/node_modules/
+esp8266/admin/package-lock.json

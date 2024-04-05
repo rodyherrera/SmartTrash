@@ -1,4 +1,6 @@
-void handleAvailableWiFiNetworks(AsyncWebServerRequest *request){
+#include "network.hpp"
+
+void NetworkController::handleAvailableWiFiNetworks(AsyncWebServerRequest *request){
     DynamicJsonDocument doc(128);
     String currentWiFiSSID = WiFi.SSID();
     const bool isConnected = WiFi.status() == WL_CONNECTED;
@@ -21,7 +23,7 @@ void handleAvailableWiFiNetworks(AsyncWebServerRequest *request){
     request->send(200, "application/json", doc.as<String>());
 };
 
-void handleWiFiCredentialsSave(AsyncWebServerRequest *request){
+void NetworkController::handleWiFiCredentialsSave(AsyncWebServerRequest *request){
     DynamicJsonDocument doc(128);
 
     const char* plainBody = request->getParam("plain", true)->value().c_str(); 
@@ -45,7 +47,7 @@ void handleWiFiCredentialsSave(AsyncWebServerRequest *request){
     }
 
     // TODO: remove potential additional parameters from the request body.
-    if(!saveWiFiCredentials(doc)){
+    if(!FileSystem::saveWiFiCredentials(doc)){
         doc.clear();
         doc["status"] = "error";
         doc["data"]["message"] = "Wifi::ErrorSavingCredentials";
@@ -53,7 +55,7 @@ void handleWiFiCredentialsSave(AsyncWebServerRequest *request){
         return;
     }
 
-    if(!tryWiFiConnection()){
+    if(!Network::tryWiFiConnection()){
         doc.clear();
         doc["status"] = "error";
         doc["data"]["message"] = "Wifi::SavedCredentialsButNotConnected";
@@ -65,7 +67,7 @@ void handleWiFiCredentialsSave(AsyncWebServerRequest *request){
     request->send(200, "application/json", doc.as<String>());
 };
 
-void removeCurrentWiFiNetwork(AsyncWebServerRequest *request){
+void NetworkController::removeCurrentWiFiNetwork(AsyncWebServerRequest *request){
     DynamicJsonDocument doc(128);
     WiFi.disconnect();
     if(request->hasParam("operation") && request->getParam("operation")->value() == "DISCONNECT"){
@@ -75,7 +77,7 @@ void removeCurrentWiFiNetwork(AsyncWebServerRequest *request){
     }
     doc["ssid"] = "";
     doc["password"] = "";
-    const bool isDeleted = saveWiFiCredentials(doc);
+    const bool isDeleted = FileSystem::saveWiFiCredentials(doc);
     if(!isDeleted){
         doc.clear();
         doc["status"] = "error";
@@ -87,7 +89,7 @@ void removeCurrentWiFiNetwork(AsyncWebServerRequest *request){
     request->send(200, "application/json", doc.as<String>());
 };
 
-void handleWiFiConnectionStatus(AsyncWebServerRequest *request){
+void NetworkController::handleWiFiConnectionStatus(AsyncWebServerRequest *request){
     DynamicJsonDocument doc(128);
     if(WiFi.status() != WL_CONNECTED){
         doc["status"] = "error";
@@ -96,7 +98,7 @@ void handleWiFiConnectionStatus(AsyncWebServerRequest *request){
         return;
     }
     doc["status"] = "success";
-    DynamicJsonDocument currentWiFiCredentials = loadWiFiCredentials();
+    DynamicJsonDocument currentWiFiCredentials = FileSystem::loadWiFiCredentials();
     doc["data"]["ssid"] = currentWiFiCredentials["ssid"];
     request->send(200, "application/json", doc.as<String>());
 };

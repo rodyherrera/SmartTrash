@@ -1,24 +1,10 @@
-#ifndef BOOTSTRAP_H
-#define BOOTSTRAP_H
-
-#include <WiFiClient.h>
-#include <ESP8266WiFi.h>
-#include <LittleFS.h>
-#include <PubSubClient.h>
-#include <ESPAsyncWebServer.h>
-
-#include "hardware.h"
-#include "utilities.h"
-#include "network.h"
-#include "controllers/auth.h"
-#include "controllers/neltwork.h"
-#include "controllers/server.h"
+#include "bootstrap.hpp"
 
 WiFiClient wifiClient;
 PubSubClient mqttClient(wifiClient);
 AsyncWebServer httpServer(WEB_SERVER_PORT);
 
-void configureHardware(){
+void Bootstrap::configureHardware(){
     if(!LittleFS.begin()){ 
         Serial.println("Failed to initialize LittleFS");
         return;
@@ -30,7 +16,7 @@ void configureHardware(){
     pinMode(GREEN_PIN, OUTPUT);
 };
 
-void connectToMQTT(){
+void Bootstrap::connectToMQTT(){
     if(WiFi.status() != WL_CONNECTED) return;
     mqttClient.setServer(MQTT_SERVER, MQTT_SERVER_PORT);
     while(!mqttClient.connected()){
@@ -50,7 +36,7 @@ void connectToMQTT(){
     }
 };
 
-void notFoundHandler(AsyncWebServerRequest *request){
+void Bootstrap::notFoundHandler(AsyncWebServerRequest *request){
     // Cors preflight
     if(request->method() == HTTP_OPTIONS){
         request->send(200);
@@ -60,27 +46,25 @@ void notFoundHandler(AsyncWebServerRequest *request){
     } 
 };
 
-void registerServerEndpoints(){
+void Bootstrap::registerServerEndpoints(){
     httpServer.serveStatic("/", LittleFS, "/").setDefaultFile("index.html");
-    httpServer.on("/api/v1/network/", HTTP_POST, handleWiFiCredentialsSave);
-    httpServer.on("/api/v1/network/", HTTP_GET, handleAvailableWiFiNetworks); 
-    httpServer.on("/api/v1/network/", HTTP_DELETE, removeCurrentWiFiNetwork);
-    httpServer.on("/api/v1/network/is-connected/", HTTP_GET, handleWiFiConnectionStatus);
+    httpServer.on("/api/v1/network/", HTTP_POST, NetworkController::handleWiFiCredentialsSave);
+    httpServer.on("/api/v1/network/", HTTP_GET, NetworkController::handleAvailableWiFiNetworks); 
+    httpServer.on("/api/v1/network/", HTTP_DELETE, NetworkController::removeCurrentWiFiNetwork);
+    httpServer.on("/api/v1/network/is-connected/", HTTP_GET, NetworkController::handleWiFiConnectionStatus);
 
-    httpServer.on("/api/v1/server/restart/", HTTP_GET, handleESPRestart);
-    httpServer.on("/api/v1/server/ap-config/", HTTP_GET, handleAccessPointConfig);
-    httpServer.on("/api/v1/server/ap-config/", HTTP_PUT, handleAccessPointConfigUpdate);
-    httpServer.on("/api/v1/server/ap-config/reset/", HTTP_GET, handleAccessPointReset);
+    httpServer.on("/api/v1/server/restart/", HTTP_GET, ServerController::handleESPRestart);
+    httpServer.on("/api/v1/server/ap-config/", HTTP_GET, ServerController::handleAccessPointConfig);
+    httpServer.on("/api/v1/server/ap-config/", HTTP_PUT, ServerController::handleAccessPointConfigUpdate);
+    httpServer.on("/api/v1/server/ap-config/reset/", HTTP_GET, ServerController::handleAccessPointReset);
 
-    httpServer.on("/api/v1/auth/sign-up/", HTTP_POST, handleSmartTrashCloudAccountCreation);
+    httpServer.on("/api/v1/auth/sign-up/", HTTP_POST, AuthController::handleSmartTrashCloudAccountCreation);
     httpServer.onNotFound(notFoundHandler);
     httpServer.begin();
 };
 
-void setupWiFiServices(){
-    configureAccessPoint(); 
-    setupDefaultHeaders();
+void Bootstrap::setupWiFiServices(){
+    Network::configureAccessPoint(); 
+    Utilities::setupDefaultHeaders();
     registerServerEndpoints();
 };
-
-#endif

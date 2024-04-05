@@ -1,13 +1,14 @@
+#include "server.hpp"
 
-void handleAccessPointReset(AsyncWebServerRequest *request){
+void ServerController::handleAccessPointReset(AsyncWebServerRequest *request){
     DynamicJsonDocument doc(128);
     doc["status"] = "success";
-    doc["data"] = loadDefaultESP8266Config();
+    doc["data"] = FileSystem::loadDefaultESP8266Config();
     request->send(200, "application/json", doc.as<String>());
 };
 
 
-void handleESPRestart(AsyncWebServerRequest *request){
+void ServerController::handleESPRestart(AsyncWebServerRequest *request){
     DynamicJsonDocument doc(64);
     doc["status"] = "success";
     request->send(200, "application/json", doc.as<String>());
@@ -15,7 +16,7 @@ void handleESPRestart(AsyncWebServerRequest *request){
     ESP.reset();
 };
 
-void handleAccessPointConfigUpdate(AsyncWebServerRequest *request){
+void ServerController::handleAccessPointConfigUpdate(AsyncWebServerRequest *request){
     DynamicJsonDocument doc(128);
 
     const char* plainBody = request->getParam("plain", true)->value().c_str();
@@ -38,7 +39,7 @@ void handleAccessPointConfigUpdate(AsyncWebServerRequest *request){
         return;
     }
 
-    if(!saveESP8266Config(doc)){
+    if(!FileSystem::saveESP8266Config(doc)){
         doc["status"] = "error";
         doc["data"]["message"] = "Server::AP::ErrorSavingConfig";
         request->send(500, "application/json", doc.as<String>());
@@ -49,9 +50,9 @@ void handleAccessPointConfigUpdate(AsyncWebServerRequest *request){
     request->send(200, "application/json", doc.as<String>());
 };
 
-void handleAccessPointConfig(AsyncWebServerRequest *request){
+void ServerController::handleAccessPointConfig(AsyncWebServerRequest *request){
     DynamicJsonDocument doc(128);
     doc["status"] = "success";
-    doc["data"] = getESP8266Config();
+    doc["data"] = FileSystem::getESP8266Config();
     request->send(200, "application/json", doc.as<String>());
 };

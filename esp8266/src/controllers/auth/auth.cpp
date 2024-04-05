@@ -1,10 +1,11 @@
+#include "auth.hpp"
 
-struct HttpRequestCallbackData{
+struct AuthController::HttpRequestCallbackData{
     void* request;
     String jsonResponse;
 };
 
-void handleSmartTrashCloudAccountCreation(AsyncWebServerRequest *request){
+void AuthController::handleSmartTrashCloudAccountCreation(AsyncWebServerRequest *request){
     if(WiFi.status() != WL_CONNECTED){  
         DynamicJsonDocument doc(64);
         doc["status"] = "error";
@@ -19,7 +20,7 @@ void handleSmartTrashCloudAccountCreation(AsyncWebServerRequest *request){
         ESP.wdtFeed();
         
         const char* body = request->getParam("plain", true)->value().c_str();
-        const char* httpRequest = buildHTTPRequest("/api/v1/auth/sign-up/", "POST", body);
+        const char* httpRequest = Utilities::buildHTTPRequest("/api/v1/auth/sign-up/", "POST", body);
         client->write(httpRequest);
 
         String jsonResponse = "";
