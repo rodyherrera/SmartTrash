@@ -9,6 +9,7 @@ const Header = () => {
     return (
         <header className='Header-Container'>
             <section className='Header-Brand-Container'>
+                <h3 className='Header-Brand-Title'>ST</h3>
             </section>
             <section className='Header-ESP-Related-Container'>
                 <ResetAPConfigButton />

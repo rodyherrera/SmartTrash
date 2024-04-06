@@ -11,3 +11,14 @@
     display: flex;
     gap: 1rem;
 }
+
+.Header-Brand-Title{
+    display: flex;
+    gap: .3rem;
+    background-color: #0f62fe;
+    color: #FFFFFF;
+    font-size: 1rem;
+    padding: .5rem 1rem;
+    align-items: center;
+    font-weight: 300;
+}

@@ -1,5 +1,4 @@
 const mqtt = require('mqtt');
-const { createAndSendToken } = require('@controllers/authentication');
 
 const connectToMQTT = async () => {
     try{
