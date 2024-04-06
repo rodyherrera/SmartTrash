@@ -1,8 +1,8 @@
 #ifndef CONFIG_H
 #define CONFIG_H
 
-#include <WiFiClient.h>
 #include <ArduinoJson.h>
+#include <ESP8266WiFi.h>
 
 extern const char* DEFAULT_ESP8266_AP_SSID;
 extern const char* DEFAULT_ESP8266_AP_PASSWORD;
@@ -22,8 +22,6 @@ extern const uint32_t DISTANCE_READ_TIMEOUT;
 extern const uint32_t MEASUREMENT_DELAY_MS;
 extern const float SPEED_OF_SOUND_CM_PER_US;
 extern const uint8_t MAX_WIFI_CONNECTION_ATTEMPS;
-extern String struid;
-
-extern DynamicJsonDocument mqttResponses;
+extern String stduid;
 
 #endif

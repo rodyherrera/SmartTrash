@@ -1,11 +1,18 @@
-import React from 'react';
+import React, { useEffect } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
+import { CircularProgress } from '@mui/material';
+import { getDeviceUID } from '@services/server/operations';
 import Breadcrumbs from '@components/general/Breadcrumbs';
-import Card from '@components/general/Card';
-import { CiLogin } from 'react-icons/ci';
-import { PiUserLight, PiUserPlusLight } from 'react-icons/pi';
 import './LinkingDevice.css';
 
 const LinkingDevice = () => {
+    const dispatch = useDispatch();
+    const { deviceUID, isDeviceUIDLoading } = useSelector((state) => state.server);
+
+    useEffect(() => {
+        dispatch(getDeviceUID());
+    }, []);
+
     return (
         <main id='Linking-Device-Main'>
             <Breadcrumbs
@@ -15,17 +22,19 @@ const LinkingDevice = () => {
                 ]}
             />
             <section id='Linking-Device-Header'>
-                <h3 id='Linking-Device-Title'>Connecting to the SmartTrash Cloud Service</h3>
+                <h3 id='Linking-Device-Title'>Linking your device to the SmartTrash Cloud</h3>
             </section>
             <section id='Linking-Device-Body'>
-                <article id='Linking-Device-Navigation-Container'>
-                    {[
-                        ["Already you have an account? Let's Log in", '/auth/sign-in/', CiLogin],
-                        ['Create a new SmartTrash cloud account', '/auth/sign-up/', PiUserPlusLight]
-                    ].map(([ title, to, Icon ], index) => (
-                        <Card title={title} Icon={Icon} to={to} key={index} />
-                    ))}
-                </article>    
+                {(isDeviceUIDLoading) ? (
+                    <CircularProgress />                    
+                ) : (
+                    <React.Fragment>
+                        <article id='Pair-Code-Container'>
+                            <h3 id='Pair-Code'>{deviceUID}</h3>
+                            <p id='Pair-Code-Description'>This is your unique pairing code. Please log in to your SmartTrash Cloud account, navigate to "pair a new device" and enter the code displayed on this screen. This code is exclusive to your device and should not be shared under any circumstances.</p>
+                        </article>
+                    </React.Fragment>
+                )}
             </section> 
         </main>
     );

@@ -3,13 +3,27 @@
     font-weight: 300;
 }
 
-#Linking-Device-Navigation-Container{
-    display: flex;
-    gap: 1rem;
+#Pair-Code-Header-Title{
+    font-size: 1rem;
+    font-weight: 300;
+    padding: .5rem 1rem;
 }
 
-@media screen and (max-width: 768px){
-    #Linking-Device-Navigation-Container{
-        flex-direction: column;
-    }
+#Pair-Code{
+    font-size: 1.4rem;
+    font-weight: 300;
+    color: #0f62fe;
+}
+
+#Pair-Code-Description{
+    font-weight: 300;
+    font-size: .8rem;
+    opacity: .85;
+}
+
+#Pair-Code-Container{
+    display: flex;
+    flex-direction: column;
+    gap: .3rem;
+    width: 600px;
 }

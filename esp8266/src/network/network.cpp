@@ -17,19 +17,12 @@ const bool Network::tryWiFiConnection(){
     unsigned short int connectionAttempts = 0;
 
     while(WiFi.status() != WL_CONNECTED && connectionAttempts < MAX_WIFI_CONNECTION_ATTEMPS){
-        delay(500);
-        connectionAttempts++;
         ESP.wdtFeed();
+        connectionAttempts++;
+        delay(500);
     }
 
-    const bool isConnected = WiFi.status() == WL_CONNECTED;
-    
-    if(isConnected){
-        Serial.println("Connected to WiFi.");
-    }else{
-        Serial.println("Failed to connect to WiFi.");
-    }
-    return isConnected;
+    return WiFi.status() == WL_CONNECTED;
 };
 
 void Network::configureAccessPoint(){

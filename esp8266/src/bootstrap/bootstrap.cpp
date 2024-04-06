@@ -16,6 +16,12 @@ void Bootstrap::configureHardware(){
     pinMode(GREEN_PIN, OUTPUT);
 };
 
+String Bootstrap::generateDeviceUID(){
+    String macAddress = WiFi.macAddress();
+    macAddress.replace(":", "");
+    return macAddress;
+};
+
 void Bootstrap::connectToMQTT(){
     if(WiFi.status() != WL_CONNECTED) return;
     mqttClient.setServer(MQTT_SERVER, MQTT_SERVER_PORT);
@@ -27,7 +33,7 @@ void Bootstrap::connectToMQTT(){
         if(mqttClient.connect(clientId.c_str(), MQTT_USERNAME, MQTT_PASSWORD)){
             Serial.println("Connected to MQTT server.");
             mqttClient.subscribe("sensors/ultrasonic");
-            mqttClient.subscribe(struid.c_str());
+            mqttClient.subscribe(stduid.c_str());
         }else{
             Serial.print(" failed, rc=");
             Serial.print(mqttClient.state());
@@ -43,7 +49,7 @@ void Bootstrap::notFoundHandler(AsyncWebServerRequest *request){
         request->send(200);
     }else{
         // Handle other types of not-found requests
-        request->send(404, "text/plain", "Not Found"); 
+        request->redirect("/");
     } 
 };
 
@@ -55,11 +61,11 @@ void Bootstrap::registerServerEndpoints(){
     httpServer.on("/api/v1/network/is-connected/", HTTP_GET, NetworkController::handleWiFiConnectionStatus);
 
     httpServer.on("/api/v1/server/restart/", HTTP_GET, ServerController::handleESPRestart);
+    httpServer.on("/api/v1/server/device-uid/", HTTP_GET, ServerController::handleGetDeviceUID);
     httpServer.on("/api/v1/server/ap-config/", HTTP_GET, ServerController::handleAccessPointConfig);
     httpServer.on("/api/v1/server/ap-config/", HTTP_PUT, ServerController::handleAccessPointConfigUpdate);
     httpServer.on("/api/v1/server/ap-config/reset/", HTTP_GET, ServerController::handleAccessPointReset);
 
-    httpServer.on("/api/v1/auth/sign-up/", HTTP_POST, AuthController::handleSmartTrashCloudAccountCreation);
     httpServer.onNotFound(notFoundHandler);
     httpServer.begin();
 };

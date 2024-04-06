@@ -16,6 +16,13 @@ void ServerController::handleESPRestart(AsyncWebServerRequest *request){
     ESP.reset();
 };
 
+void ServerController::handleGetDeviceUID(AsyncWebServerRequest *request){
+    DynamicJsonDocument doc(64);
+    doc["status"] = "success";
+    doc["data"] = stduid;
+    request->send(200, "application/json", doc.as<String>());
+};
+
 void ServerController::handleAccessPointConfigUpdate(AsyncWebServerRequest *request){
     DynamicJsonDocument doc(128);
 

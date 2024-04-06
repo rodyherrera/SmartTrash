@@ -35,3 +35,12 @@ export const resetAPConfig = () => async (dispatch) => {
         loaderState: serverSlice.setIsAPUpdateLoading
     });
 };
+
+export const getDeviceUID = () => async (dispatch) => {
+    const operation = new OperationHandler(serverSlice, dispatch);
+    operation.use({
+        api: serverService.getDeviceUID,
+        loaderState: serverSlice.setIsDeviceUIDLoading,
+        responseState: serverSlice.setDeviceUID
+    });
+};

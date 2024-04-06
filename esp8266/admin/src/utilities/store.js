@@ -14,7 +14,6 @@ import { configureStore } from '@reduxjs/toolkit';
 import networkReducer from '@services/network/slice';
 import coreReducer from '@services/core/slice';
 import serverReducer from '@services/server/slice';
-import authReducer from '@services/auth/slice';
 
 /**
  * @function configureStore 
@@ -27,8 +26,7 @@ const store = configureStore({
     reducer: {
         network: networkReducer,
         core: coreReducer,
-        server: serverReducer,
-        auth: authReducer
+        server: serverReducer
     }
 });
 

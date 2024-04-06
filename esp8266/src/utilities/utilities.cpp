@@ -20,12 +20,3 @@ void Utilities::setupDefaultHeaders(){
     DefaultHeaders::Instance().addHeader("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE");
     DefaultHeaders::Instance().addHeader("Access-Control-Allow-Headers", "Content-Type");
 };
-
-String Utilities::generateUID(){
-    String uid = "";
-    for(unsigned short int i = 0; i < 8; i++){
-        char randomChar = random(65, 91);
-        uid += randomChar;
-    }
-    return uid;
-};

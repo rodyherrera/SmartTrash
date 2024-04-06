@@ -20,3 +20,8 @@ export const resetAPConfig = ServerAPI.register({
     path: '/ap-config/reset/',
     method: 'GET'
 });
+
+export const getDeviceUID = ServerAPI.register({
+    path: '/device-uid/',
+    method: 'GET'
+});

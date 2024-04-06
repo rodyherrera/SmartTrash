@@ -1,16 +1,5 @@
 const mqtt = require('mqtt');
-
-let client;
-
-const messageEventHandler = async (topic, message) => {
-    const data = JSON.parse(message.toString());
-    switch(topic){
-        case 'backend/users/create':
-            console.log('Creating user...');
-            const { struid } = data;
-            await client.publishAsync(struid, 'OK!')
-    }
-};
+const { createAndSendToken } = require('@controllers/authentication');
 
 const connectToMQTT = async () => {
     try{
@@ -19,7 +8,6 @@ const connectToMQTT = async () => {
             password: process.env.MQTT_PASSWORD
         });
         await client.subscribeAsync('sensors/ultrasonic');
-        await client.subscribeAsync('backend/users/create');
         console.log('[SmartTrash Cloud Service]: Successfully connected to MQTT Server.');
         client.on('message', messageEventHandler);
     }catch(error){

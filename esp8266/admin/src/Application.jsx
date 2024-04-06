@@ -19,9 +19,6 @@ const Application = () => {
                 <Route path='/wifi/current-network/' element={<pages.CurrentWiFiConnection />} />
                 <Route path='/server/ap-config/' element={<pages.AccessPointConfig />} />
 
-                <Route path='/auth/sign-in/' element={<pages.SignIn />} />
-                <Route path='/auth/sign-up/' element={<pages.SignUp />} />
-
                 <Route path='/cloud/connect/' element={<pages.LinkingDevice />} />
             </Route>
         </Routes>

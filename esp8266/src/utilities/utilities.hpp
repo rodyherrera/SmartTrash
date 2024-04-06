@@ -13,7 +13,6 @@ class Utilities{
     public:
         static const char* buildHTTPRequest(const char* path, const char* method = "GET",  const char* body = "", const char* contentType = "application/json");
         static void setupDefaultHeaders();
-        static String generateUID();
 };
 
 #endif

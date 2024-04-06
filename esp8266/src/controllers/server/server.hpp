@@ -12,6 +12,7 @@ class ServerController{
       static void handleESPRestart(AsyncWebServerRequest *request);
       static void handleAccessPointConfigUpdate(AsyncWebServerRequest *request);
       static void handleAccessPointConfig(AsyncWebServerRequest *request);
+      static void handleGetDeviceUID(AsyncWebServerRequest *request);
 };
 
 #endif

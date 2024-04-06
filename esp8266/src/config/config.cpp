@@ -22,9 +22,7 @@ const uint16_t WEB_SERVER_PORT = 80;
 const uint32_t DISTANCE_READ_TIMEOUT = 30000;
 const uint32_t MEASUREMENT_DELAY_MS = 3000;  
 const float SPEED_OF_SOUND_CM_PER_US = 0.034 / 2;
-const uint8_t MAX_WIFI_CONNECTION_ATTEMPS = 10;
+const uint8_t MAX_WIFI_CONNECTION_ATTEMPS = 15;
 
-DynamicJsonDocument mqttResponses(1024);
-
-// struid -> SmartTrash Runtime UID.
-String struid = "st/";
+// stduid -> SmartTrash Device Unique ID.
+String stduid;

@@ -10,7 +10,6 @@
 #include "../hardware/hardware.hpp"
 #include "../utilities/utilities.hpp"
 #include "../network/network.hpp"
-#include "../controllers/auth/auth.hpp"
 #include "../controllers/network/network.hpp"
 #include "../controllers/server/server.hpp"
 
@@ -25,6 +24,7 @@ class Bootstrap{
         static void notFoundHandler(AsyncWebServerRequest *request);
         static void registerServerEndpoints();
         static void setupWiFiServices();
+        static String generateDeviceUID();
 };
 
 #endif

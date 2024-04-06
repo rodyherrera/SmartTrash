@@ -4,7 +4,9 @@ const state = {
     error: null,
     isLoading: false,
     isAPUpdateLoading: false,
-    apConfig: {}
+    apConfig: {},
+    isDeviceUIDLoading: true,
+    deviceUID: ''
 };
 
 const serverSlice = createSlice({
@@ -22,6 +24,12 @@ const serverSlice = createSlice({
         },
         setAPConfig: (state, action) => {
             state.apConfig = action.payload;
+        },
+        setIsDeviceUIDLoading: (state, action) => {
+            state.isDeviceUIDLoading = action.payload;
+        },
+        setDeviceUID: (state, action) => {
+            state.deviceUID = action.payload;
         }
     }
 });
@@ -29,6 +37,8 @@ const serverSlice = createSlice({
 export const {
     setError,
     setIsLoading,
+    setIsDeviceUIDLoading,
+    setDeviceUID,
     setAPConfig,
     setIsAPUpdateLoading
 } = serverSlice.actions;

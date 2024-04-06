@@ -35,25 +35,14 @@ long getDistance(){
 };
 
 void mqttCallback(char* topic, byte* payload, unsigned int length){
-    if(struid.compareTo(topic)) return;
+    if(stduid.compareTo(topic)) return;
     byte* message = (byte*)malloc(length);
     memcpy(message, payload, length);
-    DynamicJsonDocument doc(1024);
-    DeserializationError error = deserializeJson(doc, message);
-    Serial.println(doc.as<String>());
-    if(!error){
-        const String stpuid = doc["stpuid"].as<String>();
-        mqttResponses[doc["stpuid"].as<String>()] = doc["data"];
-    }
     free(message);
 };
 
 void setup(){
     Serial.begin(9600);
-    randomSeed(analogRead(0));
-    struid += Utilities::generateUID();
-    Serial.print("STRUID: ");
-    Serial.println(struid);
     mqttClient.setCallback(mqttCallback);
     Bootstrap::configureHardware();
     Bootstrap::setupWiFiServices();
@@ -70,7 +59,13 @@ void sendDistance(){
 };
 
 void loop(){
-    if(!mqttClient.connected()) Bootstrap::connectToMQTT();
+    if(WiFi.status() == WL_CONNECTED && !stduid.length()){
+        stduid = "st/" + Bootstrap::generateDeviceUID();
+    }
+    
+    if(!mqttClient.connected()){
+        Bootstrap::connectToMQTT();
+    }
     mqttClient.loop();
-    //sendDistance();
+    sendDistance();
 };

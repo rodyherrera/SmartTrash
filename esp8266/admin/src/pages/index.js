@@ -4,8 +4,6 @@ import SetupWiFiConnection from './SetupWiFiConnection';
 import AccessPointConfig from './AccessPointConfig';
 import CurrentWiFiConnection from './CurrentWiFiConnection';
 import LinkingDevice from './LinkingDevice';
-import SignIn from './SignIn';
-import SignUp from './SignUp';
 
 const pages = {
     Home,
@@ -13,9 +11,7 @@ const pages = {
     SetupWiFiConnection,
     AccessPointConfig,
     CurrentWiFiConnection,
-    LinkingDevice,
-    SignIn,
-    SignUp
+    LinkingDevice
 };
 
 export default pages;
