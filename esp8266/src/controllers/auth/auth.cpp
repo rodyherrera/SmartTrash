@@ -1,10 +1,5 @@
 #include "auth.hpp"
 
-struct AuthController::HttpRequestCallbackData{
-    void* request;
-    String jsonResponse;
-};
-
 void AuthController::handleSmartTrashCloudAccountCreation(AsyncWebServerRequest *request){
     if(WiFi.status() != WL_CONNECTED){  
         DynamicJsonDocument doc(64);
@@ -14,48 +9,37 @@ void AuthController::handleSmartTrashCloudAccountCreation(AsyncWebServerRequest 
         return;
     }
 
-    AsyncClient *client = new AsyncClient;
-    client->onConnect([](void *arg, AsyncClient *client) {
-        AsyncWebServerRequest* request = (AsyncWebServerRequest *)arg;
-        ESP.wdtFeed();
-        
-        const char* body = request->getParam("plain", true)->value().c_str();
-        const char* httpRequest = Utilities::buildHTTPRequest("/api/v1/auth/sign-up/", "POST", body);
-        client->write(httpRequest);
-
-        String jsonResponse = "";
-        HttpRequestCallbackData* callbackData = new HttpRequestCallbackData{ arg, jsonResponse };
-
-        client->onData([](void *arg, AsyncClient *client, void *data, size_t len){
-            ESP.wdtFeed();
-            HttpRequestCallbackData* callbackData = (HttpRequestCallbackData*) arg;
-            AsyncWebServerRequest* request = (AsyncWebServerRequest*) callbackData->request;
-            uint8_t* bytes = (uint8_t *)data;
-            String responseBuffer = String((char*)bytes);
-            unsigned short int jsonStartIndex = responseBuffer.indexOf("{");
-            callbackData->jsonResponse += responseBuffer.substring(jsonStartIndex);
-        }, callbackData);
-
-        client->onDisconnect([](void* arg, AsyncClient *client){
-            HttpRequestCallbackData* callbackData = (HttpRequestCallbackData*) arg;
-            AsyncWebServerRequest* request = (AsyncWebServerRequest*) callbackData->request;
-            String jsonResponse = callbackData->jsonResponse;
-            Serial.println("Disconnect");
-            Serial.println(jsonResponse);
-            delete callbackData;
-        }, callbackData);
-
-    }, request);
-  
-    client->onError([](void *arg, AsyncClient *client, int8_t error){
-        ESP.wdtFeed();
-        DynamicJsonDocument doc(64);
+    const char* body = request->getParam("plain", true)->value().c_str();
+    DynamicJsonDocument doc(256);
+    DeserializationError error = deserializeJson(doc, body);
+    if(error){
+        doc.clear();
         doc["status"] = "error";
-        doc["data"]["message"] = "Core::ServerConnectionError";
-        AsyncWebServerRequest* request = (AsyncWebServerRequest *)arg;
-        request->send(500, "application/json", doc.as<String>());
-    }, request);
+        doc["data"]["message"] = "Core::InvalidJSONFormat";
+        request->send(400, "application/json");
+        return;
+    }
 
-    client->connect(CLOUD_SERVER_ADDRESS, CLOUD_SERVER_PORT);
-    ESP.wdtFeed();
-}
+    String stpuid = Utilities::generateUID();
+    
+    doc["struid"] = struid;
+    doc["stpuid"] = stpuid;
+    const char* payload = doc.as<String>().c_str();
+    mqttClient.publish("backend/users/create", payload);
+
+    unsigned short int attemps = 0;
+    while(!mqttResponses.containsKey(stpuid) && attemps <= 15){
+        ESP.wdtFeed();
+        delay(200);
+        attemps++;
+    }
+
+    if(!mqttResponses.containsKey(stpuid)){
+        Serial.println("NO EXISTS");
+        return;
+    }
+    Serial.println("EXISTS!");
+    mqttResponses.remove(stpuid);
+
+    request->send(200, "application/json", "{}");
+};

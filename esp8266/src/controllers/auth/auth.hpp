@@ -5,10 +5,10 @@
 #include <ArduinoJson.h>
 
 #include "../../utilities/utilities.hpp"
+#include "../../bootstrap/bootstrap.hpp"
 
 class AuthController{
     public:
-        struct HttpRequestCallbackData;
         static void handleSmartTrashCloudAccountCreation(AsyncWebServerRequest *request);
 };
 
