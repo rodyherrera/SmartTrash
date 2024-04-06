@@ -3,6 +3,7 @@
 
 #include <ESPAsyncWebServer.h>
 #include <ArduinoJson.h>
+#include <Ticker.h>
 
 #include "../../utilities/utilities.hpp"
 #include "../../bootstrap/bootstrap.hpp"

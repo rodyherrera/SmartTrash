@@ -1,5 +1,7 @@
 #include "auth.hpp"
 
+Ticker ticker;
+
 void AuthController::handleSmartTrashCloudAccountCreation(AsyncWebServerRequest *request){
     if(WiFi.status() != WL_CONNECTED){  
         DynamicJsonDocument doc(64);
@@ -9,37 +11,26 @@ void AuthController::handleSmartTrashCloudAccountCreation(AsyncWebServerRequest 
         return;
     }
 
-    const char* body = request->getParam("plain", true)->value().c_str();
-    DynamicJsonDocument doc(256);
-    DeserializationError error = deserializeJson(doc, body);
-    if(error){
-        doc.clear();
-        doc["status"] = "error";
-        doc["data"]["message"] = "Core::InvalidJSONFormat";
-        request->send(400, "application/json");
-        return;
-    }
-
+    DynamicJsonDocument doc(512);
     String stpuid = Utilities::generateUID();
-    
     doc["struid"] = struid;
     doc["stpuid"] = stpuid;
-    const char* payload = doc.as<String>().c_str();
-    mqttClient.publish("backend/users/create", payload);
+    const bool isPublished = mqttClient.publish("backend/users/create", doc.as<String>().c_str());
+    if(!isPublished) return;
 
-    unsigned short int attemps = 0;
-    while(!mqttResponses.containsKey(stpuid) && attemps <= 15){
-        ESP.wdtFeed();
-        delay(200);
-        attemps++;
-    }
+    ticker.once(2, [=](){
+        unsigned short int attemps = 0;
+        
+        while(!mqttResponses.containsKey(stpuid) && attemps <= 15){
+            ESP.wdtFeed();
+            attemps++;
+            Serial.print("AuthController - ");
+            Serial.println(mqttResponses.as<String>());
+            delay(300);
+        }
 
-    if(!mqttResponses.containsKey(stpuid)){
-        Serial.println("NO EXISTS");
-        return;
-    }
-    Serial.println("EXISTS!");
-    mqttResponses.remove(stpuid);
+        request->send(200, "application/json", mqttResponses[stpuid].as<String>());
+        mqttResponses.remove(stpuid);
+    });
 
-    request->send(200, "application/json", "{}");
 };

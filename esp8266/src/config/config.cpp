@@ -24,7 +24,7 @@ const uint32_t MEASUREMENT_DELAY_MS = 3000;
 const float SPEED_OF_SOUND_CM_PER_US = 0.034 / 2;
 const uint8_t MAX_WIFI_CONNECTION_ATTEMPS = 10;
 
-DynamicJsonDocument mqttResponses(512);
+DynamicJsonDocument mqttResponses(1024);
 
 // struid -> SmartTrash Runtime UID.
 String struid = "st/";

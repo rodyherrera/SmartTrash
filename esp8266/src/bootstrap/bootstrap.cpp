@@ -27,6 +27,7 @@ void Bootstrap::connectToMQTT(){
         if(mqttClient.connect(clientId.c_str(), MQTT_USERNAME, MQTT_PASSWORD)){
             Serial.println("Connected to MQTT server.");
             mqttClient.subscribe("sensors/ultrasonic");
+            mqttClient.subscribe(struid.c_str());
         }else{
             Serial.print(" failed, rc=");
             Serial.print(mqttClient.state());

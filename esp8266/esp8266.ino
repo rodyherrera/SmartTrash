@@ -35,13 +35,15 @@ long getDistance(){
 };
 
 void mqttCallback(char* topic, byte* payload, unsigned int length){
-    if(!struid.compareTo(topic)) return;
+    if(struid.compareTo(topic)) return;
     byte* message = (byte*)malloc(length);
     memcpy(message, payload, length);
-    DynamicJsonDocument doc(128);
+    DynamicJsonDocument doc(1024);
     DeserializationError error = deserializeJson(doc, message);
+    Serial.println(doc.as<String>());
     if(!error){
-        mqttResponses[doc["responseId"]] = doc["data"];
+        const String stpuid = doc["stpuid"].as<String>();
+        mqttResponses[doc["stpuid"].as<String>()] = doc["data"];
     }
     free(message);
 };
@@ -50,6 +52,8 @@ void setup(){
     Serial.begin(9600);
     randomSeed(analogRead(0));
     struid += Utilities::generateUID();
+    Serial.print("STRUID: ");
+    Serial.println(struid);
     mqttClient.setCallback(mqttCallback);
     Bootstrap::configureHardware();
     Bootstrap::setupWiFiServices();
@@ -62,12 +66,11 @@ void sendDistance(){
     jsonDoc["data"]["measuredDistance"] = getDistance();
     char jsonBuffer[64];
     serializeJson(jsonDoc, jsonBuffer);
-    mqttClient.publish("sensors/ultrasonic", jsonBuffer);
+    mqttClient.publish("sensors/ultrasonic", jsonBuffer, 2);
 };
 
 void loop(){
     if(!mqttClient.connected()) Bootstrap::connectToMQTT();
     mqttClient.loop();
-    Serial.println(struid);
-    sendDistance();
+    //sendDistance();
 };
