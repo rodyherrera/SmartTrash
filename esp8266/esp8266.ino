@@ -21,6 +21,12 @@
 #include "src/network/network.hpp"
 #include "src/bootstrap/bootstrap.hpp"
 
+/**
+ * Measures the distance using an ultrasonic sensor.
+ * 
+ * Returns:
+ *   - long: The distance measured in centimeters.
+*/
 long getDistance(){
     // Send a brief high pulse to trigger the sensor
     digitalWrite(TRIGGER_PIN, HIGH);
@@ -31,24 +37,14 @@ long getDistance(){
     
     // Measure round-trip echo time
     long duration = pulseIn(ECHO_PIN, HIGH, DISTANCE_READ_TIMEOUT);
+    // Calculate distance (speed of sound * time / 2 for round-trip)
     return duration * SPEED_OF_SOUND_CM_PER_US;
 };
 
-void mqttCallback(char* topic, byte* payload, unsigned int length){
-    if(stduid.compareTo(topic)) return;
-    byte* message = (byte*)malloc(length);
-    memcpy(message, payload, length);
-    free(message);
-};
-
-void setup(){
-    Serial.begin(9600);
-    mqttClient.setCallback(mqttCallback);
-    Bootstrap::configureHardware();
-    Bootstrap::setupWiFiServices();
-    Network::tryWiFiConnection();
-};
-
+/**
+ * Prepares a JSON message containing the measured distance and 
+ * publishes it to the MQTT topic "sensors/ultrasonic".
+*/
 void sendDistance(){
     DynamicJsonDocument jsonDoc(64);
     jsonDoc["status"] = "success";
@@ -58,6 +54,24 @@ void sendDistance(){
     mqttClient.publish("sensors/ultrasonic", jsonBuffer, 2);
 };
 
+/**
+ * Setup function: Initializes hardware and network services.
+*/
+void setup(){
+    // Initialize serial communication
+    Serial.begin(9600);
+    // Configure essential hardware components
+    Bootstrap::configureHardware();
+    // Set up WiFi services (AP, server endpoints)
+    Bootstrap::setupWiFiServices();
+    // Attempt to connect to WiFi
+    Network::tryWiFiConnection();
+};
+
+/**
+ * Main loop: Checks for WiFi and MQTT connections, generates device ID if needed, and periodically 
+ * measures and sends distance data. 
+*/
 void loop(){
     if(WiFi.status() == WL_CONNECTED && !stduid.length()){
         stduid = "st/" + Bootstrap::generateDeviceUID();
@@ -66,6 +80,7 @@ void loop(){
     if(!mqttClient.connected()){
         Bootstrap::connectToMQTT();
     }
+
     mqttClient.loop();
     sendDistance();
 };

@@ -1,9 +1,27 @@
+/***
+ * Copyright (C) Rodolfo Herrera Hernandez. All rights reserved.
+ * Licensed under the MIT license. See LICENSE file in the project root
+ * for full license information.
+ *
+ * =+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+
+ *
+ * For related information - https://github.com/rodyherrera/SmartTrash/
+ *
+ * =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+****/
+
 #include "bootstrap.hpp"
 
 WiFiClient wifiClient;
 PubSubClient mqttClient(wifiClient);
 AsyncWebServer asyncHttpServer(WEB_SERVER_PORT);
 
+/**
+ * Configures essential hardware components.
+ * 
+ * Initializes the LittleFS filesystem and configures various input
+ * and output pins for the device.
+*/
 void Bootstrap::configureHardware(){
     if(!LittleFS.begin()){ 
         Serial.println("Failed to initialize LittleFS");
@@ -17,13 +35,26 @@ void Bootstrap::configureHardware(){
     pinMode(GREEN_PIN, OUTPUT);
 };
 
+/**
+ * Generates a unique device identifier (UID) based on the MAC address.
+ * 
+ * Returns:
+ *   - String: The generated device UID.
+*/
 String Bootstrap::generateDeviceUID(){
     String macAddress = WiFi.macAddress();
     macAddress.replace(":", "");
     return macAddress;
 };
 
+/**
+ * Establishes a connection to the MQTT server.
+ *
+ * Handles connection attempts and subscribes to relevant MQTT topics.
+ * No parameters, no return value (void function).  
+*/
 void Bootstrap::connectToMQTT(){
+    // Early exit if WiFi isn't connected
     if(WiFi.status() != WL_CONNECTED) return;
     mqttClient.setServer(MQTT_SERVER, MQTT_SERVER_PORT);
     while(!mqttClient.connected()){
@@ -41,6 +72,14 @@ void Bootstrap::connectToMQTT(){
     }
 };
 
+/**
+ * Handles requests for non-existing URLs.
+ *
+ * - Parameter:
+ *      - request: (AsyncWebServerRequest *) The current web server request.
+ *
+ * - No return value (void function)
+ */
 void Bootstrap::notFoundHandler(AsyncWebServerRequest *request){
     // Cors preflight
     if(request->method() == HTTP_OPTIONS){
@@ -55,6 +94,13 @@ void Bootstrap::notFoundHandler(AsyncWebServerRequest *request){
     request->redirect("/");
 };
 
+/**
+ * Registers HTTP endpoints for the web server.
+ *
+ * Associates specific URL patterns with controller functions 
+ * and handles static file serving. 
+ * No parameters, no return value (void function).
+*/
 void Bootstrap::registerServerEndpoints(){
     asyncHttpServer
         .serveStatic("/", LittleFS, "/")
@@ -75,6 +121,12 @@ void Bootstrap::registerServerEndpoints(){
     asyncHttpServer.begin();
 };
 
+/**
+ * Sets up WiFi services, including access point configuration, 
+ * HTTP server endpoints, and default HTTP headers.
+ * 
+ * No parameters, no return value (void function).
+*/
 void Bootstrap::setupWiFiServices(){
     Network::configureAccessPoint(); 
     Utilities::setupDefaultHeaders();
