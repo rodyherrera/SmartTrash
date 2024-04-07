@@ -5,6 +5,7 @@
 #include <ArduinoJson.h>
 
 #include "../../filesystem/filesystem.hpp"
+#include "../../utilities/utilities.hpp"
 
 class ServerController{
     public:

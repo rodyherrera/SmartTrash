@@ -15,7 +15,7 @@
 
 extern PubSubClient mqttClient;
 extern WiFiClient wifiClient;
-extern AsyncWebServer httpServer;
+extern AsyncWebServer asyncHttpServer;
 
 class Bootstrap{
     public:

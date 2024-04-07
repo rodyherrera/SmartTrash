@@ -5,6 +5,7 @@
 
 #include "../../network/network.hpp"
 #include "../../filesystem/filesystem.hpp"
+#include "../../utilities/utilities.hpp"
 
 class NetworkController{
     public:
