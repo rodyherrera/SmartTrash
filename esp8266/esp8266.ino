@@ -69,14 +69,36 @@ void setup(){
 };
 
 /**
+ * Checks the WiFi connection status, generates a device ID 
+ * if needed, and visually indicates the connection status 
+ * using the on-board LED.
+*/
+void checkWiFiStatus(){
+    // Check WiFi connection status
+    const bool isConnected = WiFi.status() == WL_CONNECTED;
+    // Generate device ID if connected and ID is not yet set
+    if(isConnected && !stduid.length()){
+        stduid = "st/" + Bootstrap::generateDeviceUID();
+    }
+    // LED Behavior based on connection status 
+    if(!isConnected){
+        for(unsigned short int i = 0; i < 10; i++){
+            digitalWrite(ESP8266_LED_PIN, LOW);
+            delay(150);
+            digitalWrite(ESP8266_LED_PIN, HIGH);
+            delay(150);
+        }
+        digitalWrite(ESP8266_LED_PIN, LOW);
+    }
+};
+
+/**
  * Main loop: Checks for WiFi and MQTT connections, generates device ID if needed, and periodically 
  * measures and sends distance data. 
 */
 void loop(){
-    if(WiFi.status() == WL_CONNECTED && !stduid.length()){
-        stduid = "st/" + Bootstrap::generateDeviceUID();
-    }
-    
+    checkWiFiStatus();
+
     if(!mqttClient.connected()){
         Bootstrap::connectToMQTT();
     }

@@ -29,10 +29,8 @@ void Bootstrap::configureHardware(){
     }
     
     pinMode(TRIGGER_PIN, OUTPUT);
-    pinMode(ECHO_PIN, INPUT);
-    pinMode(RED_PIN, OUTPUT);
-    pinMode(BLUE_PIN, OUTPUT);
-    pinMode(GREEN_PIN, OUTPUT);
+    pinMode(ECHO_PIN, OUTPUT);
+    pinMode(ESP8266_LED_PIN, OUTPUT);
 };
 
 /**
