@@ -72,7 +72,7 @@ DynamicJsonDocument FileSystem::getESP8266Config(){
     const bool isSuccess = fileOperation(ESP8266_CONFIG_FILE, NULL, [&](const DynamicJsonDocument &doc, File file){
         DeserializationError error = deserializeJson(config, file);
         if(!error) return true;
-        Serial.println("Error trying to deserialize ESP8266 configuration file.");
+        Serial.println("[SmartTrash]: Error trying to deserialize ESP8266 configuration file.");
         Serial.println(error.c_str());
         return false;
     }, "r");
@@ -93,7 +93,7 @@ DynamicJsonDocument FileSystem::loadWiFiCredentials(){
     const bool isSuccess = fileOperation(CREDENTIALS_FILE, NULL, [&](const DynamicJsonDocument &doc, File file){
         DeserializationError error = deserializeJson(credentials, file);
         if(!error) return true;
-        Serial.println("Failed to read from file");
+        Serial.println("[SmartTrash]: Failed to read from file");
         return false;
     }, "r");
     return credentials;

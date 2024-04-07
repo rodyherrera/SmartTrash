@@ -24,7 +24,7 @@ AsyncWebServer asyncHttpServer(WEB_SERVER_PORT);
 */
 void Bootstrap::configureHardware(){
     if(!LittleFS.begin()){ 
-        Serial.println("Failed to initialize LittleFS");
+        Serial.println("[SmartTrash]: Failed to initialize LittleFS");
         return;
     }
     
@@ -59,14 +59,14 @@ void Bootstrap::connectToMQTT(){
     mqttClient.setServer(MQTT_SERVER, MQTT_SERVER_PORT);
     while(!mqttClient.connected()){
         ESP.wdtFeed();
-        Serial.println("Attempting MQTT connection...");
+        Serial.println("[SmartTrash]: Attempting MQTT connection...");
         if(mqttClient.connect(stduid.c_str(), MQTT_USERNAME, MQTT_PASSWORD)){
-            Serial.println("Connected to MQTT server.");
+            Serial.println("[SmartTrash]: Connected to MQTT server.");
             mqttClient.subscribe("sensors/ultrasonic");
             mqttClient.subscribe(stduid.c_str());
             break;
         }else{
-            Serial.println("Failed trying connect to MQTT server.");
+            Serial.println("[SmartTrash]: Failed trying connect to MQTT server.");
             delay(500);
         }
     }

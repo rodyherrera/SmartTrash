@@ -25,11 +25,11 @@ template <typename T, typename Callable>
 const bool fileOperation(const String &filename, const T &data, Callable operation, const char* mode = "w"){
     File file = LittleFS.open(filename, mode);
     if(!file){
-        Serial.println("Failed to open the file.");
+        Serial.println("[SmartTrash]: Failed to open the file.");
         return false;
     }
     if(!operation(data, file)){
-        Serial.println("Failed to perform operation on file.");
+        Serial.println("[SmartTrash]: Failed to perform operation on file.");
         file.close();
         return false;
     }

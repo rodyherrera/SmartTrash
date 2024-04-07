@@ -23,7 +23,7 @@ const bool Network::tryWiFiConnection(){
 
     // Early exit if credentials are missing
     if(!credentials.containsKey("ssid") || !credentials.containsKey("password")){
-        Serial.println("Missing WiFi credentials.");
+        Serial.println("[SmartTrash]: Missing WiFi credentials.");
         return false;
     }
 
@@ -32,7 +32,7 @@ const bool Network::tryWiFiConnection(){
     
     // Initiate Connection
     WiFi.begin(ssid, password);
-    Serial.println("Connecting to WiFi...");
+    Serial.println("[SmartTrash]: Connecting to WiFi...");
 
     // Connection Attempt Loop (with watchdog timer)
     for(unsigned short int attempts = 0; 
@@ -54,7 +54,7 @@ void Network::configureAccessPoint(){
     DynamicJsonDocument ESP8266Config = FileSystem::getESP8266Config();
     // Early exit if config is missing
     if(!ESP8266Config.containsKey("ssid") || !ESP8266Config.containsKey("password")){
-        Serial.println("Missing ESP8266 access point configuration.");
+        Serial.println("[SmartTrash]: Missing ESP8266 access point configuration.");
         return; 
     }
     const char* ssid = ESP8266Config["ssid"].as<const char*>();
