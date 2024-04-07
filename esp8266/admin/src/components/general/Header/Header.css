@@ -1,3 +1,5 @@
+@import url('https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,100;0,300;0,400;0,500;0,700;0,900;1,100;1,300;1,400;1,500;1,700;1,900&family=Tac+One&display=swap');
+
 .Header-Container{
     width: 100%;
     display: flex;
@@ -12,13 +14,22 @@
     gap: 1rem;
 }
 
+.Header-Brand-Container{
+    cursor: pointer;
+    background-color: #0f62fe;
+}
+
+.Header-Brand-Container:hover{
+    opacity: .8;
+}
+
 .Header-Brand-Title{
+    font-family: 'Tac One', sans-serif;
     display: flex;
     gap: .3rem;
-    background-color: #0f62fe;
     color: #FFFFFF;
-    font-size: 1rem;
-    padding: .5rem 1rem;
+    font-size: 2rem;
+    padding: .1rem .7rem;
     align-items: center;
     font-weight: 300;
 }
