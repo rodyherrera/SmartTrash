@@ -29,7 +29,7 @@ void Bootstrap::configureHardware(){
     }
     
     pinMode(TRIGGER_PIN, OUTPUT);
-    pinMode(ECHO_PIN, OUTPUT);
+    pinMode(ECHO_PIN, INPUT);
     pinMode(ESP8266_LED_PIN, OUTPUT);
 };
 
@@ -100,6 +100,7 @@ void Bootstrap::notFoundHandler(AsyncWebServerRequest *request){
  * No parameters, no return value (void function).
 */
 void Bootstrap::registerServerEndpoints(){
+    Serial.println("[SmartTrash]: Mounting local web server endpoints...");
     asyncHttpServer
         .serveStatic("/", LittleFS, "/")
         .setDefaultFile("index.html");
@@ -117,6 +118,7 @@ void Bootstrap::registerServerEndpoints(){
 
     asyncHttpServer.onNotFound(notFoundHandler);
     asyncHttpServer.begin();
+    Serial.println("[SmartTrash]: Apparently all endpoints mounted correctly.");
 };
 
 /**
@@ -129,4 +131,5 @@ void Bootstrap::setupWiFiServices(){
     Network::configureAccessPoint(); 
     Utilities::setupDefaultHeaders();
     registerServerEndpoints();
+    Serial.println("[SmartTrash]: Network and related services configured.");
 };

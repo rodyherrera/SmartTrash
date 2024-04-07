@@ -20,6 +20,7 @@
 
 #include "../config/config.hpp"
 #include "../filesystem/filesystem.hpp"
+#include "../hardware/hardware.hpp"
 
 template <typename T, typename Callable>
 const bool fileOperation(const String &filename, const T &data, Callable operation, const char* mode = "w"){
@@ -42,6 +43,7 @@ class Utilities{
         static void setupDefaultHeaders();
         static void sendJsonResponse(AsyncWebServerRequest *request, const String &status, const DynamicJsonDocument &data = DynamicJsonDocument(0));
         static void sendJsonError(AsyncWebServerRequest *request, unsigned short int statusCode, const String &message);
+        static void blinkIntegratedLed();
 };
 
 #endif

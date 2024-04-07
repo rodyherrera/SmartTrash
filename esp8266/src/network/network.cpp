@@ -51,6 +51,7 @@ const bool Network::tryWiFiConnection(){
  * Configures the ESP8266 as a WiFi access point using settings from the file system.
 */
 void Network::configureAccessPoint(){
+    Serial.println("[SmartTrash]: Initializing the device's access point to support connections...");
     DynamicJsonDocument ESP8266Config = FileSystem::getESP8266Config();
     // Early exit if config is missing
     if(!ESP8266Config.containsKey("ssid") || !ESP8266Config.containsKey("password")){
@@ -63,4 +64,5 @@ void Network::configureAccessPoint(){
     WiFi.softAP(ssid, password, 1, false, 8);
     // Configure Access Point Settings 
     WiFi.softAPConfig(localIp, gateway, subnet);
+    Serial.println("[SmartTrash]: Access point created, it should now be visible in the list of available networks.");
 };

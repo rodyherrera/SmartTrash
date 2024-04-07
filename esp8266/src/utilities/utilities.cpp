@@ -22,6 +22,26 @@ void Utilities::setupDefaultHeaders(){
 };
 
 /**
+ * Blinks the on-board LED of the ESP8266 module.
+ * 
+ * This function creates a visual blinking effect to indicate activity or signal status changes.
+*/
+void Utilities::blinkIntegratedLed(){
+    // Repeat the blink pattern 10 times
+    for(unsigned short int i = 0; i < 10; i++){
+        // Turn LED off
+        digitalWrite(ESP8266_LED_PIN, LOW);
+        // Pause for 150 milliseconds
+        delay(150);
+        // Turn LED on
+        digitalWrite(ESP8266_LED_PIN, HIGH);
+        delay(150);
+    }
+    // Ensure LED is turned off at the end
+    digitalWrite(ESP8266_LED_PIN, LOW);
+};
+
+/**
  * Sends a JSON response with a standard format.
  * 
  * Parameters:

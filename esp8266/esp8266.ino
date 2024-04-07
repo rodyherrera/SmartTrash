@@ -37,6 +37,12 @@ long getDistance(){
     
     // Measure round-trip echo time
     long duration = pulseIn(ECHO_PIN, HIGH, DISTANCE_READ_TIMEOUT);
+
+    // If duration == 0 or exceeds timeout, there was an error
+    if(duration == 0 || duration >= DISTANCE_READ_TIMEOUT){
+        Serial.println("[SmartTrash]: It seems that the ultrasound sensor is having failures... Wrong measurement.");
+        Utilities::blinkIntegratedLed();
+    }
     // Calculate distance (speed of sound * time / 2 for round-trip)
     return duration * SPEED_OF_SOUND_CM_PER_US;
 };
@@ -59,7 +65,7 @@ void sendDistance(){
 */
 void setup(){
     // Initialize serial communication
-    Serial.begin(9600);
+    Serial.begin(115200);
     // Configure essential hardware components
     Bootstrap::configureHardware();
     // Set up WiFi services (AP, server endpoints)
@@ -82,17 +88,11 @@ void checkWiFiStatus(){
     }
     // LED Behavior based on connection status 
     if(!isConnected){
-        for(unsigned short int i = 0; i < 10; i++){
-            digitalWrite(ESP8266_LED_PIN, LOW);
-            delay(150);
-            digitalWrite(ESP8266_LED_PIN, HIGH);
-            delay(150);
-        }
-        digitalWrite(ESP8266_LED_PIN, LOW);
+        Utilities::blinkIntegratedLed();
     }
 };
 
-/**
+/** 
  * Main loop: Checks for WiFi and MQTT connections, generates device ID if needed, and periodically 
  * measures and sends distance data. 
 */
