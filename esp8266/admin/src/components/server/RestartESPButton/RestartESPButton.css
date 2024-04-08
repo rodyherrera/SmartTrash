@@ -1,25 +1,23 @@
 .Restart-ESP-Button-Container{
-    border: 1px solid #121212;
-    padding: .3rem 1rem;
+    border: 1px solid #0f62fe;
+    padding: .4rem 1.5rem;
     font-size: .75rem;
     cursor: pointer;
-    border-radius: 1rem;
     display: flex;
+    color: #0f62fe;
+    transition: .2s;
     align-items: center;
     gap: .5rem;
 }
 
-.Restart-ESP-Button-Container .MuiCircularProgress-root{
-    width: 1rem !important;
-    height: 1rem !important;
-    color: #121212 !important;
-}
-
 .Restart-ESP-Button-Container:hover{
-    border-color: #0f62fe;
-    color: #0f62fe;
+    background-color: #0f62fe;
+    color: #f5f5f5;
 }
 
-.Restart-ESP-Button-Container:hover .MuiCircularProgress-root{
-    color: #0f62fe !important;
+@media screen and (max-width: 768px){
+    .Restart-ESP-Button-Container{
+        font-size: .65rem;
+        padding: .4rem 1rem;
+    }
 }

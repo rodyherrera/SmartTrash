@@ -1,17 +1,153 @@
-#Home-Header-Title{
-    font-size: 1.6rem;
-    font-weight: 350;
+#Home-Main{
+    max-width: 1300px;
+    padding: 0;
 }
 
-#Home-Navigation-Container{
+#Home-Product-Container{
     display: flex;
+    justify-content: space-between;
     gap: 1rem;
+}
+
+#Home-Product-Left-Title{
+    font-size: 2.2rem;
+    font-weight: 350;
+    line-height: 3rem;
+    width: 600px;
+}
+
+#Home-Product-Middle-Container{
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem;
+}
+
+#Home-Product-Left-Container{
+    width: 700px;
+    display: flex;
+    flex-direction: column;
+    padding: 1rem;
+    background: #f9f9f9;
+    height: 550px;
+    justify-content: space-between;
+    border-radius: 1rem;
+}
+
+#Home-Product-Description{
+    line-height: 2rem;
+    font-size: 1.2rem;
+    font-weight: 350;
+    width: 75%;
+}
+
+#Home-Product-Left-Title .Highlight{
+    font-size: 2.1rem;
+}
+
+#Home-Product-Right-Container{
+    width: 100%;
+}
+
+.Rounded-Container{
+    padding: 1rem;
+    border-radius: 1rem;
+    display: flex;
+    flex-direction: column;
+    gap: 2rem;
+}
+
+.Rounded-Header-Container{
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.Rounded-Body-Container{
+    display: flex;
+    gap: 2rem;
+    flex-wrap: wrap;
+}
+
+.Rounded-Header-Description{
+    font-size: .85rem;
+    line-height: 1.2rem;
+}
+
+.Rounded-Header-Title{
+    font-size: 2.3rem;
+    line-height: 3rem;
+    font-weight: 500;
+}
+
+.Benefit-Container{
+    display: flex;
+    flex-direction: column;
+    width: 180px;
+}
+
+.Benefit-Icon-Container{
+    font-size: 2.5rem;
+}
+
+.Benefit-Title{
+    font-size: .85rem;
+    font-weight: 600;
+}
+
+.Benefit-Content-Container{
+    display: flex;
+    flex-direction: column;
+    gap: .5rem;
+}
+
+.Benefit-Description{
+    font-size: .8rem;
+    line-height: 1.2rem;
 }
 
 @media screen and (max-width: 768px){
     #Home-Main{
         max-width: unset;
         padding: 1rem;
+        height: unset;
+    }
+
+    .Benefit-Container{
+        width: 45%;
+    }
+
+    .Rounded-Body-Container{
+        gap: 1.5rem;
+        justify-content: space-between;
+    }
+
+    #Home-Product-Container{
+        flex-direction: column-reverse;
+    }
+
+    #Home-Product-Left-Container{
+        height: unset;
+        width: 100%;
+        gap: 1.5rem;
+        order: 1;
+    }
+
+    #Home-Product-Left-Title{
+        width: 100%;
+        font-size: 2.7rem;
+        line-height: 3.4rem;
+    }
+
+    #Home-Product-Description{
+        width: 100%;
+        font-size: .9rem;
+        order: 2;
+        line-height: 1.3rem;
+    }
+    
+    #Home-Product-Middle-Container{
+        gap: 1rem;
+        order: 3;
     }
 
     #Home-Navigation-Container{

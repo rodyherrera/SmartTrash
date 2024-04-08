@@ -17,14 +17,15 @@
 
 #Pair-Code-Description{
     font-weight: 300;
-    font-size: .8rem;
+    font-size: .9rem;
+    line-height: 1.3rem;
     opacity: .85;
 }
 
 #Pair-Code-Container{
     display: flex;
     flex-direction: column;
-    gap: .3rem;
+    gap: .5rem;
     width: 600px;
 }
 

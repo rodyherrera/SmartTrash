@@ -12,7 +12,7 @@ const RestartESPButton = () => {
 
     return (
         <div className='Restart-ESP-Button-Container' onClick={onClickHandler}>
-            <p className='Restart-ESP-Button-Title'>Restart</p>
+            <p className='Restart-ESP-Button-Title'>Restart Device</p>
         </div>
     );
 };
