@@ -5,6 +5,7 @@
     color: #f5f5f5;
     cursor: pointer;
     display: flex;
+    border-radius: 5rem;
     align-items: center;
     transition: .2s;
     gap: .5rem;

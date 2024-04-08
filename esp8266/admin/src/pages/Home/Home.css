@@ -1,6 +1,7 @@
 #Home-Main{
-    max-width: 1300px;
-    padding: 0;
+    max-width: 1600px;
+    padding: 0 2rem;
+    height: 100%;
 }
 
 #Home-Product-Container{
@@ -20,6 +21,10 @@
     display: flex;
     flex-wrap: wrap;
     gap: 1rem;
+}
+
+#Home-Product-Middle-Container .Card-Container:active{
+    transform: scale(.98);
 }
 
 #Home-Product-Left-Container{
@@ -46,6 +51,8 @@
 
 #Home-Product-Right-Container{
     width: 100%;
+    height: 550px;
+    overflow-y: scroll;
 }
 
 .Rounded-Container{
@@ -148,6 +155,10 @@
     #Home-Product-Middle-Container{
         gap: 1rem;
         order: 3;
+    }
+
+    #Home-Product-Right-Container{
+        height: unset;
     }
 
     #Home-Navigation-Container{
