@@ -6,3 +6,6 @@ server/.env
 
 esp8266/admin/node_modules/
 esp8266/admin/package-lock.json
+
+client/node_modules/
+client/package-lock.json

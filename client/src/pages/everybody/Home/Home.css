@@ -1,0 +1,35 @@
+#Home-Main{
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+
+#Home-Brand-Container{
+    padding: 2rem;
+    display: flex;
+    justify-content: space-between;
+}
+
+#Home-Brand-Left-Container{
+    height: 500px;
+    width: 750px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+
+#Home-Brand-Left-Title{
+    font-size: 3.2rem;
+    line-height: 4rem;
+    font-weight: 350;
+}
+
+#Home-Brand-Left-Description{
+    font-size: 1.8rem;
+    line-height: 2.6rem;
+    font-weight: 300;
+}
+
+#Home-Brand-Left-Description span:first-child{
+    margin-right: .5rem;
+}

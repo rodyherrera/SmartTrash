@@ -1,5 +1,5 @@
 .Button{
-    padding: .5rem 1rem;
+    padding: .5rem 1.2rem;
     background-color: #0f62fe;
     color: #FFFFFF;
     width: 200px;
@@ -8,6 +8,7 @@
     justify-content: space-between;
     align-items: center;
     cursor: pointer;
+    border-radius: 5rem;
 }
 
 .Button .MuiCircularProgress-root{
