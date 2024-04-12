@@ -22,12 +22,12 @@ const Header = () => {
                     ['Developer Resources', '/'],
                     ['Building your SmartTrash', '/']
                 ].map(([ title, link ], index) => (
-                    <Link linnk={link} title={title} key={index} />
+                    <Link link={link} title={title} key={index} />
                 ))}
             </ul>
 
             <ul className='Header-Brand-Right-Navigation-Container'>
-                <Button variant='Outline'>Sign In</Button>
+                <Button to='/auth/sign-in/' variant='Outline'>Sign In</Button>
                 <Button variant='Contained Big'>Try Free</Button>
             </ul>
         </header>

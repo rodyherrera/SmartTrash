@@ -1,0 +1,68 @@
+.Simple-Form-Container{
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+    height: 100vh;
+    padding: 2rem;
+}
+
+.Simple-Form-Left-Container{
+    width: 40%;
+}
+
+.Simple-Form-Title{
+    font-size: 2.5rem;
+    font-weight: 300;
+    line-height: 3.5rem;
+}
+
+.Simple-Form-Title-Container{
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+}
+
+.Simple-Form-Description{
+    font-size: .9rem;
+    line-height: 1.5rem;
+}
+
+.Simple-Form-Right-Container{
+    width: 50%;
+    display: flex;
+    gap: 1.5rem;
+    flex-direction: column;
+    justify-content: center;
+}
+
+@media screen and (max-width: 768px){
+    .Simple-Form-Container{
+        flex-direction: column;
+        padding: 1rem;
+        justify-content: flex-start;
+        gap: 2rem;
+    }
+
+    .Simple-Form-Left-Container{
+        background-color: #f9f9f9;
+        padding: 1rem;
+        border-radius: 1rem;
+    }
+
+    .Simple-Form-Left-Container,
+    .Simple-Form-Right-Container{
+        width: 100%;
+    }
+
+    .Simple-Form-Title{
+        font-size: 2.3rem;
+        line-height: 3.5rem;
+    }
+
+    .Simple-Form-Description{
+        font-size: 1rem;
+        line-height: 1.8rem;
+        font-weight: 300;
+    }
+}

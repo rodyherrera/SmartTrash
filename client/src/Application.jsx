@@ -14,6 +14,7 @@ const Application = () => {
         <Routes location={location} key={location.pathname}>
             <Route element={<Layout />}>
                 <Route index element={<pages.everybody.Home />} />
+                <Route path='/auth/sign-in/' element={<pages.guest.SignIn />} />
             </Route>
         </Routes>
     );

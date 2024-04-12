@@ -1,7 +1,9 @@
 import everybody from './everybody';
+import guest from './guest';
 
 const pages = {
-    everybody
+    everybody,
+    guest
 };
 
 export default pages;

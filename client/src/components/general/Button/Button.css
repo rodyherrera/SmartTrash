@@ -6,10 +6,24 @@
     color: #0f62fe;
 }
 
+.Button-Container:active{
+    opacity: 1 !important;
+    transform: scale(.98);
+}
+
 .Button-Container{
     padding: .5rem 1.5rem;
     cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
     border-radius: 1rem;
+}
+
+.Button-Container > i{
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
 .Button-Container.Contained{
@@ -36,4 +50,29 @@
 
 .Button-Container.Contained:hover{
     opacity: .8;
+}
+
+.Button-Container.Form-Contained{
+    transition: .2s;
+    border-radius: .2rem;
+    background-color: #0f62fe;
+    box-shadow: 0 0 4px 0 #0f62fe;
+    color: #FFFFFF;
+    gap: .5rem;
+}
+
+.Button-Icon-Right-Container{
+    font-size: 1.1rem;
+}
+
+.Button-Container.Form-Contained:hover{
+    opacity: .8;
+}
+
+@media screen and (max-width: 768px){
+    .Button-Container.Form-Contained{
+        width: 100%;
+        padding: .8rem;
+        font-size: .9rem;
+    }
 }
