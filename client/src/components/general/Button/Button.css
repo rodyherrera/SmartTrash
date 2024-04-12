@@ -1,0 +1,39 @@
+.Button-Container.Outline{
+    transition: .2s;
+    box-shadow: 2px 3px 2px 0px #d7e6ff;
+    background-color: transparent;
+    border: 1px solid #0f62fe;
+    color: #0f62fe;
+}
+
+.Button-Container{
+    padding: .5rem 1.5rem;
+    cursor: pointer;
+    border-radius: 1rem;
+}
+
+.Button-Container.Contained{
+    background-color: #0f62fe;
+    color: #FFFFFF;
+}
+
+.Button-Container.Big{
+    padding: .7rem 2rem;
+    border-radius: .3rem;
+    box-shadow: 0 0 5px 0 #0f62fe;
+    font-size: .9rem;
+    transition: .2s;
+}
+
+.Button-Container.Big:hover{
+    border-radius: 5rem;
+}
+
+.Button-Container.Outline:hover{
+    background-color: #0f62fe;
+    color: #FFFFFF;
+}
+
+.Button-Container.Contained:hover{
+    opacity: .8;
+}

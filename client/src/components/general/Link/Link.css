@@ -1,0 +1,11 @@
+.Link-Container{
+    color: #121212;
+    font-weight: 340;
+    font-size: .9rem;
+    padding: .5rem 1rem;
+}
+
+.Link-Container:hover{
+    border-radius: 5rem;
+    background-color: #f6f6f6;
+}

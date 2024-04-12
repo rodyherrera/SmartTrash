@@ -27,7 +27,27 @@
     font-weight: 300;
 }
 
+.Header-Brand-Right-Navigation-Container{
+    display: flex;
+    align-items: center;
+    gap: 1.5rem;
+}
+
+.Header-Brand-Center-Navigation-Container{
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
 @media screen and (max-width: 768px){
+    .Header-Brand-Center-Navigation-Container{
+        display: none;
+    }
+
+    .Header-Brand-Right-Navigation-Container{
+        gap: 1rem;
+    }
+
     .Header-Container{
         padding: 1rem;
     }

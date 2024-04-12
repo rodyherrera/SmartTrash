@@ -1,35 +1,144 @@
 #Home-Main{
-    height: 100vh;
     display: flex;
     flex-direction: column;
 }
 
 #Home-Brand-Container{
-    padding: 2rem;
+    padding: 1rem;
     display: flex;
     justify-content: space-between;
 }
 
 #Home-Brand-Left-Container{
-    height: 500px;
-    width: 750px;
+    height: 550px;
+    width: 650px;
     display: flex;
+    padding: 1rem;
     flex-direction: column;
     justify-content: space-between;
 }
 
+#Home-Brand-Right-Container{
+    height: 550px;
+    width: calc(100% - 650px);
+    overflow-y: scroll;
+    border-radius: 2rem;
+}
+
 #Home-Brand-Left-Title{
-    font-size: 3.2rem;
-    line-height: 4rem;
+    font-size: 2.8rem;
+    line-height: 3.5rem;
     font-weight: 350;
 }
 
 #Home-Brand-Left-Description{
-    font-size: 1.8rem;
-    line-height: 2.6rem;
+    font-size: 1.5rem;
+    line-height: 2.4rem;
     font-weight: 300;
 }
 
 #Home-Brand-Left-Description span:first-child{
     margin-right: .5rem;
+}
+
+.Rounded-Container{
+    padding: 1rem;
+    border-radius: 1rem;
+    display: flex;
+    flex-direction: column;
+    gap: 2rem;
+}
+
+.Rounded-Header-Container{
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.Rounded-Body-Container{
+    display: flex;
+    gap: 2rem;
+    flex-wrap: wrap;
+}
+
+.Rounded-Header-Description{
+    font-size: .85rem;
+    font-weight: 350;
+    line-height: 1.2rem;
+}
+
+.Rounded-Header-Title{
+    font-size: 2.3rem;
+    line-height: 3rem;
+    font-weight: 300;
+}
+
+.Benefit-Container{
+    display: flex;
+    flex-direction: column;
+    width: 180px;
+}
+
+.Benefit-Icon-Container{
+    font-size: 2.5rem;
+}
+
+.Benefit-Title{
+    font-size: .85rem;
+    font-weight: 430;
+}
+
+.Benefit-Content-Container{
+    display: flex;
+    flex-direction: column;
+    gap: .5rem;
+}
+
+.Benefit-Description{
+    font-size: .8rem;
+    font-weight: 300;
+    line-height: 1.2rem;
+}
+
+@media screen and (max-width: 768px){
+    .Benefit-Container{
+        width: 45%;
+    }
+
+    #Home-Brand-Left-Container{
+        background-color: #f9f9f9;
+        border-radius: 1rem;
+    }
+
+    #Home-Brand-Left-Description{
+        font-size: 1.3rem;
+        line-height: 2rem;
+        font-weight: 300;
+    }
+
+    #Home-Brand-Left-Container{
+        gap: 2rem;
+    }
+
+    #Home-Brand-Left-Title{
+        font-size: 3rem;
+        line-height: 3.5rem;
+        font-weight: 350;
+    }
+
+    #Home-Brand-Container{
+        flex-direction: column;
+        gap: 2rem;
+    }
+
+    #Home-Brand-Right-Container,
+    #Home-Brand-Left-Container{
+        height: unset;
+        width: 100%;
+    }
+
+    .Rounded-Body-Container{
+        gap: 1.5rem;
+        justify-content: space-between;
+    }
 }

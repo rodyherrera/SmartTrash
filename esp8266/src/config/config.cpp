@@ -42,7 +42,7 @@ const uint32_t DISTANCE_READ_TIMEOUT = 30000;
 // Delay between distance measurements (milliseconds)
 const uint32_t MEASUREMENT_DELAY_MS = 3000;  
 // Speed of sound for distance calculation (cm/microsecond)
-const float SPEED_OF_SOUND_CM_PER_US = 0.034 / 2;
+const float SPEED_OF_SOUND_CM_PER_US = 0.0343 / 2;
 // Maximum WiFi connection retries
 const uint8_t MAX_WIFI_CONNECTION_ATTEMPS = 15;
 

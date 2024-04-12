@@ -28,23 +28,31 @@
  *   - long: The distance measured in centimeters.
 */
 long getDistance(){
-    // Send a brief high pulse to trigger the sensor
-    digitalWrite(TRIGGER_PIN, HIGH);
-    // 10 microsecond pulse as per sensor requirements
-    delayMicroseconds(10);
-    // End the trigger pulse
-    digitalWrite(TRIGGER_PIN, LOW);
-    
-    // Measure round-trip echo time
-    long duration = pulseIn(ECHO_PIN, HIGH, DISTANCE_READ_TIMEOUT);
+    long totalDuration = 0;
+    for(unsigned short int i = 0; i < 5; i++){
+        // Send a brief high pulse to trigger the sensor
+        digitalWrite(TRIGGER_PIN, HIGH);
+        // 10 microsecond pulse as per sensor requirements
+        delayMicroseconds(10);
+        // End the trigger pulse
+        digitalWrite(TRIGGER_PIN, LOW);
+        
+        // Measure round-trip echo time
+        long duration = pulseIn(ECHO_PIN, HIGH, DISTANCE_READ_TIMEOUT);
 
-    // If duration == 0 or exceeds timeout, there was an error
-    if(duration == 0 || duration >= DISTANCE_READ_TIMEOUT){
-        Serial.println("[SmartTrash]: It seems that the ultrasound sensor is having failures... Wrong measurement.");
-        Utilities::blinkIntegratedLed();
+        // If duration == 0 or exceeds timeout, there was an error
+        if(duration == 0 || duration >= DISTANCE_READ_TIMEOUT){
+            Serial.println("[SmartTrash]: It seems that the ultrasound sensor is having failures... Wrong measurement.");
+            Utilities::blinkIntegratedLed();
+            return -1;
+        }
+
+        totalDuration += duration;
+        delay(10);
     }
-    // Calculate distance (speed of sound * time / 2 for round-trip)
-    return duration * SPEED_OF_SOUND_CM_PER_US;
+    long averageDuration = totalDuration / 5;
+    Serial.println(averageDuration * SPEED_OF_SOUND_CM_PER_US);
+    return averageDuration * SPEED_OF_SOUND_CM_PER_US;
 };
 
 /**
