@@ -1,0 +1,32 @@
+.Icon-Card-Container{
+    display: flex;
+    flex-direction: column;
+    width: 180px;
+}
+
+.Icon-Card-Icon-Container{
+    font-size: 2.5rem;
+}
+
+.Icon-Card-Title{
+    font-size: .85rem;
+    font-weight: 430;
+}
+
+.Icon-Card-Content-Container{
+    display: flex;
+    flex-direction: column;
+    gap: .5rem;
+}
+
+.Icon-Card-Description{
+    font-size: .8rem;
+    font-weight: 300;
+    line-height: 1.2rem;
+}
+
+@media screen and (max-width: 768px){
+    .Icon-Card-Container{
+        width: 45%;
+    }
+}
