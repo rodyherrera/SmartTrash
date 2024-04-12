@@ -1,9 +1,9 @@
 import React from 'react';
 import './Input.css';
 
-const Input = ({ helperText, ...props }) => {
+const Input = ({ helperText, ...props }, ref) => {
     return (
-        <div className='Input-Container'>
+        <div className='Input-Container' ref={ref}>
             <div className='Input-Node-Container'>
                 <input type='text' {...props} />
             </div>
@@ -14,4 +14,4 @@ const Input = ({ helperText, ...props }) => {
     );
 };
 
-export default Input;
+export default React.forwardRef(Input);

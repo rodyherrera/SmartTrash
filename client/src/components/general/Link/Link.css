@@ -3,6 +3,7 @@
     font-weight: 340;
     font-size: .9rem;
     padding: .5rem 1rem;
+    transition: .2s;
 }
 
 .Link-Container:hover{
