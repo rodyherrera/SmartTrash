@@ -69,6 +69,13 @@
     opacity: .8;
 }
 
+.Button-Container .MuiCircularProgress-root{
+    color: #FFFFFF !important;
+    width: 1.2rem !important;
+    height: 1.2rem !important;
+    margin-left: .5rem;
+}
+
 @media screen and (max-width: 768px){
     .Button-Container.Form-Contained{
         width: 100%;

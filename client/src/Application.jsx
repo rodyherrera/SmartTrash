@@ -15,6 +15,7 @@ const Application = () => {
             <Route element={<Layout />}>
                 <Route index element={<pages.everybody.Home />} />
                 <Route path='/auth/sign-in/' element={<pages.guest.SignIn />} />
+                <Route path='/auth/sign-up/' element={<pages.guest.SignUp />} />
             </Route>
         </Routes>
     );

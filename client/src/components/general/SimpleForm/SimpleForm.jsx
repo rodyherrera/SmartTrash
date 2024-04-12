@@ -1,21 +1,35 @@
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { HiOutlineArrowNarrowRight } from 'react-icons/hi';
-import { gsap } from 'gsap';
+import { gsap, ScrollTrigger } from 'gsap/all';
 import Input from '@components/general/Input';
 import Button from '@components/general/Button';
 import './SimpleForm.css';
 
-const SimpleForm = ({ title, description, inputs, btnTitle }) => {
+gsap.registerPlugin(ScrollTrigger);
+
+const SimpleForm = ({ isLoading, title, description, inputs, btnTitle }) => {
     const formRef = useRef(null);
     const inputRefs = useRef([]);
     const formTitleRef = useRef(null);
-    const formDescriptionRef = useRef(null)
+    const formDescriptionRef = useRef(null);
+
+    const [formValues, setFormValues] = useState(
+        inputs.map((input) => ({
+            [input.name]: input?.value || ''
+        })).reduce((acc, cur) => ({ ...acc, ...cur }), {})
+    );
 
     useEffect(() => {
         gsap.from(formRef.current, { 
             duration: 1, 
             opacity: 0, 
-            ease: "power2.out" 
+            ease: 'power2.out',
+            scrollTrigger: {
+                trigger: formRef.current,
+                start: 'top 80%',
+                end: 'bottom 20%',
+                toggleActions: 'play none none reverse'
+            }
         });
     
         gsap.from(inputRefs.current, { 
@@ -26,7 +40,12 @@ const SimpleForm = ({ title, description, inputs, btnTitle }) => {
             // Delay between each input animation
             stagger: 0.15, 
             // A slightly bouncy ease
-            ease: 'back.out(1.2)'
+            ease: 'back.out(1.2)',
+            scrollTrigger: {
+                trigger: formRef.current,
+                start: 'top 70%',
+                toggleActions: 'play none none reverse'
+            }
         });
 
         gsap.from(formTitleRef.current, {
@@ -34,7 +53,12 @@ const SimpleForm = ({ title, description, inputs, btnTitle }) => {
             y: -20,
             opacity: 0,
             stagger: 0.1,
-            ease: 'power1.out'
+            ease: 'power1.out',
+            scrollTrigger: {
+                trigger: formTitleRef.current,
+                start: 'top 80%',
+                toggleActions: 'play none none reverse'
+            }
         });
 
         gsap.from(formDescriptionRef.current, {
@@ -42,6 +66,10 @@ const SimpleForm = ({ title, description, inputs, btnTitle }) => {
             opacity: 0,
             duration: 1,
         });
+
+        return () => {
+            setFormValues({});
+        };
     }, []); 
 
     return (
@@ -55,11 +83,23 @@ const SimpleForm = ({ title, description, inputs, btnTitle }) => {
 
             <form className='Simple-Form-Right-Container' ref={formRef}>
                 {inputs.map((inputProps, index) => (
-                    <Input {...inputProps} key={index} ref={(el) => inputRefs.current[index] = el} />
+                    <Input 
+                        {...inputProps} 
+                        onChange={(e) => {
+                            const { value } = e.target;
+                            setFormValues({ ...formValues, [inputProps.name]: value });
+                        }}
+                        value={formValues[inputProps.name]}
+                        key={index} 
+                        ref={(el) => inputRefs.current[index] = el} />
                 ))}
 
                 <article className='Simple-Form-Bottom-Container'>
-                    <Button IconRight={HiOutlineArrowNarrowRight} variant='Form-Contained'>{btnTitle}</Button>
+                    <Button 
+                        IconRight={HiOutlineArrowNarrowRight} 
+                        isLoading={isLoading}
+                        variant='Form-Contained'
+                    >{btnTitle}</Button>
                 </article>
             </form>
         </main>

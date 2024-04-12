@@ -1,0 +1,34 @@
+.Link-Card-Container{
+    width: 200px;
+    display: flex;
+    flex-direction: column;
+    cursor: pointer;
+    gap: .5rem;
+}
+
+.Link-Card-Title{
+    color: #0f62fe;
+    font-size: .8rem;
+    font-weight: 400;
+    line-height: 1.2rem;
+}
+
+.Link-Card-Container:hover .Link-Card-Title{
+    text-decoration: underline;
+    color: #0851d9;
+}
+
+.Link-Card-Topic{
+    font-size: .7rem;
+}
+
+.Link-Card-Arrow-Container{
+    color: #0f62fe;
+    font-size: 1.5rem;
+}
+
+@media screen and (max-width: 768px){
+    .Link-Card-Container{
+        min-width: 200px;
+    }
+}

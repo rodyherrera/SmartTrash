@@ -62,7 +62,7 @@ const Header = () => {
 
             <ul className='Header-Brand-Right-Navigation-Container' ref={navRightRef}>
                 <Button to='/auth/sign-in/' variant='Outline'>Sign In</Button>
-                <Button variant='Contained Big'>Try Free</Button>
+                <Button to='/auth/sign-up/' variant='Contained Big'>Try Free</Button>
             </ul>
         </header>
     );

@@ -1,8 +1,9 @@
 import React from 'react';
+import { CircularProgress } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
 import './Button.css';
 
-const Button = ({ IconRight, children, to, variant = '', ...props }) => {
+const Button = ({ IconRight, isLoading, children, to, variant = '', ...props }, ref) => {
     const navigate = useNavigate();
 
     const clickHandler = (e) => {
@@ -14,15 +15,19 @@ const Button = ({ IconRight, children, to, variant = '', ...props }) => {
     };
 
     return (
-        <button className={'Button-Container '.concat(variant)} onClick={clickHandler}>
+        <button className={'Button-Container '.concat(variant)} onClick={clickHandler} ref={ref}>
             <span className='Button-Title'>{children}</span>
-            {IconRight && (
+            {(IconRight || isLoading) && (
                 <i className='Button-Icon-Right-Container'>
-                    <IconRight />
+                    {isLoading ? (
+                        <CircularProgress />
+                    ) : (
+                        <IconRight />
+                    )}
                 </i>
             )}
         </button>
     );
 };
 
-export default Button;
+export default React.forwardRef(Button);

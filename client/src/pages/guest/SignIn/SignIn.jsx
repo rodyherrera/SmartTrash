@@ -13,8 +13,20 @@ const SignInPage = () => {
             }
             description='Manage all your devices and generate detailed reports. To connect to the cloud, you must enter the requested credentials.'
             inputs={[
-                { placeholder: 'Email address, e.g "johndoe@example.com' },
-                { type: 'password', placeholder: 'Enter the password associated with your account' }
+                {
+                    name: 'email',
+                    type: 'email',
+                    required: true,
+                    placeholder: 'Email address, e.g "johndoe@example.com' 
+                },
+                { 
+                    name: 'password',
+                    type: 'password', 
+                    minLength: 8,
+                    maxLength: 16,
+                    required: true,
+                    placeholder: 'Enter the password associated with your account'
+                }
             ]}
             btnTitle='Connect to the cloud'
         />

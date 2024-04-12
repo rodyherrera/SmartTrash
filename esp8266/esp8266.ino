@@ -51,7 +51,6 @@ long getDistance(){
         delay(10);
     }
     long averageDuration = totalDuration / 5;
-    Serial.println(averageDuration * SPEED_OF_SOUND_CM_PER_US);
     return averageDuration * SPEED_OF_SOUND_CM_PER_US;
 };
 
