@@ -1,8 +1,23 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import Header from '@components/general/Header';
-import { Outlet } from 'react-router-dom';
+import { authenticateWithCachedToken } from '@services/authentication/utils';
+import { resetErrorForAllSlices } from '@services/core/operations';
+import { Outlet, useLocation } from 'react-router-dom';
+import { useDispatch, useSelector } from 'react-redux';
 
 const Layout = () => {
+    const { isAuthenticated } = useSelector((state) => state.auth);
+    const dispatch = useDispatch();
+    const location = useLocation();
+
+    useEffect(() => {
+        dispatch(resetErrorForAllSlices());
+    }, [location.pathname]);
+
+    useEffect(() => {
+        if(isAuthenticated) return;
+        authenticateWithCachedToken(dispatch);
+    }, [dispatch, isAuthenticated]);
 
     return (
         <React.Fragment>

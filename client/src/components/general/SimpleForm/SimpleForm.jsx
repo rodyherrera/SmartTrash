@@ -7,7 +7,7 @@ import './SimpleForm.css';
 
 gsap.registerPlugin(ScrollTrigger);
 
-const SimpleForm = ({ isLoading, title, description, inputs, btnTitle }) => {
+const SimpleForm = ({ isLoading, title, description, inputs, btnTitle, submitHandler }) => {
     const formRef = useRef(null);
     const inputRefs = useRef([]);
     const formTitleRef = useRef(null);
@@ -18,6 +18,11 @@ const SimpleForm = ({ isLoading, title, description, inputs, btnTitle }) => {
             [input.name]: input?.value || ''
         })).reduce((acc, cur) => ({ ...acc, ...cur }), {})
     );
+
+    const formSubmitHandler = (e) => {
+        e.preventDefault();
+        submitHandler(formValues);
+    };
 
     useEffect(() => {
         gsap.from(formRef.current, { 
@@ -81,7 +86,7 @@ const SimpleForm = ({ isLoading, title, description, inputs, btnTitle }) => {
                 </article>
             </section>
 
-            <form className='Simple-Form-Right-Container' ref={formRef}>
+            <form className='Simple-Form-Right-Container' ref={formRef} onSubmit={formSubmitHandler}>
                 {inputs.map((inputProps, index) => (
                     <Input 
                         {...inputProps} 

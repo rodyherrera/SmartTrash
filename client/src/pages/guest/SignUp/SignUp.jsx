@@ -1,8 +1,17 @@
 import React from 'react';
 import SimpleForm from '@components/general/SimpleForm';
+import { useDispatch, useSelector } from 'react-redux';
+import { signUp } from '@services/authentication/operations';
 import './SignUp.css';
 
 const SignUpPage = () => {
+    const dispatch = useDispatch();
+    const { isLoading, error } = useSelector((state) => state.auth);
+
+    const submitHandler = (data) => {
+        dispatch(signUp(data));
+    };
+
     return (
         <SimpleForm
             title={
@@ -11,6 +20,8 @@ const SignUpPage = () => {
                 </React.Fragment>
             }
             description='A SmartTrash ID is required to access the cloud platform and all related services related to your device(s).'
+            submitHandler={submitHandler}
+            isLoading={isLoading}
             inputs={[
                 {
                     name: 'fullname',

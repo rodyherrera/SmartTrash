@@ -1,8 +1,17 @@
 import React from 'react';
 import SimpleForm from '@components/general/SimpleForm';
+import { useDispatch, useSelector } from 'react-redux';
+import { signIn } from '@services/authentication/operations';
 import './SignIn.css';
 
 const SignInPage = () => {
+    const dispatch = useDispatch();
+    const { isLoading, error } = useSelector((state) => state.auth);
+
+    const submitHandler = (data) => {
+        console.log(data);
+        dispatch(signIn(data));
+    };
 
     return (
         <SimpleForm
@@ -11,7 +20,9 @@ const SignInPage = () => {
                     Connecting with <span className='Highlight-Color'>your</span> <br /> <span className='Highlight-Color'>SmartTrash Cloud</span> account.
                 </React.Fragment>
             }
+            isLoading={isLoading}
             description='Manage all your devices and generate detailed reports. To connect to the cloud, you must enter the requested credentials.'
+            submitHandler={submitHandler}
             inputs={[
                 {
                     name: 'email',

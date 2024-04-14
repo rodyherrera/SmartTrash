@@ -3,6 +3,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import { setIsHeaderAnimated } from '@services/core/slice';
 import { gsap } from 'gsap';
+import UserNavigation from '@components/authentication/UserNavigation';
 import Button from '@components/general/Button';
 import Link from '@components/general/Link';
 import './Header.css';
@@ -10,10 +11,11 @@ import './Header.css';
 const Header = () => {
     const navigate = useNavigate();
     const dispatch = useDispatch();
-    const { isHeaderAnimated } = useSelector((state) => state.core);
     const navLeftRef = useRef(null);
     const navRightRef = useRef(null);
     const brandTitleRef = useRef(null);
+    const { isHeaderAnimated } = useSelector((state) => state.core);
+    const { isAuthenticated } = useSelector((state) => state.auth);
 
     useEffect(() => {
         if(isHeaderAnimated) return;
@@ -39,7 +41,6 @@ const Header = () => {
             ease: 'back.out(1)'
         }); 
     }, [isHeaderAnimated]); 
-    
 
     return (
         <header className='Header-Container'>
@@ -61,8 +62,16 @@ const Header = () => {
             </ul>
 
             <ul className='Header-Brand-Right-Navigation-Container' ref={navRightRef}>
-                <Button to='/auth/sign-in/' variant='Outline'>Sign In</Button>
-                <Button to='/auth/sign-up/' variant='Contained Big'>Try Free</Button>
+                {isAuthenticated ? (
+                    <React.Fragment>
+                        <UserNavigation />
+                    </React.Fragment>
+                ) : (
+                    <React.Fragment>
+                        <Button to='/auth/sign-in/' variant='Outline'>Sign In</Button>
+                        <Button to='/auth/sign-up/' variant='Contained Big'>Try Free</Button>
+                    </React.Fragment>
+                )}
             </ul>
         </header>
     );

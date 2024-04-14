@@ -58,6 +58,7 @@
     background-color: #0f62fe;
     box-shadow: 0 0 4px 0 #0f62fe;
     color: #FFFFFF;
+    max-height: 30px;
     gap: .5rem;
 }
 
@@ -71,13 +72,14 @@
 
 .Button-Container .MuiCircularProgress-root{
     color: #FFFFFF !important;
-    width: 1.2rem !important;
-    height: 1.2rem !important;
+    width: 1rem !important;
+    height: 1rem !important;
     margin-left: .5rem;
 }
 
 @media screen and (max-width: 768px){
     .Button-Container.Form-Contained{
+        max-height: unset;
         width: 100%;
         padding: .8rem;
         font-size: .9rem;

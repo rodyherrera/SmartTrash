@@ -8,7 +8,6 @@ const connectToMQTT = async () => {
         });
         await client.subscribeAsync('sensors/ultrasonic');
         console.log('[SmartTrash Cloud Service]: Successfully connected to MQTT Server.');
-        client.on('message', messageEventHandler);
     }catch(error){
         console.log('[SmartTrash Cloud Service]: Error trying connect to MQTT Server ->', error);
     }

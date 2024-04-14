@@ -55,7 +55,7 @@ exports.signIn = catchAsync(async (req, res, next) => {
     if(!email || !password){
         return next(new Error('Authentication::EmailOrPasswordRequired'));
     }
-    const requestedUser = await User.findOne({ email }).select('+password').populate('github');
+    const requestedUser = await User.findOne({ email }).select('+password');
     if(!requestedUser || !(await requestedUser.isCorrectPassword(password, requestedUser.password))){
         return next(new Error('Authentication::EmailOrPasswordIncorrect', 401));
     }

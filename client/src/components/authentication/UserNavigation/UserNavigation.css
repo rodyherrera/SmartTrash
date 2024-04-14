@@ -1,0 +1,129 @@
+.User-Navigation-Container{
+    position: relative;
+}
+
+.User-Navigation-Header-Container{
+    display: flex;
+    flex-direction: column;
+    padding: 1rem;
+    gap: 1rem;
+    border-top-right-radius: 1rem;
+    border-top-left-radius: 1rem;
+    background-color: #fbfbfb;
+}
+
+.User-Navigation-Body-Container{
+    display: flex;
+    flex-direction: column;
+}
+
+.User-Navigation-Logout-Container{
+    background-color: #fbfbfb;
+    transition: .2s;
+    border-bottom-left-radius: 1rem;
+    border-bottom-right-radius: 1rem;
+    padding: .5rem 1rem .8rem;
+    cursor: pointer;
+}
+
+.User-Navigation-Logout-Title{
+    font-weight: 300;
+    font-size: .85rem;
+}
+
+.User-Navigation-Option-Title{
+    font-weight: 450;
+    font-size: .8rem;
+}
+
+.User-Navigation-Option-Icon{
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.User-Navigation-Option-Container:hover{
+    background-color: #0f62fe;
+    color: #FFFFFF;
+}
+
+.User-Navigation-Option-Container{
+    transition: .2s;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    padding: 1rem;
+    gap: 1rem;
+}
+
+.User-Navigation-Option-Content{
+    display: flex;
+    flex-direction: column;
+    gap: .3rem;
+}
+
+.User-Navigation-Information-Container{
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    gap: .3rem;
+}
+
+.User-Navigation-Fullname{
+    font-weight: 350;
+    font-size: 1rem;
+}
+
+.User-Navigation-Email{
+    font-size: .85rem;
+}
+
+.User-Navigation-Content-Container{
+    position: absolute;
+    top: 3rem;
+    right: 0;
+    width: 240px;
+    height: auto;
+    border-radius: 1rem;
+    box-shadow: 0px 0px 7px 0 #dadada;
+    background-color: #FFFFFF;
+    z-index: 100;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+
+.User-Navigation-Clickable-Container{
+    display: flex;
+    gap: .5rem;
+    align-items: center;
+    padding: .4rem 1.2rem;
+    border-radius: 5rem;
+    color: #FFFFFF;
+    transition: .2s;
+    background-color: #0f62fe;
+    box-shadow: 0px 0px 4px 0 #0f62fe;
+    cursor: pointer;
+}
+
+.User-Navigation-Clickable-Container:hover{
+    opacity: .8;
+}
+
+.User-Navigation-Clickable-Container:active{
+    transform: scale(.98);
+}
+
+.User-Navigation-Clickable-Username{
+    font-size: .8rem;
+    font-weight: 400;
+}
+
+.User-Navigation-Clickable-Icon{
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}

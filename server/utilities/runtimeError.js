@@ -1,6 +1,6 @@
 /**
  * @class RuntimeError 
- * @description Represents a custom error specifically designed for runtime issues within the Quantum Cloud environment.
+ * @description Represents a custom error specifically designed for runtime issues within the SmartTrash Cloud environment.
  * @extends Error
 */
 class RuntimeError extends Error{
