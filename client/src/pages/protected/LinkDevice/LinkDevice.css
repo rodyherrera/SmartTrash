@@ -1,0 +1,56 @@
+#Link-Device-Main{
+    padding: 2rem;
+}
+
+#Link-Device-Header-Container{
+    display: flex;
+    height: 400px;
+    justify-content: center;
+    flex-direction: column;
+    gap: 2rem;
+}
+
+#Link-Device-Header-Title{
+    width: 600px;
+    font-size: 3.2rem;
+    font-weight: 300;
+    line-height: 4.5rem;
+    text-align: center;
+    margin: 0 auto;
+}
+
+#Link-Device-STUID-Container{
+    margin: 0 auto;
+}
+
+#Link-Device-STUID-Container .Input-Container{
+    width: 610px;
+}
+
+@media screen and (max-width: 768px){
+    #Link-Device-Main{
+        padding: 1rem;
+        display: flex;
+        flex-direction: column;
+        gap: 5rem;
+    }
+
+    #Link-Device-STUID-Container .Input-Container{
+        width: 100%;
+    }
+
+    #Link-Device-STUID-Container{
+        width: 100%;
+    }
+
+    #Link-Device-Header-Container{
+        height: 300px;
+    }
+    
+    #Link-Device-Header-Title{
+        width: 100%;
+        font-size: 2.7rem;
+        line-height: 4rem;
+        text-align: center;
+    }
+}

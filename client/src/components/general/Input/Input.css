@@ -22,7 +22,31 @@
     border-radius: .5rem;
     font-size: 20px;
     line-height: 30px;
+}
+
+.Input-Node-Container input{
     padding: 1rem;
+}
+
+.Input-Right-Icon-Container{
+    padding: calc(1rem - 2px);
+    border-top-right-radius: .5rem;
+    border-bottom-right-radius: .5rem;
+    display: flex;
+    justify-content: center;
+    cursor: pointer;
+    align-items: center;
+    background-color: #0f62fe;
+    color: #FFF;
+    transition: .2s;
+}
+
+.Input-Right-Icon-Container:hover{
+    opacity: .8;
+}
+
+.Input-Right-Icon-Container:active > *{
+    transform: scale(.94);
 }
 
 .Input-Container.Error .Input-Node-Container{
@@ -35,7 +59,8 @@
     height: 50px;
 }
 
-.Input-Node-Container:has(input:focus){
+.Input-Node-Container:has(input:focus),
+.Input-Container.Highlight .Input-Node-Container{
     box-shadow: 0 0px 11px 0 #e4e4e4;
 }
 

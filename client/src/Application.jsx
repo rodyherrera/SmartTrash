@@ -20,6 +20,11 @@ const Application = () => {
                     <Route path='/auth/sign-in/' element={<pages.guest.SignIn />} />
                     <Route path='/auth/sign-up/' element={<pages.guest.SignUp />} />
                 </Route>
+
+                <Route element={<ProtectedRoute mode='protect' />}>
+                    <Route path='/dashboard/' element={<pages.protect.Dashboard />} />
+                    <Route path='/device/new/' element={<pages.protect.LinkDevice />} />
+                </Route>
             </Route>
         </Routes>
     );

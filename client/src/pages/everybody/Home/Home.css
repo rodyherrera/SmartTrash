@@ -12,6 +12,8 @@
 
 #Home-Brand-Container{
     padding: 1rem;
+    position: relative;
+    z-index: -1;
     display: flex;
     justify-content: space-between;
 }
@@ -27,8 +29,6 @@
 
 #Home-Brand-Right-Container{
     height: 550px;
-    position: relative;
-    z-index: -1;
     width: calc(100% - 650px);
     overflow-y: scroll;
     border-radius: 2rem;

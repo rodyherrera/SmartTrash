@@ -3,12 +3,15 @@ import { useDispatch, useSelector } from 'react-redux';
 import { MdKeyboardArrowDown, MdKeyboardArrowUp } from 'react-icons/md';
 import { RxDashboard } from 'react-icons/rx';
 import { logout } from '@services/authentication/operations';
+import { useNavigate } from 'react-router-dom';
+import { VscLink } from 'react-icons/vsc';
 import BrandBallIcon from '@components/general/BrandBallIcon';
 import './UserNavigation.css';
 
 const UserNavigation = () => {
     const [isVisible, setIsVisible] = useState(false);
     const dispatch = useDispatch();
+    const navigate = useNavigate();
     const { user } = useSelector((state) => state.auth);
 
     useEffect(() => {
@@ -38,9 +41,10 @@ const UserNavigation = () => {
 
                     <ul className='User-Navigation-Body-Container'>
                         {[
-                            [RxDashboard, 'Dashboard']
-                        ].map(([ Icon, title ], index) => (
-                            <li className='User-Navigation-Option-Container' key={index}>
+                            [RxDashboard, 'Dashboard', '/dashboard/'],
+                            [VscLink, 'Link new device', '/device/new/']
+                        ].map(([ Icon, title, to ], index) => (
+                            <li className='User-Navigation-Option-Container' key={index} onClick={() => navigate(to)}>
                                 <i className='User-Navigation-Option-Icon'>
                                     <Icon />
                                 </i>
