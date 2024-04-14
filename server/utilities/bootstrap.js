@@ -1,4 +1,21 @@
+const Device = require('@models/device');
+const mqttClient = require('@utilities/mqttConnector');
 const { capitalizeToLowerCaseWithDelimitier } = require('@utilities/algorithms');
+
+exports.startDevicesListening = async () => {
+    try{
+        console.log('[SmartTrash Cloud Server]: Loading linked devices...');
+        const devices = await Device.find().select('stduid -_id');
+        console.log(`[SmartTrash Cloud Server]: Found ${devices.length} devices.`);
+        await Promise.all(devices.map(async ({ stduid }) => {
+            // stduid: SmartTrash Device's Unique ID.
+            await mqttClient.client.subscribeAsync(stduid);
+        }));
+        console.log('[SmartTrash Cloud Server]: Subscriptions to all devices have been initialized.');
+    }catch(error){
+        console.log('[SmartTrash Cloud Server] CRITICAL ERROR (at @utilities/bootstrap - startDevicesListening):', error);
+    }
+};
 
 /**
  * Configures the Express application with provided routes, middlewares, and settings.

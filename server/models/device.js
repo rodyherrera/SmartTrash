@@ -20,6 +20,16 @@ const DeviceSchema = new mongoose.Schema({
         unique: true,
         trim: true
     },
+    logs: [{
+        distance: {
+            type: Number,
+            required: true
+        },
+        timestamp: {
+            type: Date,
+            default: Date.now
+        }
+    }],
     createdAt: {
         type: Date,
         default: Date.now()
