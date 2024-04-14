@@ -13,6 +13,12 @@
     width: 90%;
 }
 
+.Input-Node-Container .MuiCircularProgress-root{
+    color: #FFFFFF !important;
+    width: 1.2rem !important;
+    height: 1.2rem !important;
+}
+
 .Input-Node-Container{
     height: 50px;
     display: flex;
@@ -29,7 +35,8 @@
 }
 
 .Input-Right-Icon-Container{
-    padding: calc(1rem - 2px);
+    height: 50px;
+    width: 50px;
     border-top-right-radius: .5rem;
     border-bottom-right-radius: .5rem;
     display: flex;

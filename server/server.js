@@ -1,7 +1,7 @@
 require('./aliases');
 
 const { httpServer } = require('@config/express'); 
-const mqttConnector = require('@utilities/mqttConnector');
+const mqttClient = require('@utilities/mqttConnector');
 const mongoConnector = require('@utilities/mongoConnector');
 
 // Server configuration
@@ -35,8 +35,8 @@ process.on('SIGINT', async () => {
 // Starts the HTTP Server
 httpServer.listen(SERVER_PORT, SERVER_HOST, async () => {
     try{
-        mongoConnector();
-        mqttConnector();
+        await mongoConnector();
+        await mqttClient.connect();
         console.log(`[SmartTrash Cloud Server]: Server running at http://${SERVER_HOST}:${SERVER_PORT}/.`);
     }catch(error){
         console.error('[SmartTrash Cloud Server]: Error during server initialization:', error);

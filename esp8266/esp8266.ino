@@ -56,7 +56,7 @@ long getDistance(){
 
 /**
  * Prepares a JSON message containing the measured distance and 
- * publishes it to the MQTT topic "sensors/ultrasonic".
+ * publishes it to the MQTT topic
 */
 void sendDistance(){
     DynamicJsonDocument jsonDoc(64);
@@ -64,7 +64,7 @@ void sendDistance(){
     jsonDoc["data"]["measuredDistance"] = getDistance();
     char jsonBuffer[64];
     serializeJson(jsonDoc, jsonBuffer);
-    mqttClient.publish("sensors/ultrasonic", jsonBuffer, 2);
+    mqttClient.publish(stduid.c_str(), jsonBuffer, 2);
 };
 
 /**

@@ -60,7 +60,6 @@ void Bootstrap::connectToMQTT(){
         Serial.println("[SmartTrash]: Attempting MQTT connection...");
         if(mqttClient.connect(stduid.c_str(), MQTT_USERNAME, MQTT_PASSWORD)){
             Serial.println("[SmartTrash]: Connected to MQTT server.");
-            mqttClient.subscribe("sensors/ultrasonic");
             mqttClient.subscribe(stduid.c_str());
             break;
         }else{

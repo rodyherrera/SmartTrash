@@ -13,7 +13,8 @@ bootstrap.configureApp({
     app,
     suffix: '/api/v1/',
     routes: [
-        'auth'
+        'auth',
+        'device'
     ],
     middlewares: [
         cors({ origin: process.env.CORS_ORIGIN, credentials: true }),

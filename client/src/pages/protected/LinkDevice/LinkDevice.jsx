@@ -1,4 +1,4 @@
-import React, { useRef, useEffect } from 'react';
+import React, { useRef, useEffect, useState } from 'react';
 import Input from '@components/general/Input';
 import LinkDeviceImage from '@images/Link-Device.png';
 import DeviceWiFiNetworkImage from '@images/Device-WiFi-Network.png';
@@ -6,10 +6,24 @@ import AdministratorOptionsImage from '@images/Administrator-Options.png';
 import ArticleItem from '@components/general/ArticleItem';
 import { IoSendOutline } from 'react-icons/io5';
 import { gsap } from 'gsap/all';
+import { useDispatch, useSelector } from 'react-redux';
+import { createDevice } from '@services/device/operations';
 import './LinkDevice.css';
 
 const LinkDevice = () => {
     const titleRef = useRef(null);
+    const [stduid, setStduid] = useState('');
+    const dispatch = useDispatch();
+    const { user } = useSelector((state) => state.auth);
+    const { isLoading } = useSelector((state) => state.device);
+
+    const submitHandler = () => {
+        dispatch(createDevice({
+            stduid,
+            name: stduid,
+            user: user._id
+        }));
+    };
 
     useEffect(() => {
         gsap.from(titleRef.current, { 
@@ -31,8 +45,12 @@ const LinkDevice = () => {
                     <Input 
                         variant='Highlight'
                         maxLength='16'
-                        required='true'
+                        onChange={(e) => setStduid(e.target.value)}
+                        value={stduid}
+                        required={true}
                         placeholder={`Enter your device's unique id, e.g "st/3C41BD213DBF"`}
+                        isLoading={isLoading}
+                        submitHandler={submitHandler}
                         RightIcon={IoSendOutline}
                     />
                 </article>

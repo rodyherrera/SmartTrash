@@ -1,6 +1,7 @@
 import { configureStore } from '@reduxjs/toolkit';
 import coreReducer from '@services/core/slice';
 import authReducer from '@services/authentication/slice';
+import deviceReducer from '@services/device/slice';
 
 /**
  * @function configureStore 
@@ -12,7 +13,8 @@ import authReducer from '@services/authentication/slice';
 const store = configureStore({
     reducer: {
         core: coreReducer,
-        auth: authReducer
+        auth: authReducer,
+        device: deviceReducer
     }
 });
 
