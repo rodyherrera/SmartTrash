@@ -24,6 +24,7 @@ const Application = () => {
                 <Route element={<ProtectedRoute mode='protect' />}>
                     <Route path='/dashboard/' element={<pages.protect.Dashboard />} />
                     <Route path='/device/new/' element={<pages.protect.LinkDevice />} />
+                    <Route path='/device/calibrate/' element={<pages.protect.CalibrateDevice />} />
                 </Route>
             </Route>
         </Routes>

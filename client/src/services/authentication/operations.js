@@ -90,10 +90,7 @@ export const updateMyProfile = (body, navigate) => async (dispatch) => {
     operation.use({
         api: authService.updateMyProfile,
         loaderState: authSlice.setIsOperationLoading,
-        query: {
-            body,
-            query: { populate: 'github' }
-        }
+        query: { body }
     });
 };
 

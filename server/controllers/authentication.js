@@ -8,7 +8,6 @@ const UserFactory = new HandlerFactory({
     fields: [
         'username',
         'fullname',
-        'github',
         'email',
         'password',
         'passwordConfirm',
@@ -80,7 +79,7 @@ exports.signUp = catchAsync(async (req, res, next) => {
  * @returns {Promise<void>}
 */
 exports.updateMyPassword = catchAsync(async (req, res, next) => {
-    const requestedUser = await User.findById(req.user.id).select('+password').populate('github');
+    const requestedUser = await User.findById(req.user.id).select('+password');
     // Verify if the current password provided by the user is indeed the current password of the account.
     if(!(await requestedUser.isCorrectPassword(req.body.passwordCurrent, requestedUser.password))){
         return next(new Error('Authentication::Update::PasswordCurrentIncorrect'));
@@ -118,7 +117,7 @@ exports.deleteMyAccount = catchAsync(async (req, res, next) => {
  * @returns {Promise<void>}
 */
 exports.getMyAccount = catchAsync(async (req, res, next) => {
-    const requestedUser = await User.findById(req.user.id).populate('github');
+    const requestedUser = await User.findById(req.user.id).populate('devices');
     if(!requestedUser){
         return next(new Error('Authentication::Get::UserNotFound'));
     }
@@ -138,7 +137,7 @@ exports.updateMyAccount = catchAsync(async (req, res, next) => {
     const requestedUser = await User.findByIdAndUpdate(req.user.id, filteredBody, {
         new: true,
         runValidators: true
-    }).populate('github');
+    });
     if(!requestedUser){
         return next(new Error('Authentication::Update::UserNotFound'));
     }

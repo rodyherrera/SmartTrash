@@ -1,0 +1,88 @@
+#Calibrate-Device-Main{
+    padding: 2rem;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    height: 90vh;
+}
+
+#Calibrate-Device-Header-Title{
+    font-size: 3.2rem;
+    font-weight: 300;
+    line-height: 3.8rem;
+    text-align: center;
+}
+
+#Calibrate-Device-Body-Container{
+    display: flex;
+    flex-direction: column;
+    gap: 5rem;
+    align-items: center;
+    justify-content: center;
+}
+
+#Calibration-Device-Measured-Distance-Helper-Text{
+    text-align: center;
+    width: 550px;
+    color: #444444;
+    line-height: 1.25rem;
+    font-size: .75rem;
+}
+
+#Calibration-Device-Measured-Distance-Helper-Text .Highlight-Color{
+    color: #023fb1;
+}
+
+
+#Calibrate-Device-Footer-Container{
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
+#Calibrate-Device-Measured-Distance-Container{
+    display: flex;
+    align-items: flex-end;
+    gap: .3rem;
+}
+
+#Calibrate-Device-Measured-Distance-Unit{
+    padding: .3rem .7rem;
+    color: #FFFFFF;
+    font-size: .8rem;
+    background-color: #0f62fe;
+    border-radius: 5rem;
+}
+
+#Calibrate-Device-Measured-Distance{
+    font-size: 10rem;
+    font-weight: 600;
+    line-height: 6rem;
+    color: #0f62fe;
+}
+
+@media screen and (max-width: 768px){
+    #Calibration-Device-Measured-Distance-Helper-Text{
+        width: 100%;
+    }
+
+    #Calibrate-Device-Body-Container{
+        height: 65vh;
+    }
+
+    #Calibration-Device-Measured-Distance-Helper-Text{
+        font-size: .9rem;
+        line-height: 1.5rem;
+    }
+
+    #Calibrate-Device-Header-Title{
+        font-size: 2.2rem;
+        line-height: 2.8rem;
+    }
+    
+    #Calibrate-Device-Main{
+        height: fit-content;
+        padding: 1rem;
+    }
+}

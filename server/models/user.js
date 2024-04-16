@@ -12,6 +12,10 @@ const UserSchema = new mongoose.Schema({
         lowercase: true,
         trim: true
     },
+    devices: [{
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Device'
+    }],
     fullname: {
         type: String,
         minlength: [8, 'User::Fullname::MinLength'],

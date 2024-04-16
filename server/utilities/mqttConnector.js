@@ -13,26 +13,11 @@ class mqttController{
     constructor(){
         this.client = null;
         this.updateQueue = new Queue();
-    }
+        this.handlers = [];
+    };
 
-    /**
-     * Handles incoming messages from the MQTT server. Expects the message to be
-     * JSON with a 'measuredDistance' property, then updates a device record with 
-     * the distance information.
-     *
-     * @param {string} topicName - The topic name where the message originated.
-     * @param {Buffer} message - The message in binary format.
-     * @throws {Error} - If there's an error parsing the JSON message.
-    */
-    async messageEventHandler(topicName, message){
-        try{
-            const { measuredDistance } = JSON.parse(message.toString());
-            const stduid = topicName.toString();
-            const log = { distance: measuredDistance };
-            this.updateQueue.enqueue({ stduid, log });
-        }catch(error){
-            console.error(`[Quantum Cloud Server]: Error parsing message: ${error}`);
-        }
+    addHandler(handler){
+        this.handlers.push(handler);
     };
 
     /**
@@ -50,6 +35,44 @@ class mqttController{
             await Device.updateOne({ stduid }, { $push: { logs: log } });
         }catch(error){
             console.error(`[Quantum Cloud Server]: Error processing update: ${error}`);
+        }
+    };
+
+    /**
+     * Update processing loop. Waits for updates and processes them asynchronously.
+    */
+    async startAsyncUpdateProcessing(){
+        while(true){
+            const update = this.updateQueue.dequeue();
+            if(update){
+                await this.processUpdate(update);
+            }else{
+                await new Promise(resolve => setTimeout(resolve, 1000)); 
+            }
+        }
+    };
+    
+    /**
+     * Handles incoming messages from the MQTT server. Expects the message to be
+     * JSON with a 'measuredDistance' property, then updates a device record with 
+     * the distance information.
+     *
+     * @param {string} topicName - The topic name where the message originated.
+     * @param {Buffer} message - The message in binary format.
+     * @throws {Error} - If there's an error parsing the JSON message.
+    */
+    async messageEventHandler(topicName, message){
+        try{
+            const { data } = JSON.parse(message.toString());
+            const { measuredDistance } = data;
+            const stduid = topicName.toString();
+            for(const handler of this.handlers){
+                handler(topicName, data);
+            }
+            const log = { distance: measuredDistance };
+            this.updateQueue.enqueue({ stduid, log });
+        }catch(error){
+            console.error(`[Quantum Cloud Server]: Error parsing message: ${error}`);
         }
     };
 
@@ -81,20 +104,6 @@ class mqttController{
                 resolve(messageReceived);
             }, timeout);
         });
-    };
-
-    /**
-     * Update processing loop. Waits for updates and processes them asynchronously.
-    */
-    async startAsyncUpdateProcessing(){
-        while(true){
-            const update = this.updateQueue.dequeue();
-            if(update){
-                await this.processUpdate(update);
-            }else{
-                await new Promise(resolve => setTimeout(resolve, 1000)); 
-            }
-        }
     };
 
     /**

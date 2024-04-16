@@ -2,6 +2,7 @@ const HandlerFactory = require('@controllers/handlerFactory');
 const Device = require('@models/device');
 const RuntimeError = require('@utilities/runtimeError');
 const mqttClient = require('@utilities/mqttConnector');
+const User = require('@models/user');
 const { catchAsync } = require('@utilities/runtime');
 
 /**
@@ -15,7 +16,8 @@ const DeviceFactory = new HandlerFactory({
     fields: [
         'name',
         'user',
-        'stduid'
+        'stduid',
+        'height'
     ]
 });
 
@@ -73,6 +75,7 @@ exports.createDevice = catchAsync(async (req, res, next) => {
             return next(new RuntimeError('Device::UserAlreadyAssociated', 400));
         }
         // Update Existing Device: Add the user to the existing device and save the changes.
+        await User.findByIdAndUpdate(user, { $push: { devices: storedDevice._id } });
         storedDevice.users.push(user);
         await storedDevice.save();
         res.status(200).json({ status: 'success', data: storedDevice });
@@ -85,5 +88,6 @@ exports.createDevice = catchAsync(async (req, res, next) => {
     }
     await mqttClient.client.subscribeAsync(stduid);
     const device = await Device.create({ name, stduid, users: [ user ] });
+    await User.findByIdAndUpdate(user, { $push: { devices: device._id } });
     res.status(200).json({ status: 'success', data: device });
 });

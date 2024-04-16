@@ -5,6 +5,8 @@ const { startDevicesListening } = require('@utilities/bootstrap');
 const mqttClient = require('@utilities/mqttConnector');
 const mongoConnector = require('@utilities/mongoConnector');
 
+require('@config/ws');
+
 // Server configuration
 const SERVER_PORT = process.env.SERVER_PORT || 8000;
 const SERVER_HOST = process.env.SERVER_HOSTNAME || '0.0.0.0';

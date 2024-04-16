@@ -13,6 +13,10 @@ const DeviceSchema = new mongoose.Schema({
         ref: 'User',
         required: [true, 'Device::User::Required']
     }],
+    height: {
+        type: Number,
+        default: 0
+    },
     stduid: {
         type: String,
         maxlength: [32, 'Device::STDUID::MaxLength'],

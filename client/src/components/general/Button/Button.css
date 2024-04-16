@@ -77,6 +77,10 @@
     margin-left: .5rem;
 }
 
+.Button-Container.Rounded{
+    border-radius: 5rem;
+}
+
 @media screen and (max-width: 768px){
     .Button-Container.Form-Contained{
         max-height: unset;
