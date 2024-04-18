@@ -7,7 +7,7 @@ import { io } from 'socket.io-client';
 import { useSelector } from 'react-redux';
 import './MeasuredDistance.css';
   
-const MeasuredDistance = () => {
+const MeasuredDistance = ({ setUsagePercentage }) => {
     const [distance, setDistance] = useState(0);
     const { devices } = useSelector((state) => state.device);
     const navigate = useNavigate();
@@ -24,7 +24,10 @@ const MeasuredDistance = () => {
                 deviceId: devices[0]._id
             }
         });
-        newSocket.on('distance', (distance) => setDistance(distance));
+        newSocket.on('data', ({ measuredDistance, usagePercentage }) => {
+            setDistance(measuredDistance);
+            setUsagePercentage(usagePercentage);
+        });
         return () => {
             newSocket.disconnect();
             setDistance(0);

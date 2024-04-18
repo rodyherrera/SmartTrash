@@ -1,6 +1,6 @@
 const mqtt = require('mqtt');
 const Device = require('@models/device');
-const Queue = require('@utilities/queue');
+const DeviceLog = require('@models/deviceLog');
 
 /**
  * This class manages the connection to an MQTT server, receives messages from
@@ -12,46 +12,17 @@ class mqttController{
     */
     constructor(){
         this.client = null;
-        this.updateQueue = new Queue();
-        this.handlers = [];
+        this.handlers = new Map();
     };
 
-    addHandler(handler){
-        this.handlers.push(handler);
+    addHandler(id, options, callback){
+        this.handlers.set(id, { options, callback });
     };
 
-    /**
-     * Processes an update for a device. The update is appended (pushed) to the
-     * 'logs' property of the corresponding device.
-     *
-     * @param {Object} update - Object containing properties:
-     *   * {string} stduid  - Unique identifier of the device.
-     *   * {Object} log - Log object to be appended to the device's logs.
-     * @throws {Error} - If there's an error updating the device in the database.
-    */
-    async processUpdate(update){
-        const { stduid, log } = update;
-        try{
-            await Device.updateOne({ stduid }, { $push: { logs: log } });
-        }catch(error){
-            console.error(`[Quantum Cloud Server]: Error processing update: ${error}`);
-        }
+    deleteHandler(id){
+        this.handlers.delete(id);
     };
 
-    /**
-     * Update processing loop. Waits for updates and processes them asynchronously.
-    */
-    async startAsyncUpdateProcessing(){
-        while(true){
-            const update = this.updateQueue.dequeue();
-            if(update){
-                await this.processUpdate(update);
-            }else{
-                await new Promise(resolve => setTimeout(resolve, 1000)); 
-            }
-        }
-    };
-    
     /**
      * Handles incoming messages from the MQTT server. Expects the message to be
      * JSON with a 'measuredDistance' property, then updates a device record with 
@@ -66,11 +37,25 @@ class mqttController{
             const { data } = JSON.parse(message.toString());
             const { measuredDistance } = data;
             const stduid = topicName.toString();
-            for(const handler of this.handlers){
-                handler(topicName, data);
+            const device = await Device
+                .findOne({ stduid })
+                .select('height');
+                
+            const usagePercentage = Math.round((measuredDistance / device.height) * 100);
+            device.usagePercentage = usagePercentage;
+            for(const { options, callback } of this.handlers.values()){
+                if(options?.topicName && (options.topicName !== topicName)){
+                    continue;
+                }
+                callback({ measuredDistance, usagePercentage });
             }
-            const log = { distance: measuredDistance };
-            this.updateQueue.enqueue({ stduid, log });
+            await DeviceLog.create({ 
+                height: device.height, 
+                distance: measuredDistance, 
+                usagePercentage, 
+                stduid 
+            });
+            await device.save();
         }catch(error){
             console.error(`[Quantum Cloud Server]: Error parsing message: ${error}`);
         }
@@ -118,7 +103,6 @@ class mqttController{
                 password: process.env.MQTT_PASSWORD
             });
             this.client.on('message', this.messageEventHandler.bind(this));
-            this.startAsyncUpdateProcessing();
             console.log('[SmartTrash Cloud Server]: Successfully connected to MQTT Server.');
         }catch(error){
             console.log('[SmartTrash Cloud Server]: Error trying connect to MQTT Server ->', error);

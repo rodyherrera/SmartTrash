@@ -1,4 +1,4 @@
-import React, { Suspense, lazy, useEffect } from 'react';
+import React, { Suspense, lazy, useEffect, useState } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { getMyDevices } from '@services/device/operations';
 import { GoChevronRight, GoChevronLeft } from 'react-icons/go';
@@ -10,6 +10,7 @@ const TrashCanModel = lazy(() => import('@components/general/TrashCanModel'));
 
 const DashboardPage = () => {
     const dispatch = useDispatch();
+    const [usagePercentage, setUsagePercentage] = useState(0);
     const { isLoading, devices } = useSelector((state) => state.device);
 
     useEffect(() => {
@@ -20,7 +21,7 @@ const DashboardPage = () => {
         <main className='Device-Viewer-Container' key={index}>
             <section className='Device-Viewer-Left-Container'>
                 <article className='Device-Viewer-Left-Header-Container'>
-                    <MeasuredDistance />
+                    <MeasuredDistance setUsagePercentage={setUsagePercentage} />
                 </article>
                 <article className='Device-Viewer-Left-Bottom-Container'>
                     <article className='Device-Viewer-ID-Related-Container'>
@@ -34,7 +35,7 @@ const DashboardPage = () => {
                     <GaugeContainer 
                         width={500} 
                         height={110} 
-                        value={60}
+                        value={usagePercentage}
                         outerRadius={100}
                         innerRadius={98}
                         startAngle={-90} 
@@ -42,8 +43,7 @@ const DashboardPage = () => {
                     >
                         <GaugeReferenceArc />
                         <GaugeValueArc />
-                        <GaugeValueText className='Device-Usage-Percentage-Value' text={'60%'} />
-                        <GaugeValueText className='Device-Usage-Percentage-Value' text={'60%'} />
+                        <GaugeValueText className='Device-Usage-Percentage-Value' text={usagePercentage + '%'} />
                     </GaugeContainer>
                 </article>
                 <article className='Device-Viewer-3D-Model-Container'>

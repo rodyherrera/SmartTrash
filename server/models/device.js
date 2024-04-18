@@ -25,14 +25,8 @@ const DeviceSchema = new mongoose.Schema({
         trim: true
     },
     logs: [{
-        distance: {
-            type: Number,
-            required: true
-        },
-        timestamp: {
-            type: Date,
-            default: Date.now
-        }
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'DeviceLog'
     }],
     createdAt: {
         type: Date,
@@ -42,7 +36,6 @@ const DeviceSchema = new mongoose.Schema({
 
 DeviceSchema.index({ name: 'text' });
 DeviceSchema.index({ stduid: 1 }, { unique: true });
-DeviceSchema.index({ 'logs.timestamp': 1 });  
 
 const Device = mongoose.model('Device', DeviceSchema);
 

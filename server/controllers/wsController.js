@@ -39,9 +39,13 @@ const tokenOwnership = async (socket, next) => {
 };
 
 const deviceMeasurementHandler = (socket) => {
-    mqttClient.addHandler((topicName, { measuredDistance }) => {
-        if(topicName !== socket.device.stduid) return;
-        socket.emit('distance', measuredDistance)
+    const { topicName } = socket.device;
+    const callback = (data) => {
+        socket.emit('data', data);
+    };
+    mqttClient.addHandler(socket.id, { topicName }, callback);
+    socket.on('disconnect', () => {
+        mqttClient.deleteHandler(socket.id);
     });
 };
 
