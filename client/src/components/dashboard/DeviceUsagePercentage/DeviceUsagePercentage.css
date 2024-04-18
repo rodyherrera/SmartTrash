@@ -1,0 +1,25 @@
+.Device-Usage-Percentage-Container{
+    position: absolute;
+    z-index: 100;
+    left: 50%;
+    top: 4.5rem;
+    transform: translate(-50%, -50%);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.Device-Usage-Percentage-Container > :first-child{
+    height: 100% !important;
+    width: 790px;
+    position: relative;
+    z-index: -100;
+    top: 3.5rem;
+}
+
+.Device-Usage-Percentage-Container text{
+    transform: translate(0px, -63px);
+    font-size: 1.3rem;
+    font-weight: 350;
+    fill: #0f62fe !important;
+}
