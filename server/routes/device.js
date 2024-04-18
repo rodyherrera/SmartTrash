@@ -5,6 +5,7 @@ const deviceController = require('@controllers/device');
 
 router.use(authMiddleware.protect);
 
+router.get('/me/', deviceController.getMyDevices)
 router.post('/', deviceController.createDevice);
 
 // router.use(authMiddleware.restrictTo('admin'));

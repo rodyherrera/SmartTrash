@@ -1,0 +1,82 @@
+
+.Device-Measured-Distance-Container{
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+    padding: 1rem;
+    width: 280px;
+    border-radius: .2rem;
+    background-color: #f8f8f8;
+}
+
+.Device-Measured-Distance-Header-Container{
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.Device-Measured-Distance-Title{
+    font-size: .6rem;
+    font-weight: 350;
+    text-transform: uppercase;
+    letter-spacing: 0.08rem;
+}
+
+.Device-Measured-Distance{
+    color: #0f62fe;
+    font-size: 2.5rem;
+    line-height: 2rem;
+}
+
+.Dashboard-Button{
+    background-color: #0f62fe;
+    cursor: pointer;
+    text-transform: uppercase;
+    font-size: .65rem;
+    color: #FFF;
+    border-radius: .12rem;
+    letter-spacing: 0.03rem;
+    transition: .2s;
+    display: flex;
+    align-items: center;
+    gap: .5rem;
+    padding: .3rem .7rem;
+}
+
+.Dashboard-Button:hover{
+    opacity: .75;
+}
+
+.Dashboard-Button-Icon-Container{
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.Dashboard-Button:active{
+    transform: scale(.98);
+}
+
+.Device-Measured-Distance-Value-Container{
+    display: flex;
+    gap: .3rem;
+    align-items: flex-end;
+}
+
+.Device-Measured-Distance-Unit{
+    color: #0f62fe;
+    font-size: .9rem;
+}
+
+.Device-Measured-Distance-Footer-Container{
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+}
+
+.Device-Measured-Distance-Help-Icon-Container{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 1.1rem;
+}

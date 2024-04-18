@@ -91,3 +91,9 @@ exports.createDevice = catchAsync(async (req, res, next) => {
     await User.findByIdAndUpdate(user, { $push: { devices: device._id } });
     res.status(200).json({ status: 'success', data: device });
 });
+
+// TODO: DELETE THIS CONTROLLER AND USE HANDLERFACTORY!!!
+exports.getMyDevices = catchAsync(async (req, res) => {
+    const devices = await Device.find({ users: req.user._id }).select('-logs -__v').lean();
+    res.status(200).json({ status: 'success', data: devices });
+});

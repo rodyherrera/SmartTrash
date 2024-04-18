@@ -15,13 +15,19 @@ import OperationHandler from '@utilities/operationHandler';
 
 export const createDevice = (body) => async (dispatch) => {
     const operation = new OperationHandler(deviceSlice, dispatch);
-    operation.on('response', (data) => {
-        console.log(data);
-        dispatch(deviceSlice.setDevice(data))
-    });
     operation.use({
         api: deviceService.createDevice,
         loaderState: deviceSlice.setIsLoading,
+        responseState: deviceSlice.setDevice,
         query: { body }
+    });
+};
+
+export const getMyDevices = () => (dispatch) => {
+    const operation = new OperationHandler(deviceSlice, dispatch);
+    operation.use({
+        api: deviceService.getMyDevices,
+        loaderState: deviceSlice.setIsLoading,
+        responseState: deviceSlice.setDevices
     });
 };

@@ -18,7 +18,7 @@ const CalibrateDevice = () => {
             auth: { token: authToken },
             query: { 
                 action: 'Device::Measurement',
-                deviceId: user.devices[0]._id
+                deviceId: user.devices[0]
             }
         });
         newSocket.on('distance', (distance) => setDistance(distance));

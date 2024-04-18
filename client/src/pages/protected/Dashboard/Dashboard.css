@@ -1,0 +1,108 @@
+.Device-Viewer-Container{
+    height: 90vh;
+    background-color: #FFFFFF;
+    display: flex;
+    justify-content: space-between;
+}
+
+.Device-Viewer-Left-Container,
+.Device-Viewer-Center-Container,
+.Device-Viewer-Right-Container{
+    width: calc(100vw / 3);
+}
+
+.Device-Viewer-3D-Model-Container{
+    width: 300px;
+    height: 500px;
+    margin: 0 auto;
+    position: relative;
+    z-index: 100;
+}
+
+.Device-Viewer-Name{
+    font-weight: 350;
+}
+
+.Device-Viewer-Caption-Name-Container{
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 2rem;
+}
+
+.Device-Viewer-Caption-Container{
+    display: flex;
+    gap: 1rem;
+    flex-direction: column;
+}
+
+.Device-Viewer-Navigation-Helper-Text{
+    font-size: .75rem;
+}
+
+.Device-Viewer-Previous-Icon-Container,
+.Device-Viewer-Next-Icon-Container{
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.Device-Viewer-Center-Container{
+    text-align: center;
+    position: relative;
+}
+
+.Device-Viewer-Right-Container,
+.Device-Viewer-Left-Container{
+    display: flex;
+    justify-content: space-between;
+    flex-direction: column;
+}
+
+.Device-Viewer-Right-Bottom-Container,
+.Device-Viewer-Left-Bottom-Container{
+    padding: 1rem;
+}
+
+.Device-Viewer-Left-Header-Container{
+    padding: 1rem;
+}
+
+.Device-Viewer-ID-Related-Container{
+    display: flex;
+    flex-direction: column;
+    gap: .3rem;
+}
+
+.Device-Viewer-STDUID,
+.Device-Viewer-ID{
+    font-size: .8rem;
+    font-weight: 400;
+    color: #0f62fe;
+}
+
+.Device-Usage-Percentage-Container{
+    position: absolute;
+    z-index: 100;
+    left: 50%;
+    top: 4.5rem;
+    transform: translate(-50%, -50%);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.Device-Usage-Percentage-Container > :first-child{
+    height: 100% !important;
+    width: 790px;
+    position: relative;
+    z-index: -100;
+    top: 3.5rem;
+}
+
+.Device-Usage-Percentage-Container text{
+    transform: translate(0px, -63px);
+    font-size: 1.3rem;
+    font-weight: 350;
+    fill: #0f62fe !important;
+}

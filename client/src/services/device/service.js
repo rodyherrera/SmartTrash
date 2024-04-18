@@ -23,3 +23,8 @@ export const createDevice = DeviceAPI.register({
     path: '/',
     method: 'POST'
 });
+
+export const getMyDevices = DeviceAPI.register({
+    path: '/me/',
+    method: 'GET'
+});

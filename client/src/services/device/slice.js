@@ -3,7 +3,8 @@ import { createSlice } from '@reduxjs/toolkit';
 const state = {
     error: null,
     device: {},
-    isLoading: false
+    isLoading: false,
+    devices: []
 };
 
 const deviceSlice = createSlice({
@@ -18,12 +19,16 @@ const deviceSlice = createSlice({
         },
         setDevice(state, action){
             state.device = action.payload;
+        },
+        setDevices(state, action){
+            state.devices = action.payload;
         }
     }
 });
 
 export const {
     setError,
+    setDevices,
     setDevice,
     setIsLoading
 } = deviceSlice.actions;

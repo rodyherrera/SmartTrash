@@ -41,7 +41,8 @@ const DeviceSchema = new mongoose.Schema({
 });
 
 DeviceSchema.index({ name: 'text' });
-DeviceSchema.index({ stduid: 1, user: 1 }, { unique: true });
+DeviceSchema.index({ stduid: 1 }, { unique: true });
+DeviceSchema.index({ 'logs.timestamp': 1 });  
 
 const Device = mongoose.model('Device', DeviceSchema);
 
