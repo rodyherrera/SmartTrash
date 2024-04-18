@@ -4,7 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import { PiDotsThreeVertical } from 'react-icons/pi';
 import './DeviceMeasuredDistance.css';
   
-const DeviceMeasuredDistance = ({ distance }) => {
+const DeviceMeasuredDistance = ({ distance, deviceId }) => {
     const navigate = useNavigate();
 
     return (
@@ -20,7 +20,7 @@ const DeviceMeasuredDistance = ({ distance }) => {
                     <h3 className='Device-Measured-Distance'>{distance}</h3>
                     <p className='Device-Measured-Distance-Unit'>cm</p>
                 </div>
-                <button className='Dashboard-Button' onClick={() => navigate('/device/calibrate/')}>
+                <button className='Dashboard-Button' onClick={() => navigate(`/device/${deviceId}/calibrate/`)}>
                     <span>Calibrate</span>
                     <i className='Dashboard-Button-Icon-Container'>
                         <HiOutlineArrowRight />

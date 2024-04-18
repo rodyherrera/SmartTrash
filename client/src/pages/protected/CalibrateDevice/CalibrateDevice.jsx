@@ -1,34 +1,13 @@
-import React, { useEffect, useState } from 'react';
+import React from 'react';
 import Button from '@components/general/Button';
-import { getCurrentUserToken } from '@services/authentication/localStorageService';
+import useDeviceMeasurement from '@hooks/useDeviceMeasurement';
+import { useParams } from 'react-router-dom';
 import { HiOutlineArrowNarrowRight } from 'react-icons/hi';
-import { useSelector } from 'react-redux';
-import { io } from 'socket.io-client';
 import './CalibrateDevice.css';
 
 const CalibrateDevice = () => {
-    const [socket, setSocket] = useState(null);
-    const [distance, setDistance] = useState(0);
-    const { user } = useSelector((state) => state.auth);
-
-    useEffect(() => {
-        const authToken = getCurrentUserToken();
-        const newSocket = io(import.meta.env.VITE_SERVER, {
-            transports: ['websocket'],
-            auth: { token: authToken },
-            query: { 
-                action: 'Device::Measurement',
-                deviceId: user.devices[0]
-            }
-        });
-        newSocket.on('distance', (distance) => setDistance(distance));
-        setSocket(newSocket);
-        return () => {
-            newSocket.disconnect();
-            setSocket(null);
-            setDistance(0);
-        };
-    }, []);
+    const { deviceId } = useParams();
+    const { distance } = useDeviceMeasurement(deviceId);
 
     return (
         <main id='Calibrate-Device-Main'>

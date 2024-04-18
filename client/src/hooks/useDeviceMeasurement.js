@@ -1,11 +1,10 @@
-import { useEffect, useState, useRef } from 'react';
+import { useEffect, useState } from 'react';
 import { getCurrentUserToken } from '@services/authentication/localStorageService';
 import io from 'socket.io-client';
 
 const useDeviceMeasurement = (deviceId) => {
     const [distance, setDistance] = useState(0);
     const [usagePercentage, setUsagePercentage] = useState(0);
-    const socketRef = useRef(null);
 
     useEffect(() => {
         if(!deviceId) return;
@@ -22,10 +21,6 @@ const useDeviceMeasurement = (deviceId) => {
             setDistance(measuredDistance);
             setUsagePercentage(usagePercentage);
         });
-        socketRef.current = socket; // Store the reference
-        return () => {
-            socket.current.disconnect();
-        };
     }, [deviceId]);
 
     return { distance, usagePercentage };

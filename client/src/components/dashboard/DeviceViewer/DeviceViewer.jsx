@@ -14,7 +14,7 @@ const DeviceViewer = ({ _id, stduid }) => {
         <main className='Device-Viewer-Container'>
             <section className='Device-Viewer-Left-Container'>
                 <article className='Device-Viewer-Left-Header-Container'>
-                    <DeviceMeasuredDistance distance={distance} />
+                    <DeviceMeasuredDistance distance={distance} deviceId={_id} />
                 </article>
                 <article className='Device-Viewer-Left-Bottom-Container'>
                     <article className='Device-Viewer-ID-Related-Container'>
