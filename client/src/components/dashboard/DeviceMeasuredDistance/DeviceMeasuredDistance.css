@@ -79,3 +79,9 @@
     align-items: center;
     font-size: 1.1rem;
 }
+
+@media screen and (max-width: 768px){
+    .Device-Measured-Distance-Container{
+        width: 100%;
+    }
+}

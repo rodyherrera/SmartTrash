@@ -23,3 +23,13 @@
     font-weight: 350;
     fill: #0f62fe !important;
 }
+
+@media screen and (max-width: 768px){
+    .Device-Usage-Percentage-Container{
+        top: 3rem;
+    }
+
+    .Device-Usage-Percentage-Container > :first-child > :first-child{
+        width: 800px;
+    }
+}

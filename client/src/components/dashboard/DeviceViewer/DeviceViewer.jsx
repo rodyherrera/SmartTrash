@@ -45,7 +45,7 @@ const DeviceViewer = ({ _id, stduid }) => {
             </section>
             <section className='Device-Viewer-Right-Container'>
                 <article className='Device-Viewer-Right-Header-Container'>
-
+                    
                 </article>
                 <article className='Device-Viewer-Right-Bottom-Container'>
                 </article>

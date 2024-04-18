@@ -1,5 +1,6 @@
 .User-Navigation-Container{
     position: relative;
+    z-index: 200;
 }
 
 .User-Navigation-Header-Container{

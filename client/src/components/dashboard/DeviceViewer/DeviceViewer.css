@@ -80,3 +80,62 @@
     font-weight: 400;
     color: #0f62fe;
 }
+
+@media screen and (max-width: 768px){
+    .Device-Viewer-Container{
+        height: unset;
+        flex-direction: column;
+    }
+
+    .Device-Viewer-Left-Container, 
+    .Device-Viewer-Center-Container, 
+    .Device-Viewer-Right-Container{
+        width: 100%;
+    }
+
+    .Device-Viewer-Center-Container{
+        order: 1;
+        height: 75vh;
+        display: flex;
+        justify-content: space-between;
+        flex-direction: column;
+        overflow-x: hidden;
+    }
+
+    .Device-Viewer-Left-Container{
+        order: 2;
+    }
+
+    .Device-Viewer-Right-Container{
+        order: 3;
+    }
+
+    .Device-Viewer-Caption-Container{
+        gap: .3rem;
+    }
+    
+    .Device-Viewer-Caption-Name-Container{
+        gap: 1rem;
+    }
+
+    .Device-Viewer-Navigation-Helper-Text{
+        font-size: .9rem;
+        font-weight: 300;
+        width: 80%;
+        line-height: 1.5rem;
+        margin: 0 auto;
+    }
+
+    .Device-Viewer-Previous-Icon-Container, .Device-Viewer-Next-Icon-Container{
+        font-size: 1.2rem;
+    }
+    
+    .Device-Viewer-Name{
+        font-size: 1.4rem;
+    }
+
+    .Device-Viewer-3D-Model-Container{
+        width: 100%;
+        height: 60vh;
+    }
+}
