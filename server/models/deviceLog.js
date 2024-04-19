@@ -1,5 +1,4 @@
 const mongoose = require('mongoose');
-const Device = require('@models/device');
 
 const DeviceLogSchema = new mongoose.Schema({
     stduid: {
@@ -22,6 +21,18 @@ const DeviceLogSchema = new mongoose.Schema({
 });
 
 DeviceLogSchema.index({ stduid: 1, createdAt: 1 });
+
+DeviceLogSchema.pre('save', async function(next){
+    try{
+        await mongoose.model('Device').updateOne({ stduid: this.stduid }, {
+            $push: { logs: this._id }
+        });
+        next();
+    }catch(error){
+        console.error('[SmartTrash Cloud Server]: Error updating Device logs:', error);
+        next(error);
+    }
+});
 
 const DeviceLog = mongoose.model('DeviceLog', DeviceLogSchema);
 

@@ -92,7 +92,7 @@ class MQTTController{
     */
     async updateDeviceAndLog(topicName, measuredDistance){
         const stduid = topicName.toString();
-        const device = await Device.findOne({ stduid }).select('height');
+        const device = await Device.findOne({ stduid }).select('height stduid distance');
         const usagePercentage = Math.round((measuredDistance / device.height) * 100);
         device.usagePercentage = usagePercentage;
         // Notify handlers
