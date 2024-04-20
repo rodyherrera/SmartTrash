@@ -2,6 +2,7 @@
     height: 90vh;
     background-color: #FFFFFF;
     display: flex;
+    padding: 1rem;
     justify-content: space-between;
 }
 
@@ -21,6 +22,11 @@
 
 .Device-Viewer-Name{
     font-weight: 350;
+    background-color: #0f62fe;
+    color: #FFFFFF;
+    padding: .2rem 1rem;
+    font-size: 1rem;
+    border-radius: 2rem;
 }
 
 .Device-Viewer-Caption-Name-Container{
@@ -74,13 +80,6 @@
     gap: .3rem;
 }
 
-.Device-Viewer-STDUID,
-.Device-Viewer-ID{
-    font-size: .8rem;
-    font-weight: 400;
-    color: #0f62fe;
-}
-
 @media screen and (max-width: 768px){
     .Device-Viewer-Container{
         height: unset;
@@ -131,7 +130,8 @@
     }
     
     .Device-Viewer-Name{
-        font-size: 1.4rem;
+        font-size: 1rem;
+        padding: .3rem 1rem;
     }
 
     .Device-Viewer-3D-Model-Container{

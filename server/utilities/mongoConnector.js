@@ -9,15 +9,15 @@ const mongoConnector = async () => {
         ? process.env.PRODUCTION_DATABASE
         : process.env.DEVELOPMENT_DATABASE;
 
-    console.log(`[SmartTrash Cloud Server]: Connecting to MongoDB (${databaseName})...`);
+    console.log(`[SmartTrash Cloud]: Connecting to MongoDB (${databaseName})...`);
     const uri = process.env.MONGO_URI + '/' + databaseName;
     mongoose.set('strictQuery', false);
     mongoose.set('strictPopulate', false);
     try{
         await mongoose.connect(uri, { authSource: 'admin' });
-        console.log('[SmartTrash Cloud Server]: Connected to MongoDB!');
+        console.log('[SmartTrash Cloud]: Connected to MongoDB!');
     }catch(error){
-        console.log('[SmartTrash Cloud Server]: An unhandled error has been ocurred while trying to connect to MongoDB.');
+        console.log('[SmartTrash Cloud]: An unhandled error has been ocurred while trying to connect to MongoDB.');
         console.log(error);
     }
 };

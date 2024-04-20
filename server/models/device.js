@@ -46,28 +46,18 @@ DeviceSchema.index({ stduid: 1 }, { unique: true });
  * @throws {Error} If an invalid `type` is provided.
 */
 const getDateRange = (type) => {
+    const ranges = {
+        hourly: { days: 1 },
+        daily: { days: 1},
+        weekly: { days: 7},
+        monthly: { months: 1 } 
+    };
+    if(!ranges[type]) throw new Error('Invalid range type');
     const today = new Date();
-    let start, end;
-    switch(type){
-        case 'hourly':
-            start = new Date(today.getFullYear(), today.getMonth(), today.getDate());
-            end = new Date(start.getTime() + 24 * 60 * 60 * 1000);
-            break;
-        case 'daily':
-            start = new Date(today.getFullYear(), today.getMonth(), today.getDate());
-            end = new Date(start.getTime() + 24 * 60 * 60 * 1000);
-            break;
-        case 'weekly':
-            start = new Date(today.getFullYear(), today.getMonth(), today.getDate() - (today.getDay() + 1) % 7);
-            end = new Date(start.getTime() + 6 * 24 * 60 * 60 * 1000);
-            break;
-        case 'monthly':  
-            start = new Date(today.getFullYear(), today.getMonth(), 1);
-            end = new Date(start.getTime() + 31 * 24 * 60 * 60 * 1000);
-            break;
-        default:
-            throw new Error('Invalid range type');
-    }
+    const start = new Date(today.getFullYear(), today.getMonth(), today.getDate()); 
+    const end = new Date(start);
+    if(ranges[type].days) end.setDate(end.getDate() + ranges[type].days);
+    if(ranges[type].months) end.setMonth(end.getMonth() + ranges[type].months);
     return { start, end };
 };
 

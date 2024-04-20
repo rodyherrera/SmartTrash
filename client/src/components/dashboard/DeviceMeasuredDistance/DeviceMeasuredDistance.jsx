@@ -1,7 +1,6 @@
 import React from 'react';
 import { HiOutlineArrowRight } from 'react-icons/hi2';
 import { useNavigate } from 'react-router-dom';
-import { PiDotsThreeVertical } from 'react-icons/pi';
 import './DeviceMeasuredDistance.css';
   
 const DeviceMeasuredDistance = ({ distance, deviceId }) => {
@@ -10,10 +9,7 @@ const DeviceMeasuredDistance = ({ distance, deviceId }) => {
     return (
         <div className='Device-Measured-Distance-Container'>
             <div className='Device-Measured-Distance-Header-Container'>
-                <h3 className='Device-Measured-Distance-Title'>/Measured Distance</h3>
-                <i className='Device-Measured-Distance-Help-Icon-Container'>
-                    <PiDotsThreeVertical />
-                </i>
+                <h3 className='Device-Measured-Distance-Title'>Measured Distance</h3>
             </div>
             <div className='Device-Measured-Distance-Footer-Container'>
                 <div className='Device-Measured-Distance-Value-Container'>

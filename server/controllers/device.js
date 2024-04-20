@@ -1,7 +1,7 @@
 const HandlerFactory = require('@controllers/handlerFactory');
 const Device = require('@models/device');
 const RuntimeError = require('@utilities/runtimeError');
-const mqttClient = require('@utilities/mqttConnector');
+const mqttClient = require('@utilities/mqttClient');
 const User = require('@models/user');
 const { catchAsync } = require('@utilities/runtime');
 

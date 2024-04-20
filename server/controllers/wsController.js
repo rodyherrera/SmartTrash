@@ -1,15 +1,17 @@
 const { getUserByToken } = require('@middlewares/authentication');
-const mqttClient = require('@utilities/mqttConnector');
+const mqttClient = require('@utilities/mqttClient');
 const RuntimeError = require('@utilities/runtimeError');
 const Device = require('@models/device');
 
 /**
- * Authenticates user based on provided token.
+ * Authenticates a user using a provided token.
+ *
  * @param {import('socket.io').Socket} socket - Socket.IO socket object.
  * @param {import('socket.io').NextFunction} next - Socket.IO next function.
+ * @returns {Promise<void>}
 */
-const userAuthentication = async (socket, next) => {
-    const { token } = socket.handshake.auth;
+const authenticateUser = async (socket, next) => {
+    const { token } = socket.handshake.query;
     if(!token) return next(new RuntimeError('Authentication::Token::Required'));
     try{
         const user = await getUserByToken(token, next);
@@ -21,11 +23,13 @@ const userAuthentication = async (socket, next) => {
 };
 
 /**
- * Verifies user ownership of the requested device.
+ * Verifies a user's ownership of a device.
+ *
  * @param {import('socket.io').Socket} socket - Socket.IO socket object.
  * @param {import('socket.io').NextFunction} next - Socket.IO next function.
+ * @returns {Promise<void>}
 */
-const tokenOwnership = async (socket, next) => {
+const verifyDeviceOwnership = async (socket, next) => {
     const { deviceId } = socket.handshake.query;
     if(!deviceId) return next(new RuntimeError('Device::Id::Required'));
     try{
@@ -38,7 +42,12 @@ const tokenOwnership = async (socket, next) => {
     }
 };
 
-const deviceMeasurementHandler = (socket) => {
+/**
+ * Handles device measurement data from MQTT.
+ *
+ * @param {import('socket.io').Socket} socket - Socket.IO socket object.
+*/
+const handleDeviceMeasurement = (socket) => {
     const { topicName } = socket.device;
     const callback = (data) => {
         socket.emit('data', data);
@@ -50,15 +59,17 @@ const deviceMeasurementHandler = (socket) => {
 };
 
 module.exports = (io) => {
-    io.use(userAuthentication);
+    // Use authentication middleware for authentication
+    io.use(authenticateUser);
     io.on('connection', async (socket) => {
         const { action } = socket.handshake.query;
         if(action === 'Device::Measurement'){
-            await tokenOwnership(socket, (error) => {
+            // Enforce device ownership before handling measurements
+            await verifyDeviceOwnership(socket, (error) => {
                 if(error){
-                    console.log('[SmartTrash Cloud Server]: Critical Error (@controllers/wsController)', error);
+                    console.log('[SmartTrash Cloud]: Critical Error (@controllers/wsController)', error);
                 }else{
-                    deviceMeasurementHandler(socket);
+                    handleDeviceMeasurement(socket);
                 }
             });
         }else{

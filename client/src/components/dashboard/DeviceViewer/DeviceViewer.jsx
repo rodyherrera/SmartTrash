@@ -7,7 +7,7 @@ import './DeviceViewer.css';
 
 const TrashCanModel = lazy(() => import('@components/general/TrashCanModel'));
 
-const DeviceViewer = ({ _id, stduid }) => {
+const DeviceViewer = ({ _id }) => {
     const { usagePercentage, distance } = useDeviceMeasurement(_id);
 
     return (
@@ -17,10 +17,6 @@ const DeviceViewer = ({ _id, stduid }) => {
                     <DeviceMeasuredDistance distance={distance} deviceId={_id} />
                 </article>
                 <article className='Device-Viewer-Left-Bottom-Container'>
-                    <article className='Device-Viewer-ID-Related-Container'>
-                        <p className='Device-Viewer-STDUID'>{stduid}</p>
-                        <p className='Device-Viewer-ID'>{_id}</p>
-                    </article>
                 </article>
             </section>
             <section className='Device-Viewer-Center-Container'>

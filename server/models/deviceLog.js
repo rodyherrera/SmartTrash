@@ -29,7 +29,7 @@ DeviceLogSchema.pre('save', async function(next){
         });
         next();
     }catch(error){
-        console.error('[SmartTrash Cloud Server]: Error updating Device logs:', error);
+        console.error('[SmartTrash Cloud]: Error updating Device logs:', error);
         next(error);
     }
 });

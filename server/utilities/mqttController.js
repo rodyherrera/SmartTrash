@@ -33,7 +33,7 @@ class MQTTController{
         try{
             await this.updateDeviceAndLog(topicName, distance.toString());
         }catch(error){
-            console.error(`[SmartTrash Cloud Server]: Error parsing message: ${error}`);
+            console.error(`[SmartTrash Cloud]: Error parsing message: ${error}`);
         }
     };
 
@@ -48,9 +48,9 @@ class MQTTController{
                 password: process.env.MQTT_PASSWORD
             });
             this.client.on('message', this.handleIncomingMessage.bind(this));
-            console.log('[SmartTrash Cloud Server]: Successfully connected to MQTT Server.');
+            console.log('[SmartTrash Cloud]: Successfully connected to MQTT Server.');
         }catch(error){
-            console.error('[SmartTrash Cloud Server]: Error connecting to MQTT Server:', error);
+            console.error('[SmartTrash Cloud]: Error connecting to MQTT Server:', error);
         }
     };
 
@@ -132,6 +132,4 @@ class MQTTController{
     }
 };
 
-const mqttClient = new MQTTController();
-
-module.exports = mqttClient;
+module.exports = MQTTController;

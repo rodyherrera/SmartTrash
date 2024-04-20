@@ -2,7 +2,7 @@ require('./aliases');
 
 const { httpServer } = require('@config/express'); 
 const { startDevicesListening } = require('@utilities/bootstrap');
-const mqttClient = require('@utilities/mqttConnector');
+const mqttClient = require('@utilities/mqttClient');
 const mongoConnector = require('@utilities/mongoConnector');
 
 require('@config/ws');
@@ -16,7 +16,7 @@ const SERVER_HOST = process.env.SERVER_HOSTNAME || '0.0.0.0';
  * @param {Error} err - The uncaught exception.
 */
 process.on('uncaughtException', async (error) => {
-    console.error('[SmartTrash Cloud Server]: Uncaught Exception:', error);
+    console.error('[SmartTrash Cloud]: Uncaught Exception:', error);
 });
 
 /**
@@ -24,14 +24,14 @@ process.on('uncaughtException', async (error) => {
  * @param {String} reason - The unhandled rejection.
 */
 process.on('unhandledRejection', (reason) => {
-    console.error('[SmartTrash Cloud Server]: Unhandled Promise Rejection, reason:', reason);
+    console.error('[SmartTrash Cloud]: Unhandled Promise Rejection, reason:', reason);
 });
 
 /**
  * Handles SIGINT (Ctrl-C) for graceful shutdown.
 */
 process.on('SIGINT', async () => {
-    console.log('[SmartTrash Cloud Server]: SIGINT signal received, shutting down...');
+    console.log('[SmartTrash Cloud]: SIGINT signal received, shutting down...');
     process.exit(0);
 });
 
@@ -41,9 +41,9 @@ httpServer.listen(SERVER_PORT, SERVER_HOST, async () => {
         await mongoConnector();
         await mqttClient.connect();
         startDevicesListening();
-        console.log(`[SmartTrash Cloud Server]: Server running at http://${SERVER_HOST}:${SERVER_PORT}/.`);
+        console.log(`[SmartTrash Cloud]: Server running at http://${SERVER_HOST}:${SERVER_PORT}/.`);
     }catch(error){
-        console.error('[SmartTrash Cloud Server]: Error during server initialization:', error);
+        console.error('[SmartTrash Cloud]: Error during server initialization:', error);
         process.exit(1);
     }
 });
