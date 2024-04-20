@@ -2,7 +2,7 @@ require('./aliases');
 
 const { httpServer } = require('@config/express'); 
 const { startDevicesListening } = require('@utilities/bootstrap');
-const { redisConnector } = require('@utilities/redisClient');
+const { redisConnector, redisClient } = require('@utilities/redisClient');
 const mqttClient = require('@utilities/mqttClient');
 const mongoConnector = require('@utilities/mongoConnector');
 
@@ -33,6 +33,7 @@ process.on('unhandledRejection', (reason) => {
 */
 process.on('SIGINT', async () => {
     console.log('[SmartTrash Cloud]: SIGINT signal received, shutting down...');
+    await redisClient.flushAll();
     process.exit(0);
 });
 

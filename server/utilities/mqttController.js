@@ -25,20 +25,6 @@ class MQTTController{
     };
 
     /**
-     * Handles an incoming MQTT message, updates the relevant device, and logs data.
-     * @param {string} topicName - The MQTT topic name.
-     * @param {number} distance - The measured distance reported by the device.
-     * @returns {Promise<void>}
-    */
-    async handleIncomingMessage(topicName, distance){
-        try{
-            await this.updateDeviceAndLog(topicName, distance.toString());
-        }catch(error){
-            console.error(`[SmartTrash Cloud]: Error parsing message: ${error}`);
-        }
-    };
-
-    /**
      * Establishes a connection to the MQTT server.
      * @returns {Promise<void>}
     */
@@ -86,36 +72,53 @@ class MQTTController{
     };
 
     /**
-     * Updates device data and creates a log entry based on measured distance.
+     * Handles an incoming MQTT message, updates the relevant device, and logs data.
      * @param {string} topicName - The MQTT topic name.
-     * @param {string} measuredDistance - The distance measured by the device.
+     * @param {number} distance - The measured distance reported by the device.
      * @returns {Promise<void>}
     */
-    async updateDeviceAndLog(topicName, measuredDistance){
-        const stduid = topicName.toString();
-        const cachedDevice = await redisClient.get(`mqttc-device:${stduid}`);
-        let device;
-        if(cachedDevice){
-            device = JSON.parse(cachedDevice);
-        }else{
-            device = await Device.findOne({ stduid }).select('height stduid distance');
-            await redisClient.set(`mqttc-device:${stduid}`, JSON.stringify(device));
+    async handleIncomingMessage(topicName, distance){
+        try{
+            const stduid = topicName.toString();
+            distance = distance.toString();
+            let deviceData = await redisClient.get(`mqttc-device:${stduid}`);
+            if(deviceData){
+                await this.processMessage(stduid, JSON.parse(deviceData), distance);
+            }else{
+                const device = await Device.findOne({ stduid }).select('height stduid distance');
+                if(device){
+                    await redisClient.set(`mqttc-device:${stduid}`, JSON.stringify(device));
+                    await this.processMessage(stduid, device, distance);
+                }else{
+                    console.error(`[SmartTrash Cloud]: Device not found for STDUID: ${stduid}`);
+                }
+            }
+        }catch(error){
+            console.error(`[SmartTrash Cloud]: Error parsing message: ${error}`);
         }
-        const usagePercentage = Math.round((measuredDistance / device.height) * 100);
+    };
+
+    /**
+     * Processes an MQTT message, calculating usage and updating data.
+     * @param {string} stduid - The device's STDUID
+     * @param {object} device - The device object 
+     * @param {number} distance - The measured distance 
+     */
+    async processMessage(stduid, device, distance){
+        const usagePercentage = Math.floor(100 - ((distance / device.height) * 100));
+        
         // Notify handlers
         for(const { options, callback } of this.handlers.values()){
-            if(options?.topicName && (options.topicName !== topicName)){
+            if(options?.topicName && (options.topicName !== stduid)){
                 continue;
             }
-            callback({ measuredDistance, usagePercentage });
+            callback({ measuredDistance: distance, usagePercentage });
         }
-        await Promise.all([
-            DeviceLog.create({
-                height: device.height,
-                distance: measuredDistance,
-                stduid
-            })
-        ]);
+        await DeviceLog.create({
+            height: device.height,
+            distance,
+            stduid
+        });
     };
 
     /**
