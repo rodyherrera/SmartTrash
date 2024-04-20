@@ -1,6 +1,7 @@
 const mqtt = require('mqtt');
 const Device = require('@models/device');
 const DeviceLog = require('@models/deviceLog');
+const { redisClient } = require('@utilities/redisClient');
 
 /**
  * Manages communication with the MQTT server, handling messages,
@@ -92,9 +93,15 @@ class MQTTController{
     */
     async updateDeviceAndLog(topicName, measuredDistance){
         const stduid = topicName.toString();
-        const device = await Device.findOne({ stduid }).select('height stduid distance');
+        const cachedDevice = await redisClient.get(stduid);
+        let device;
+        if(cachedDevice){
+            device = JSON.parse(cachedDevice);
+        }else{
+            device = await Device.findOne({ stduid }).select('height stduid distance');
+            await redisClient.set(stduid, JSON.stringify(device));
+        }
         const usagePercentage = Math.round((measuredDistance / device.height) * 100);
-        device.usagePercentage = usagePercentage;
         // Notify handlers
         for(const { options, callback } of this.handlers.values()){
             if(options?.topicName && (options.topicName !== topicName)){
@@ -106,10 +113,8 @@ class MQTTController{
             DeviceLog.create({
                 height: device.height,
                 distance: measuredDistance,
-                usagePercentage,
                 stduid
-            }),
-            device.save()
+            })
         ]);
     };
 

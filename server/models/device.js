@@ -1,5 +1,6 @@
 const mongoose = require('mongoose');
 const ARIMA = require('arima');
+const { redisClient } = require('@utilities/redisClient');
 
 const DeviceSchema = new mongoose.Schema({
     name: {
@@ -138,6 +139,14 @@ DeviceSchema.methods.getHistoricalUsage = async function(type = 'daily'){
     const historicalData = deviceLogs.map(log => log.usagePercentage);
     return historicalData;
 };
+
+DeviceSchema.post('save', async function(doc){
+    await redisClient.del(doc.stduid);
+});
+
+DeviceSchema.post('remove', async function(doc){
+    await redisClient.del(doc.stduid);
+});
 
 const Device = mongoose.model('Device', DeviceSchema);
 

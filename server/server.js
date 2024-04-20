@@ -2,6 +2,7 @@ require('./aliases');
 
 const { httpServer } = require('@config/express'); 
 const { startDevicesListening } = require('@utilities/bootstrap');
+const { redisConnector } = require('@utilities/redisClient');
 const mqttClient = require('@utilities/mqttClient');
 const mongoConnector = require('@utilities/mongoConnector');
 
@@ -39,6 +40,7 @@ process.on('SIGINT', async () => {
 httpServer.listen(SERVER_PORT, SERVER_HOST, async () => {
     try{
         await mongoConnector();
+        await redisConnector();
         await mqttClient.connect();
         startDevicesListening();
         console.log(`[SmartTrash Cloud]: Server running at http://${SERVER_HOST}:${SERVER_PORT}/.`);
