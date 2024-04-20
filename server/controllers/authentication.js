@@ -117,7 +117,7 @@ exports.deleteMyAccount = catchAsync(async (req, res, next) => {
  * @returns {Promise<void>}
 */
 exports.getMyAccount = catchAsync(async (req, res, next) => {
-    const requestedUser = await User.findById(req.user.id);
+    const requestedUser = await User.findById(req.user._id);
     if(!requestedUser){
         return next(new Error('Authentication::Get::UserNotFound'));
     }

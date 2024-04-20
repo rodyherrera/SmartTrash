@@ -36,7 +36,7 @@ const DeviceSchema = new mongoose.Schema({
     }
 });
 
-DeviceSchema.index({ name: 'text' });
+DeviceSchema.index({ name: 'text', _id: 1, users: 1 });
 DeviceSchema.index({ stduid: 1 }, { unique: true });
 
 /**
@@ -141,11 +141,11 @@ DeviceSchema.methods.getHistoricalUsage = async function(type = 'daily'){
 };
 
 DeviceSchema.post('save', async function(doc){
-    await redisClient.del(doc.stduid);
+    await redisClient.del(`mqttc-device:${doc.stduid}`);
 });
 
 DeviceSchema.post('remove', async function(doc){
-    await redisClient.del(doc.stduid);
+    await redisClient.del(`mqttc-device:${doc.stduid}`);
 });
 
 const Device = mongoose.model('Device', DeviceSchema);

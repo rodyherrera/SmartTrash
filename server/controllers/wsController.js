@@ -29,7 +29,7 @@ const tokenOwnership = async (socket, next) => {
     const { deviceId } = socket.handshake.query;
     if(!deviceId) return next(new RuntimeError('Device::Id::Required'));
     try{
-        const device = await Device.findOne({ _id: deviceId, users: socket.user._id });
+        const device = await Device.findOne({ _id: deviceId, users: socket.user._id }).select('stduid');
         if(!device) return next(new RuntimeError('Device::Not::Found'));
         socket.device = device;
         next();
@@ -39,11 +39,11 @@ const tokenOwnership = async (socket, next) => {
 };
 
 const deviceMeasurementHandler = (socket) => {
-    const { topicName } = socket.device;
+    const { stduid } = socket.device;
     const callback = (data) => {
         socket.emit('data', data);
     };
-    mqttClient.addHandler(socket.id, { topicName }, callback);
+    mqttClient.addHandler(socket.id, { topicName: stduid }, callback);
     socket.on('disconnect', () => {
         mqttClient.deleteHandler(socket.id);
     });

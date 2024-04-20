@@ -93,13 +93,13 @@ class MQTTController{
     */
     async updateDeviceAndLog(topicName, measuredDistance){
         const stduid = topicName.toString();
-        const cachedDevice = await redisClient.get(stduid);
+        const cachedDevice = await redisClient.get(`mqttc-device:${stduid}`);
         let device;
         if(cachedDevice){
             device = JSON.parse(cachedDevice);
         }else{
             device = await Device.findOne({ stduid }).select('height stduid distance');
-            await redisClient.set(stduid, JSON.stringify(device));
+            await redisClient.set(`mqttc-device:${stduid}`, JSON.stringify(device));
         }
         const usagePercentage = Math.round((measuredDistance / device.height) * 100);
         // Notify handlers

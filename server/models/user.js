@@ -1,6 +1,7 @@
 const mongoose = require('mongoose');
 const validator = require('validator');
 const bcrypt = require('bcryptjs');
+const { redisClient } = require('@utilities/redisClient');
 
 const UserSchema = new mongoose.Schema({
     username: {
@@ -64,6 +65,14 @@ const UserSchema = new mongoose.Schema({
 });
 
 UserSchema.index({ username: 'text', fullname: 'text', email: 'text' });
+
+UserSchema.post('save', async function(doc){
+    await redisClient.del(`user:${doc._id}`);
+});
+
+UserSchema.post('remove', async function(doc){
+    await redisClient.del(`user:${doc._id}`);
+});
 
 UserSchema.pre('save', async function(next){
     try{

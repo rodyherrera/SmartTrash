@@ -3,6 +3,7 @@ const User = require('@models/user');
 const RuntimeError = require('@utilities/runtimeError');
 const { promisify } = require('util');
 const { catchAsync } = require('@utilities/runtime');
+const { redisClient } = require('@utilities/redisClient');
 
 /**
  * Extracts and verifies a JWT token from the Authorization header, then retrieves
@@ -15,11 +16,16 @@ const { catchAsync } = require('@utilities/runtime');
 */
 exports.getUserByToken = async (token, next) => {
     const decodedToken = await promisify(jwt.verify)(token, process.env.SECRET_KEY);
+    const cachedUser = await redisClient.get(`user:${decodedToken.id}`);
+    if(cachedUser){
+        return JSON.parse(cachedUser);
+    }
     // Retrieve the user from the database
-    const freshUser = await User.findById(decodedToken.id);
+    const freshUser = await User.findById(decodedToken.id).select('-devices -__v');
     if(!freshUser){
         return next(new RuntimeError('Authentication::User::NotFound', 401));
     }
+    await redisClient.set(`user:${decodedToken.id}`, JSON.stringify(freshUser));
     // Check if the user's password has changed since the token was issued
     if(await freshUser.isPasswordChangedAfterJWFWasIssued(decodedToken.iat)){
         return next(new RuntimeError('Authentication::PasswordChanged', 401));
