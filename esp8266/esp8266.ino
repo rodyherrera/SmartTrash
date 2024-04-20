@@ -21,6 +21,9 @@
 #include "src/network/network.hpp"
 #include "src/bootstrap/bootstrap.hpp"
 
+// For getDistance() fn
+long previousDistance = -1;
+
 /**
  * Measures the distance using an ultrasonic sensor.
  * 
@@ -51,7 +54,13 @@ long getDistance() {
     // Median filter
     std::sort(durations, durations + MEDIAN_SAMPLES);
     long medianDistance = durations[MEDIAN_SAMPLES / 2];
-    return medianDistance;
+    if(previousDistance == -1){
+        previousDistance = medianDistance;
+        return medianDistance;
+    }
+
+    long difference = abs(medianDistance - previousDistance);
+    return (difference == 1) ? previousDistance : medianDistance;
 };
 
 /**
