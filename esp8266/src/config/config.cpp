@@ -27,6 +27,7 @@ const char* MQTT_SERVER = "mqtt.rodyherrera.com";
 const char* MQTT_USERNAME = "";
 const char* MQTT_PASSWORD = "";
 const uint16_t MQTT_SERVER_PORT = 1883;
+const uint8_t MEDIAN_SAMPLES = 7;
 
 // Network Settings
 const IPAddress localIp(192, 168, 1, 1);

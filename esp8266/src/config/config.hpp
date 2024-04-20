@@ -21,6 +21,7 @@ extern const char* DEFAULT_ESP8266_AP_PASSWORD;
 extern const char* ESP8266_CONFIG_FILE;
 extern const char* CREDENTIALS_FILE;
 extern const char* MQTT_SERVER;
+extern const uint8_t MEDIAN_SAMPLES;
 extern const char* MQTT_USERNAME;
 extern const char* MQTT_PASSWORD;
 extern const uint16_t MQTT_SERVER_PORT;

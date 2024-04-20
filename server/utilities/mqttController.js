@@ -105,7 +105,12 @@ class MQTTController{
      * @param {number} distance - The measured distance 
      */
     async processMessage(stduid, device, distance){
-        const usagePercentage = Math.floor(100 - ((distance / device.height) * 100));
+        if(!device || typeof device.height !== 'number' || device.height <= 0){
+            // Device data is invalid
+            return;
+        }
+        const clampedDistance = Math.max(0, Math.min(distance, device.height));
+        const usagePercentage = Math.floor(100 - ((clampedDistance / device.height) * 100))
         
         // Notify handlers
         for(const { options, callback } of this.handlers.values()){
