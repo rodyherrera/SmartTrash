@@ -80,19 +80,22 @@ class MQTTController{
     async handleIncomingMessage(topicName, distance){
         try{
             const stduid = topicName.toString();
-            distance = distance.toString();
-            let deviceData = await redisClient.get(`mqttc-device:${stduid}`);
-            if(deviceData){
-                await this.processMessage(stduid, JSON.parse(deviceData), distance);
-            }else{
-                const device = await Device.findOne({ stduid }).select('height stduid distance');
-                if(device){
-                    await redisClient.set(`mqttc-device:${stduid}`, JSON.stringify(device));
-                    await this.processMessage(stduid, device, distance);
-                }else{
-                    console.error(`[SmartTrash Cloud]: Device not found for STDUID: ${stduid}`);
-                }
+            distance = parseFloat(distance.toString());
+            if(isNaN(distance)){
+                throw new Error('MQTT::InvalidPayloadFormat');
             }
+            const deviceKey = `mqttc-device:${stduid}`;
+            let device = await redisClient.get(deviceKey);
+            if(!device){
+                device = await Device.findOne({ stduid }).select('height stduid');
+                if(!device){
+                    throw new Error('MQTT::DeviceNotFound');
+                }
+                await redisClient.set(deviceKey, JSON.stringify(device));
+            }else{
+                device = JSON.parse(device);
+            }
+            await this.processMessage(stduid, device, distance);
         }catch(error){
             console.error(`[SmartTrash Cloud]: Error parsing message: ${error}`);
         }
