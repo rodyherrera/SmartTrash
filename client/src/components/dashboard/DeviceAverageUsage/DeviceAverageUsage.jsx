@@ -20,7 +20,7 @@ ChartJS.register(
 const DeviceAverageUsage = () => {
     const { isAnalyticsLoading, analytics } = useSelector((state) => state.device);
 
-    return true && (
+    return !isAnalyticsLoading && (
         <div className='Device-Average-Usage-Container'>
             <Line
                 options={{
@@ -70,7 +70,7 @@ const DeviceAverageUsage = () => {
                     labels: ['Hourly', 'Daily', 'Weekly', 'Monthly'],
                     datasets: [{
                         label: 'Average Usage',
-                        data: [48, 80, 18, 23],
+                        data: [analytics.averageUsage.hourly, analytics.averageUsage.daily, analytics.averageUsage.weekly, analytics.averageUsage.monthly],
                         backgroundColor: 'rgba(255, 255, 255)',
                         borderColor: 'rgba(255, 255, 255)',
                         borderWidth: 1,
