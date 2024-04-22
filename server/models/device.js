@@ -79,32 +79,6 @@ DeviceSchema.methods.getAverageUsage = async function(type = 'daily'){
 };
 
 /**
- * Calculates hourly device usage over a specified timeframe.
- *
- * @param {string} type - The timeframe type (default: 'daily'). Valid options: 'hourly', 'daily', 'weekly', 'monthly'
- * @returns {object} An object with properties representing hours (0-23), with average usage percentage for each.
-*/
-DeviceSchema.methods.getHourlyUsage = async function(type = 'daily'){
-    const { start, end } = getDateRange(type);
-    const deviceLogs = await this.model('DeviceLog').find({
-        stduid: this.stduid,
-        createdAt: { $gte: start, $lt: end } 
-    });
-    const hourlyUsage = {};
-    for(const log of deviceLogs){
-        const hour = new Date(log.createdAt).getHours();
-        if(!hourlyUsage[hour]){
-            hourlyUsage[hour] = 0; 
-        }
-        hourlyUsage[hour] += log.usagePercentage; 
-    }
-    for(const hour in hourlyUsage){
-        hourlyUsage[hour] = Math.round(hourlyUsage[hour] / deviceLogs.length); 
-    }
-    return hourlyUsage;
-};
-
-/**
  * Predicts future device usage based on historical data using the ARIMA model.
  *
  * @param {string} type - The timeframe for historical data (default: 'hourly'). Valid options: 'hourly', 'daily', 'weekly', 'monthly'
