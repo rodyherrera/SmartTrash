@@ -26,18 +26,14 @@ const DeviceSchema = new mongoose.Schema({
         unique: true,
         trim: true
     },
-    logs: [{
-        type: mongoose.Schema.Types.ObjectId,
-        ref: 'DeviceLog'
-    }],
     createdAt: {
         type: Date,
         default: Date.now()
     }
 });
-
-DeviceSchema.index({ name: 'text', _id: 1, users: 1 });
-DeviceSchema.index({ stduid: 1 }, { unique: true });
+DeviceSchema.index({ name: 'text' });
+DeviceSchema.index({ _id: 1, users: 1 });
+DeviceSchema.index({ stduid: 1 }, { unique: true }); 
 
 /**
  * Gets a start and end date range based on a selected type.
@@ -132,6 +128,7 @@ DeviceSchema.methods.predictFutureUsage = async function(type = 'hourly', numFut
 */
 DeviceSchema.methods.getHistoricalUsage = async function(type = 'daily'){
     const { start, end } = getDateRange(type);
+    console.log(this.stduid);
     const deviceLogs = await this.model('DeviceLog').find({
         stduid: this.stduid,
         createdAt: { $gte: start, $lt: end }

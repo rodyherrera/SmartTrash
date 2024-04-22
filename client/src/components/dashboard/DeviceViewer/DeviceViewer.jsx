@@ -1,20 +1,32 @@
-import React, { Suspense, lazy } from 'react';
+import React, { Suspense, lazy, useEffect } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
 import { GoChevronRight, GoChevronLeft } from 'react-icons/go';
-import DeviceMeasuredDistance from '@components/dashboard/DeviceMeasuredDistance';
+import { getDeviceAnalytics } from '@services/device/operations';
 import DeviceUsagePercentage from '@components/dashboard/DeviceUsagePercentage';
+import DeviceAverageUsage from '@components/dashboard/DeviceAverageUsage';
 import useDeviceMeasurement from '@hooks/useDeviceMeasurement';
 import './DeviceViewer.css';
 
 const TrashCanModel = lazy(() => import('@components/general/TrashCanModel'));
 
 const DeviceViewer = ({ _id }) => {
+    const dispatch = useDispatch();
     const { usagePercentage, distance } = useDeviceMeasurement(_id);
+    const { isAnalyticsLoading, analytics } = useSelector((state) => state.device);
+
+    useEffect(() => {
+        dispatch(getDeviceAnalytics(_id));
+    }, []);
+
+    useEffect(() => {
+        console.log(isAnalyticsLoading, analytics);
+    }, [isAnalyticsLoading, analytics]);
 
     return (
         <main className='Device-Viewer-Container'>
             <section className='Device-Viewer-Left-Container'>
                 <article className='Device-Viewer-Left-Header-Container'>
-                    <DeviceMeasuredDistance distance={distance} deviceId={_id} />
+                    <DeviceAverageUsage />
                 </article>
                 <article className='Device-Viewer-Left-Bottom-Container'>
                 </article>

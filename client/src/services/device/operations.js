@@ -31,3 +31,13 @@ export const getMyDevices = () => (dispatch) => {
         responseState: deviceSlice.setDevices
     });
 };
+
+export const getDeviceAnalytics = (id) => async (dispatch) => {
+    const operation = new OperationHandler(deviceSlice, dispatch);
+    operation.use({
+        api: deviceService.getDeviceAnalytics,
+        loaderState: deviceSlice.setIsAnalyticsLoading,
+        responseState: deviceSlice.setAnalytics,
+        query: { query: { params: { id } }, queryParams: { type: 'daily' } }
+    });
+};

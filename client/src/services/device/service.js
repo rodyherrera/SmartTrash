@@ -28,3 +28,8 @@ export const getMyDevices = DeviceAPI.register({
     path: '/me/',
     method: 'GET'
 });
+
+export const getDeviceAnalytics = DeviceAPI.register({
+    path: '/:id/analytics/',
+    method: 'GET'
+});

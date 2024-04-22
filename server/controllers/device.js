@@ -97,3 +97,28 @@ exports.getMyDevices = catchAsync(async (req, res) => {
     const devices = await Device.find({ users: req.user._id }).select('-logs -__v').lean();
     res.status(200).json({ status: 'success', data: devices });
 });
+
+exports.getDeviceAnalytics = catchAsync(async (req, res) => {
+    const { id } = req.params;
+    const device = await Device.findById(id).select('stduid');
+    const intervals = ['hourly', 'daily', 'weekly', 'monthly'];
+    const averageUsagePromises = intervals.map((interval) => device.getAverageUsage(interval));
+    const usagePromises = intervals.map((interval) => device.getHourlyUsage(interval));
+    const [averageUsages, usages] = await Promise.all([
+        Promise.all(averageUsagePromises),
+        Promise.all(usagePromises) 
+    ]);
+    const averageUsageData = {};
+    const usageData = {};
+    intervals.forEach((interval, index) => {
+        averageUsageData[interval] = averageUsages[index];
+        usageData[interval] = usages[index];
+    });
+    res.status(200).json({
+        status: 'success',
+        data: {
+            averageUsage: averageUsageData,
+            usage: usageData
+        }
+    });
+});

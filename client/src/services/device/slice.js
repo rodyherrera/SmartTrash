@@ -4,13 +4,21 @@ const state = {
     error: null,
     device: {},
     isLoading: false,
-    devices: []
+    devices: [],
+    isAnalyticsLoading: true,
+    analytics: {}
 };
 
 const deviceSlice = createSlice({
     name: 'device',
     initialState: state,
     reducers: {
+        setIsAnalyticsLoading(state, action){
+            state.isAnalyticsLoading = action.payload;
+        },
+        setAnalytics(state, action){
+            state.analytics = action.payload;
+        },
         setError(state, action){
             state.error = action.payload;
         },
@@ -27,6 +35,8 @@ const deviceSlice = createSlice({
 });
 
 export const {
+    setAnalytics,
+    setIsAnalyticsLoading,
     setError,
     setDevices,
     setDevice,
