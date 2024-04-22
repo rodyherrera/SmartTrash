@@ -12,6 +12,11 @@
     width: calc(100vw / 3);
 }
 
+.Device-Stats-Container{
+    display: flex;
+    gap: 4rem;
+}
+
 .Device-Viewer-3D-Model-Container{
     width: 300px;
     height: 470px;

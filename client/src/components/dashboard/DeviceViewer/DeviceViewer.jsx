@@ -2,7 +2,8 @@ import React, { Suspense, lazy, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { GoChevronRight, GoChevronLeft } from 'react-icons/go';
 import { RxHeight } from 'react-icons/rx';
-import { getDeviceAnalytics } from '@services/device/operations';
+import { PiDatabaseLight } from 'react-icons/pi';
+import { getDeviceAnalytics, countDeviceLogs } from '@services/device/operations';
 import StatCard from '@components/general/StatCard';
 import DeviceUsagePercentage from '@components/dashboard/DeviceUsagePercentage';
 import DeviceAverageUsage from '@components/dashboard/DeviceAverageUsage';
@@ -15,10 +16,11 @@ const TrashCanModel = lazy(() => import('@components/general/TrashCanModel'));
 const DeviceViewer = ({ _id, name, height }) => {
     const dispatch = useDispatch();
     const { usagePercentage, distance } = useDeviceMeasurement(_id);
-    const { isAnalyticsLoading, analytics } = useSelector((state) => state.device);
+    const { isAnalyticsLoading, analytics, isDeviceLogsCountLoading, deviceLogsCount } = useSelector((state) => state.device);
 
     useEffect(() => {
         dispatch(getDeviceAnalytics(_id));
+        dispatch(countDeviceLogs(_id));
     }, []);
 
     useEffect(() => {
@@ -29,7 +31,10 @@ const DeviceViewer = ({ _id, name, height }) => {
         <main className='Device-Viewer-Container'>
             <section className='Device-Viewer-Left-Container'>
                 <article className='Device-Viewer-Left-Header-Container'>
-                    <StatCard Icon={RxHeight} title='Garbage Container Height' content={height + ' cm'} />
+                    <div className='Device-Stats-Container'>
+                        <StatCard Icon={RxHeight} title='Garbage Container Height' content={height + ' cm'} />
+                        <StatCard Icon={PiDatabaseLight} title='Stored Device Logs' content={deviceLogsCount} />
+                    </div>
                 </article>
                 <article className='Device-Viewer-Left-Bottom-Container'>
                     <DeviceNotificationManager />

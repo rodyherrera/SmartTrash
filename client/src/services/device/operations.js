@@ -32,12 +32,22 @@ export const getMyDevices = () => (dispatch) => {
     });
 };
 
+export const countDeviceLogs = (id) => async (dispatch) => {
+    const operation = new OperationHandler(deviceSlice, dispatch);
+    operation.use({
+        api: deviceService.getDeviceAnalytics,
+        loaderState: deviceSlice.setIsDeviceLogsCountLoading,
+        responseState: deviceSlice.setDeviceLogsCount,
+        query: { query: { params: { id }, queryParams: { type: 'countDeviceLogs' } } }
+    });
+};
+
 export const getDeviceAnalytics = (id) => async (dispatch) => {
     const operation = new OperationHandler(deviceSlice, dispatch);
     operation.use({
         api: deviceService.getDeviceAnalytics,
         loaderState: deviceSlice.setIsAnalyticsLoading,
         responseState: deviceSlice.setAnalytics,
-        query: { query: { params: { id } }, queryParams: { type: 'daily' } }
+        query: { query: { params: { id } } }
     });
 };

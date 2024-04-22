@@ -6,13 +6,21 @@ const state = {
     isLoading: false,
     devices: [],
     isAnalyticsLoading: true,
-    analytics: {}
+    analytics: {},
+    isDeviceLogsCountLoading: true,
+    deviceLogsCount: 0
 };
 
 const deviceSlice = createSlice({
     name: 'device',
     initialState: state,
     reducers: {
+        setIsDeviceLogsCountLoading(state, action){
+            state.isDeviceLogsCountLoading = action.payload;
+        },
+        setDeviceLogsCount(state, action){
+            state.deviceLogsCount = action.payload;
+        },
         setIsAnalyticsLoading(state, action){
             state.isAnalyticsLoading = action.payload;
         },
@@ -40,6 +48,8 @@ export const {
     setError,
     setDevices,
     setDevice,
+    setDeviceLogsCount,
+    setIsDeviceLogsCountLoading,
     setIsLoading
 } = deviceSlice.actions;
 
