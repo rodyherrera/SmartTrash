@@ -83,6 +83,7 @@
 @media screen and (max-width: 768px){
     .Device-Viewer-Container{
         height: unset;
+        gap: 1rem;
         flex-direction: column;
     }
 
@@ -90,6 +91,11 @@
     .Device-Viewer-Center-Container, 
     .Device-Viewer-Right-Container{
         width: 100%;
+    }
+
+    .Device-Viewer-Right-Bottom-Container, 
+    .Device-Viewer-Left-Bottom-Container{
+        padding: 0;
     }
 
     .Device-Viewer-Center-Container{

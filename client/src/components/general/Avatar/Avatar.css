@@ -1,0 +1,14 @@
+.Avatar-Container{
+    width: 30px;
+    height: 30px;
+    background-color: #FFF;
+    border-radius: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    color: #0f62fe;
+}
+
+.Avatar-Char{
+    font-weight: 400;
+}

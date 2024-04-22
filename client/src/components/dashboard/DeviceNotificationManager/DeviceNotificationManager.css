@@ -1,0 +1,62 @@
+.Device-Notification-Manager-Header-Container,
+.Device-Notification-Manager-Icon-Container{
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.Device-Notification-Manager-Container{
+    display: flex;
+    flex-direction: column;
+    background-color: #0f62fe;
+    color: #FFF;
+    gap: 1.5rem;
+    padding: 1rem;
+    border-radius: 1.5rem;
+}
+
+.Device-Notification-Manager-Icon-Container{
+    gap: .5rem;
+    color: #0d1615;
+    background-color: #FFF;
+    border-radius: 1rem;
+    padding: .3rem .8rem;
+}
+
+.Device-Notification-Manager-Header-Title{
+    font-weight: 300;
+    font-size: 1.2rem;
+    color: #FFF;
+}
+
+.Device-Notification-Manager-Icon{
+    display: flex;
+    font-size: .9rem;
+    align-items: center;
+    justify-content: center;
+}
+
+.Device-Notification-Manager-Icon-Length{
+    font-size: .85rem;
+}
+
+.Device-Notification-Manager-Address-Container{
+    display: flex;
+    gap: .5rem;
+    align-items: center;
+}
+
+.Device-Notification-Manager-Address-Data-Container{
+    display: flex;
+    flex-direction: column;
+    gap: .2rem;
+}
+
+.Device-Notification-Manager-Address-Name{
+    font-size: .85rem;
+    font-weight: 450;
+}
+
+.Device-Notification-Manager-Address-Mail{
+    font-size: .8rem;
+}

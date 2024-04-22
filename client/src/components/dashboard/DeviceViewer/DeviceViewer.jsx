@@ -4,6 +4,7 @@ import { GoChevronRight, GoChevronLeft } from 'react-icons/go';
 import { getDeviceAnalytics } from '@services/device/operations';
 import DeviceUsagePercentage from '@components/dashboard/DeviceUsagePercentage';
 import DeviceAverageUsage from '@components/dashboard/DeviceAverageUsage';
+import DeviceNotificationManager from '@components/dashboard/DeviceNotificationManager';
 import useDeviceMeasurement from '@hooks/useDeviceMeasurement';
 import './DeviceViewer.css';
 
@@ -28,6 +29,7 @@ const DeviceViewer = ({ _id }) => {
                 <article className='Device-Viewer-Left-Header-Container'>
                 </article>
                 <article className='Device-Viewer-Left-Bottom-Container'>
+                    <DeviceNotificationManager />
                 </article>
             </section>
             <section className='Device-Viewer-Center-Container'>
