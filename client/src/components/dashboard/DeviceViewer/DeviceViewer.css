@@ -14,10 +14,17 @@
 
 .Device-Viewer-3D-Model-Container{
     width: 300px;
-    height: 500px;
+    height: 470px;
     margin: 0 auto;
     position: relative;
     z-index: 100;
+}
+
+.Device-Viewer-Current-Distance{
+    font-size: .75rem;
+    position: relative;
+    top: .5rem;
+    opacity: .7;
 }
 
 .Device-Viewer-Name{
@@ -80,6 +87,56 @@
     gap: .3rem;
 }
 
+.Device-Viewer-Height-Title{
+    font-weight: 350;
+    color: #0f62fe;
+    line-height: 1.55rem;
+    font-size: 2rem;
+}
+
+.Device-Viewer-Height-Content{
+    display: flex;
+    gap: .5rem;
+}
+
+.Device-Viewer-Height-Container{
+    display: flex;
+    flex-direction: column;
+    gap: .5rem;
+    cursor: pointer;
+}
+
+.Device-Viewer-Height-Container:hover .Device-Viewer-Height-Title{
+    text-decoration: underline;
+    text-underline-offset: .5rem;
+}
+
+.Device-Viewer-Height-Bottom{
+    display: flex;
+    gap: 1rem;
+    align-items: flex-end;
+}
+
+.Device-Viewer-Height-Content{
+    font-size: .8rem;
+    opacity: .6;
+}
+
+.Device-Viewer-Height-Icon-Container{
+    border-radius: 50%;
+}
+
+.Device-Viewer-Arrow-Icon{
+    color: #0f62fe;
+}
+
+.Device-Viewer-Height-Icon,
+.Device-Viewer-Arrow-Icon{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
 @media screen and (max-width: 768px){
     .Device-Viewer-Container{
         height: unset;
@@ -107,6 +164,10 @@
         overflow-x: hidden;
     }
 
+    .Device-Viewer-Current-Distance{
+        position: unset;
+    }
+
     .Device-Viewer-Left-Container{
         order: 2;
     }
@@ -116,15 +177,15 @@
     }
 
     .Device-Viewer-Caption-Container{
-        gap: .3rem;
+        gap: .5rem;
     }
-    
+
     .Device-Viewer-Caption-Name-Container{
         gap: 1rem;
     }
 
     .Device-Viewer-Navigation-Helper-Text{
-        font-size: .9rem;
+        font-size: .95rem;
         font-weight: 300;
         width: 80%;
         line-height: 1.5rem;
@@ -137,7 +198,7 @@
     
     .Device-Viewer-Name{
         font-size: 1rem;
-        padding: .3rem 1rem;
+        padding: .35rem 1rem;
     }
 
     .Device-Viewer-3D-Model-Container{

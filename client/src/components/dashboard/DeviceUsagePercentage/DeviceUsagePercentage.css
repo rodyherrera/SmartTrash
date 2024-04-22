@@ -26,7 +26,7 @@
 
 @media screen and (max-width: 768px){
     .Device-Usage-Percentage-Container{
-        top: 3rem;
+        top: 4.2rem;
     }
 
     .Device-Usage-Percentage-Container > :first-child > :first-child{

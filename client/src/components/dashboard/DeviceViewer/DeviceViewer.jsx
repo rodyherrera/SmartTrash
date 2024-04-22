@@ -1,6 +1,8 @@
 import React, { Suspense, lazy, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { GoChevronRight, GoChevronLeft } from 'react-icons/go';
+import { RxHeight } from 'react-icons/rx';
+import { HiOutlineArrowUpRight } from 'react-icons/hi2';
 import { getDeviceAnalytics } from '@services/device/operations';
 import DeviceUsagePercentage from '@components/dashboard/DeviceUsagePercentage';
 import DeviceAverageUsage from '@components/dashboard/DeviceAverageUsage';
@@ -10,7 +12,7 @@ import './DeviceViewer.css';
 
 const TrashCanModel = lazy(() => import('@components/general/TrashCanModel'));
 
-const DeviceViewer = ({ _id }) => {
+const DeviceViewer = ({ _id, name, height }) => {
     const dispatch = useDispatch();
     const { usagePercentage, distance } = useDeviceMeasurement(_id);
     const { isAnalyticsLoading, analytics } = useSelector((state) => state.device);
@@ -27,12 +29,29 @@ const DeviceViewer = ({ _id }) => {
         <main className='Device-Viewer-Container'>
             <section className='Device-Viewer-Left-Container'>
                 <article className='Device-Viewer-Left-Header-Container'>
+                    <div className='Device-Viewer-Height-Container'>
+                        <div className='Device-Viewer-Height-Content'>
+                            <div className='Device-Viewer-Height-Icon-Container'>
+                                <i className='Device-Viewer-Height-Icon'>
+                                    <RxHeight />
+                                </i>
+                            </div>
+                            <p className='Device-Viewer-Height-Description'>Garbage Container Height</p>
+                        </div>
+                        <div className='Device-Viewer-Height-Bottom'>
+                            <h3 className='Device-Viewer-Height-Title'>{height} cm</h3>
+                            <i className='Device-Viewer-Arrow-Icon'>
+                                <HiOutlineArrowUpRight />
+                            </i>
+                        </div>
+                    </div>
                 </article>
                 <article className='Device-Viewer-Left-Bottom-Container'>
                     <DeviceNotificationManager />
                 </article>
             </section>
             <section className='Device-Viewer-Center-Container'>
+                <p className='Device-Viewer-Current-Distance'>Device sensor reading {distance} cm</p>
                 <DeviceUsagePercentage usagePercentage={usagePercentage} />
                 <article className='Device-Viewer-3D-Model-Container'>
                     <Suspense fallback={<div>...</div>}>
@@ -44,7 +63,7 @@ const DeviceViewer = ({ _id }) => {
                         <i className='Device-Viewer-Previous-Icon-Container'>
                             <GoChevronLeft />
                         </i>
-                        <h3 className='Device-Viewer-Name'>Rodolfo's SmartTrash</h3>
+                        <h3 className='Device-Viewer-Name'>{name}</h3>
                         <i className='Device-Viewer-Next-Icon-Container'>
                             <GoChevronRight />
                         </i>
