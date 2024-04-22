@@ -26,7 +26,6 @@ const DeviceViewer = ({ _id }) => {
         <main className='Device-Viewer-Container'>
             <section className='Device-Viewer-Left-Container'>
                 <article className='Device-Viewer-Left-Header-Container'>
-                    <DeviceAverageUsage />
                 </article>
                 <article className='Device-Viewer-Left-Bottom-Container'>
                 </article>
@@ -53,9 +52,9 @@ const DeviceViewer = ({ _id }) => {
             </section>
             <section className='Device-Viewer-Right-Container'>
                 <article className='Device-Viewer-Right-Header-Container'>
-                    
                 </article>
                 <article className='Device-Viewer-Right-Bottom-Container'>
+                    <DeviceAverageUsage />
                 </article>
             </section>
         </main>

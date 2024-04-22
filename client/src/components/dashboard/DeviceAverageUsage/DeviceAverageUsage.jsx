@@ -1,46 +1,44 @@
 import React from 'react';
-import { useSelector } from 'react-redux';
-import { 
+import {
     Chart as ChartJS,
     CategoryScale,
     LinearScale,
-    PointElement,
-    LineElement
+    BarElement,
+    Tooltip
 } from 'chart.js';
-import { Line } from 'react-chartjs-2';
+import { Bar } from 'react-chartjs-2';
+import { useSelector } from 'react-redux';
 import './DeviceAverageUsage.css';
 
 ChartJS.register(
     CategoryScale,
     LinearScale,
-    PointElement,
-    LineElement
+    BarElement,
+    Tooltip
 );
 
-const DeviceAverageUsage = () => {
+const DeviceUsage = () => {
     const { isAnalyticsLoading, analytics } = useSelector((state) => state.device);
 
     return !isAnalyticsLoading && (
         <div className='Device-Average-Usage-Container'>
-            <Line
+            <Bar 
                 options={{
-                    responsive: true,
+                    indexAxis: 'y',
                     scales: {
-                        y: {
+                        x: {
                             beginAtZero: true,
                             type: 'linear',
                             ticks: {
                                 color: '#FFF',
-                                font: {
-                                    size: 11
-                                },
-                                callback: (value) => `${value}%`,
+                                font: 11,
+                                callback: (value) => `${value}%`
                             },
                             grid: {
                                 display: false
                             }
                         },
-                        x: {
+                        y: {
                             ticks: {
                                 color: '#FFF',
                                 font: {
@@ -48,38 +46,24 @@ const DeviceAverageUsage = () => {
                                 }
                             },
                             grid: {
-                                color: '#FFF'
+                                display: false
                             }
                         }
                     },
-                    elements: {
-                        line: {
-                            tension: 0.4,
-                            fill: true,
-                            backgroundColor: 'rgba(255, 255, 255, 0.5)'
-                        },
-                        point: {
-                            radius: 7,
-                            hitRadius: 10,
-                            backgroundColor: 'rgba(255, 255, 255, 1)',
-                            borderColor: 'white'   
-                        }
-                    }
+                    responsive: true
                 }}
                 data={{
                     labels: ['Hourly', 'Daily', 'Weekly', 'Monthly'],
                     datasets: [{
-                        label: 'Average Usage',
                         data: [analytics.averageUsage.hourly, analytics.averageUsage.daily, analytics.averageUsage.weekly, analytics.averageUsage.monthly],
-                        backgroundColor: 'rgba(255, 255, 255)',
-                        borderColor: 'rgba(255, 255, 255)',
-                        borderWidth: 1,
+                        borderRadius: 50,
+                        backgroundColor: '#F5F5F5'
                     }]
                 }}
-                height={110}
+                height={120}
             />
         </div>
-    )
+    );
 };
 
-export default DeviceAverageUsage;
+export default DeviceUsage;
