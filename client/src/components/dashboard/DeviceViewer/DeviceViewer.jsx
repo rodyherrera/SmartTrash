@@ -2,8 +2,8 @@ import React, { Suspense, lazy, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { GoChevronRight, GoChevronLeft } from 'react-icons/go';
 import { RxHeight } from 'react-icons/rx';
-import { HiOutlineArrowUpRight } from 'react-icons/hi2';
 import { getDeviceAnalytics } from '@services/device/operations';
+import StatCard from '@components/general/StatCard';
 import DeviceUsagePercentage from '@components/dashboard/DeviceUsagePercentage';
 import DeviceAverageUsage from '@components/dashboard/DeviceAverageUsage';
 import DeviceNotificationManager from '@components/dashboard/DeviceNotificationManager';
@@ -29,22 +29,7 @@ const DeviceViewer = ({ _id, name, height }) => {
         <main className='Device-Viewer-Container'>
             <section className='Device-Viewer-Left-Container'>
                 <article className='Device-Viewer-Left-Header-Container'>
-                    <div className='Device-Viewer-Height-Container'>
-                        <div className='Device-Viewer-Height-Content'>
-                            <div className='Device-Viewer-Height-Icon-Container'>
-                                <i className='Device-Viewer-Height-Icon'>
-                                    <RxHeight />
-                                </i>
-                            </div>
-                            <p className='Device-Viewer-Height-Description'>Garbage Container Height</p>
-                        </div>
-                        <div className='Device-Viewer-Height-Bottom'>
-                            <h3 className='Device-Viewer-Height-Title'>{height} cm</h3>
-                            <i className='Device-Viewer-Arrow-Icon'>
-                                <HiOutlineArrowUpRight />
-                            </i>
-                        </div>
-                    </div>
+                    <StatCard Icon={RxHeight} title='Garbage Container Height' content={height + ' cm'} />
                 </article>
                 <article className='Device-Viewer-Left-Bottom-Container'>
                     <DeviceNotificationManager />
@@ -73,9 +58,9 @@ const DeviceViewer = ({ _id, name, height }) => {
             </section>
             <section className='Device-Viewer-Right-Container'>
                 <article className='Device-Viewer-Right-Header-Container'>
+                    <DeviceAverageUsage />
                 </article>
                 <article className='Device-Viewer-Right-Bottom-Container'>
-                    <DeviceAverageUsage />
                 </article>
             </section>
         </main>

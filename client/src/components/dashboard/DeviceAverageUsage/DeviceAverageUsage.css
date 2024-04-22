@@ -3,3 +3,25 @@
     background-color: #0f62fe;
     border-radius: 1.5rem;
 }
+
+.Device-Average-Usage-Header-Container{
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.Device-Average-Usage-Header-Title{
+    font-weight: 300;
+    color: #FFFFFF;
+}
+
+.Device-Average-Usage-Icon-Container{
+    padding: .5rem;
+    background-color: #FFFFFF;
+    font-size: 1.1rem;
+    color: #0f62fe;
+    display: flex;
+    align-items: center;
+    border-radius: 50%;
+    justify-content: center;
+}

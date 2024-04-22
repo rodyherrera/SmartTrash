@@ -87,56 +87,6 @@
     gap: .3rem;
 }
 
-.Device-Viewer-Height-Title{
-    font-weight: 350;
-    color: #0f62fe;
-    line-height: 1.55rem;
-    font-size: 2rem;
-}
-
-.Device-Viewer-Height-Content{
-    display: flex;
-    gap: .5rem;
-}
-
-.Device-Viewer-Height-Container{
-    display: flex;
-    flex-direction: column;
-    gap: .5rem;
-    cursor: pointer;
-}
-
-.Device-Viewer-Height-Container:hover .Device-Viewer-Height-Title{
-    text-decoration: underline;
-    text-underline-offset: .5rem;
-}
-
-.Device-Viewer-Height-Bottom{
-    display: flex;
-    gap: 1rem;
-    align-items: flex-end;
-}
-
-.Device-Viewer-Height-Content{
-    font-size: .8rem;
-    opacity: .6;
-}
-
-.Device-Viewer-Height-Icon-Container{
-    border-radius: 50%;
-}
-
-.Device-Viewer-Arrow-Icon{
-    color: #0f62fe;
-}
-
-.Device-Viewer-Height-Icon,
-.Device-Viewer-Arrow-Icon{
-    display: flex;
-    justify-content: center;
-    align-items: center;
-}
-
 @media screen and (max-width: 768px){
     .Device-Viewer-Container{
         height: unset;

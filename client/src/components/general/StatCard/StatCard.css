@@ -1,0 +1,43 @@
+.Stat-Card-Container{
+    display: flex;
+    flex-direction: column;
+    gap: .8rem;
+    cursor: pointer;
+}
+
+.Stat-Card-Container:hover .Stat-Card-Content{
+    text-decoration: underline;
+    text-underline-offset: .5rem;
+}
+
+.Stat-Card-Header-Container{
+    font-size: .8rem;
+    opacity: .6;
+    display: flex;
+    gap: .5rem;
+}
+
+.Stat-Card-Content{
+    font-weight: 350;
+    color: #0f62fe;
+    line-height: 1.55rem;
+    font-size: 2rem;
+}
+
+.Stat-Card-Arrow-Icon,
+.Stat-Card-Header-Icon-Container{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.Stat-Card-Arrow-Icon{
+    font-size: 1.3rem;
+    color: #0f62fe;
+}
+
+.Stat-Card-Bottom-Container{
+    display: flex;
+    gap: 1rem;
+    align-items: flex-end;
+}
