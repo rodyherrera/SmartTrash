@@ -10,9 +10,9 @@ ChartJS.register(CategoryScale, LinearScale, BarElement, Tooltip);
 const DeviceUsage = () => {
     const { isAnalyticsLoading, analytics } = useSelector((state) => state.device);
 
-    //if(isAnalyticsLoading){
-    //    return <React.Fragment />
-    //  };
+    if(isAnalyticsLoading){
+        return <React.Fragment />
+    };
 
     const chartOptions = {
         indexAxis: 'y',

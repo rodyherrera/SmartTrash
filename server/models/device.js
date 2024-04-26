@@ -1,5 +1,4 @@
 const mongoose = require('mongoose');
-const ARIMA = require('arima');
 const { redisClient } = require('@utilities/redisClient');
 
 const DeviceSchema = new mongoose.Schema({
@@ -34,82 +33,6 @@ const DeviceSchema = new mongoose.Schema({
 DeviceSchema.index({ name: 'text' });
 DeviceSchema.index({ _id: 1, users: 1 });
 DeviceSchema.index({ stduid: 1 }, { unique: true }); 
-
-/**
- * Gets a start and end date range based on a selected type.
- * 
- * @param {string} type - The type of range.  Valid values are 'hourly', 'daily', 'weekly', 'monthly'.
- * @returns {object} An object with `start` and `end` properties representing the date range.
- * @throws {Error} If an invalid `type` is provided.
-*/
-const getDateRange = (type) => {
-    const ranges = {
-        hourly: { days: 1 },
-        daily: { days: 1},
-        weekly: { days: 7},
-        monthly: { months: 1 } 
-    };
-    if(!ranges[type]) throw new Error('Invalid range type');
-    const today = new Date();
-    const start = new Date(today.getFullYear(), today.getMonth(), today.getDate()); 
-    const end = new Date(start);
-    if(ranges[type].days) end.setDate(end.getDate() + ranges[type].days);
-    if(ranges[type].months) end.setMonth(end.getMonth() + ranges[type].months);
-    return { start, end };
-};
-
-/**
- * Calculates the average device usage over a specified timeframe.
- * 
- * @param {string} type - The timeframe type (default: 'daily'). Valid options: 'hourly', 'daily', 'weekly', 'monthly'
- * @returns {number} The rounded average usage percentage.
-*/
-DeviceSchema.methods.getAverageUsage = async function(type = 'daily'){
-    const { start, end } = getDateRange(type);
-    const deviceLogs = await this.model('DeviceLog').find({
-        stduid: this.stduid,
-        createdAt: { $gte: start, $lt: end }
-    });
-    if(deviceLogs.length === 0){
-        return 0;
-    }
-    const totalUsage = deviceLogs.reduce((sum, log) => sum + log.usagePercentage, 0);
-    const averageUsage = Math.round(totalUsage / deviceLogs.length);
-    return averageUsage;
-};
-
-/**
- * Predicts future device usage based on historical data using the ARIMA model.
- *
- * @param {string} type - The timeframe for historical data (default: 'hourly'). Valid options: 'hourly', 'daily', 'weekly', 'monthly'
- * @param {number} numFutureValues - The number of future values to predict (default: 2).
- * @returns {array} An array of predicted usage values.
-*/
-DeviceSchema.methods.predictFutureUsage = async function(type = 'hourly', numFutureValues = 2){
-    const historicalData = await this.getHistoricalUsage(type);
-    const autoarima = new ARIMA({ auto: true, verbose: false });
-    autoarima.train(historicalData);
-    const futureValues = autoarima.predict(numFutureValues); 
-    const predictions = futureValues[0]; 
-    return predictions;
-};
-
-/**
- * Retrieves historical usage data for a device over a specified timeframe.
- *
- * @param {string} type - The timeframe type (default: 'daily'). Valid options: 'hourly', 'daily', 'weekly', 'monthly'
- * @returns {array} An array of device usage percentages over the timeframe.
-*/
-DeviceSchema.methods.getHistoricalUsage = async function(type = 'daily'){
-    const { start, end } = getDateRange(type);
-    console.log(this.stduid);
-    const deviceLogs = await this.model('DeviceLog').find({
-        stduid: this.stduid,
-        createdAt: { $gte: start, $lt: end }
-    });
-    const historicalData = deviceLogs.map(log => log.usagePercentage);
-    return historicalData;
-};
 
 DeviceSchema.post('save', async function(doc){
     await redisClient.del(`mqttc-device:${doc.stduid}`);
