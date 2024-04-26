@@ -1,10 +1,15 @@
 const mongoose = require('mongoose');
+const { processDeviceLog } = require('@middlewares/device');
 
 const DeviceLogSchema = new mongoose.Schema({
     stduid: {
         type: String,
         ref: 'Device',
         required: true
+    },
+    timePartition: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'deviceLogPartition'
     },
     distance: {
         type: Number,
@@ -22,15 +27,11 @@ const DeviceLogSchema = new mongoose.Schema({
 
 DeviceLogSchema.index({ stduid: 1, createdAt: 1 });
 
-DeviceLogSchema.pre('save', async function(next){
+DeviceLogSchema.post('save', async function(doc){
     try{
-        await mongoose.model('Device').updateOne({ stduid: this.stduid }, {
-            $push: { logs: this._id }
-        });
-        next();
+        await processDeviceLog(doc);
     }catch(error){
-        console.error('[SmartTrash Cloud]: Error updating Device logs:', error);
-        next(error);
+        console.log('[SmartTrash Cloud]: (deviceLog - post save middleware)', error);
     }
 });
 
