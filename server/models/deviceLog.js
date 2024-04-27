@@ -1,5 +1,5 @@
 const mongoose = require('mongoose');
-const { processDeviceLog } = require('@middlewares/device');
+const deviceLogQueue = require('@utilities/deviceLogQueue');
 
 const DeviceLogSchema = new mongoose.Schema({
     stduid: {
@@ -29,7 +29,9 @@ DeviceLogSchema.index({ stduid: 1, createdAt: 1 });
 
 DeviceLogSchema.post('save', async function(doc){
     try{
-        await processDeviceLog(doc);
+        const { createdAt, stduid, _id } = doc;
+        const documentJson = { createdAt, stduid, _id };
+        await deviceLogQueue.add(documentJson);
     }catch(error){
         console.log('[SmartTrash Cloud]: (deviceLog - post save middleware)', error);
     }

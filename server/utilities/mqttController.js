@@ -71,6 +71,21 @@ class MQTTController{
         });
     };
 
+    async getDevice(stduid){
+        const deviceKey = `mqttc-device:${stduid}`;
+        let device = await redisClient.get(deviceKey);
+        if(!device){
+            device = await Device.findOne({ stduid }).select('height stduid');
+            if(!device){
+                throw new Error('MQTT::DeviceNotFound');
+            }
+            await redisClient.set(deviceKey, JSON.stringify(device));
+        }else{
+            device = JSON.parse(device);
+        }
+        return device;
+    };
+
     /**
      * Handles an incoming MQTT message, updates the relevant device, and logs data.
      * @param {string} topicName - The MQTT topic name.
@@ -84,17 +99,7 @@ class MQTTController{
             if(isNaN(distance)){
                 throw new Error('MQTT::InvalidPayloadFormat');
             }
-            const deviceKey = `mqttc-device:${stduid}`;
-            let device = await redisClient.get(deviceKey);
-            if(!device){
-                device = await Device.findOne({ stduid }).select('height stduid');
-                if(!device){
-                    throw new Error('MQTT::DeviceNotFound');
-                }
-                await redisClient.set(deviceKey, JSON.stringify(device));
-            }else{
-                device = JSON.parse(device);
-            }
+            const device = await this.getDevice(stduid);
             await this.processMessage(stduid, device, distance);
         }catch(error){
             console.error(`[SmartTrash Cloud]: Error parsing message: ${error}`);
@@ -113,7 +118,8 @@ class MQTTController{
             return;
         }
         const clampedDistance = Math.max(0, Math.min(distance, device.height));
-        const usagePercentage = Math.floor(100 - ((clampedDistance / device.height) * 100))
+        const usagePercentage = Math.floor(100 - ((clampedDistance / device.height) * 100));
+
         // Notify handlers
         for(const { options, callback } of this.handlers.values()){
             if(options?.topicName && (options.topicName !== stduid)){
@@ -121,6 +127,7 @@ class MQTTController{
             }
             callback({ measuredDistance: distance, usagePercentage });
         }
+
         await DeviceLog.create({
             height: device.height,
             usagePercentage,
