@@ -27,9 +27,10 @@ deviceLogQueue.process(async function(job, done){
             $setOnInsert: { name: partitionName },
             $push: { logs: _id }
         }, { upsert: true });
-        done();
     }catch(error){
         console.log('[SmartTrash Cloud]: Error processing the job (deviceLogQueue) ->', error);
+    }finally{
+        done();
     }
 });
 

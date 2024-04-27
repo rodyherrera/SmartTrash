@@ -1,6 +1,6 @@
 const mqtt = require('mqtt');
 const Device = require('@models/device');
-const DeviceLog = require('@models/deviceLog');
+const deviceQueue = require('@queues/device');
 const { redisClient } = require('@utilities/redisClient');
 
 /**
@@ -119,21 +119,21 @@ class MQTTController{
         }
         const clampedDistance = Math.max(0, Math.min(distance, device.height));
         const usagePercentage = Math.floor(100 - ((clampedDistance / device.height) * 100));
+        
+        await deviceQueue.add({
+            height: device.height,
+            usagePercentage,
+            distance,
+            stduid
+        });
 
-        // Notify handlers
+        // Notify handlers (CHECK THIS CODE FOR PERFOMANCE!?)
         for(const { options, callback } of this.handlers.values()){
             if(options?.topicName && (options.topicName !== stduid)){
                 continue;
             }
             callback({ measuredDistance: distance, usagePercentage });
         }
-
-        await DeviceLog.create({
-            height: device.height,
-            usagePercentage,
-            distance,
-            stduid
-        });
     };
 
     /**

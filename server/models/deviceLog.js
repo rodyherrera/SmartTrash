@@ -1,5 +1,5 @@
 const mongoose = require('mongoose');
-const deviceLogQueue = require('@utilities/deviceLogQueue');
+const deviceLogQueue = require('@queues/deviceLog');
 
 const DeviceLogSchema = new mongoose.Schema({
     stduid: {
