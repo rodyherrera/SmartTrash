@@ -1,7 +1,7 @@
 require('./aliases');
 const mqtt = require('mqtt');
 const BATCH_SIZE = 100000;
-const TOTAL_DOCUMENTS = 30 * 24 * 60 * 60;
+const TOTAL_DOCUMENTS = 100000;
 const TOPIC = 'st/4C11AE113CBF';
 let client;
 

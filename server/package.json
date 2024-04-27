@@ -3,9 +3,7 @@
   "version": "1.0.0",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "dev": "node server.js",
-    "start": "pm2 start --name 'SmartTrash Cloud' server.js -i max",
-    "stop": "pm2 stop 'SmartTrash Cloud'"
+    "dev": "node server.js"
   },
   "author": "",
   "license": "ISC",
