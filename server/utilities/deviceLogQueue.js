@@ -16,19 +16,24 @@ const getLogPartitionName = (creationDate) => {
 };
 
 const processQueue = async () => {
-    const jobs = await deviceLogQueue.getJobs();
-    for(const job of jobs){
-        const { data } = job;
-        const { stduid, _id, createdAt } = data;
-        await Device.updateOne({ stduid }, { $push: { logs: _id } });
-        const partitionName = getLogPartitionName(createdAt);
-        await DeviceLogPartition.updateOne({
-            name: partitionName
-        }, {
-            $setOnInsert: { name: partitionName },
-            $push: { logs: _id }
-        }, { upsert: true });
-        await job.moveToCompleted('completed', true, true);
+    try{
+        const jobs = await deviceLogQueue.getWaiting();
+        const promises = jobs.map(async (job) => {
+            const { data } = job;
+            const { stduid, _id, createdAt } = data;
+            await Device.updateOne({ stduid }, { $push: { logs: _id } });
+            const partitionName = getLogPartitionName(createdAt);
+            await DeviceLogPartition.updateOne({
+                name: partitionName
+            }, {
+                $setOnInsert: { name: partitionName },
+                $push: { logs: _id }
+            }, { upsert: true });
+            await job.remove();
+        });
+        await Promise.all(promises);
+    }catch(error){
+        console.log('[SmartTrash Cloud]: Error processing the job (deviceLogQueue) ->', error);
     }
 };
 
