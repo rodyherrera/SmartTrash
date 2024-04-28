@@ -1,6 +1,6 @@
 const mqtt = require('mqtt');
 const Device = require('@models/device');
-const deviceQueue = require('@queues/device');
+const deviceLogQueue = require('@queues/deviceLog');
 const { redisClient } = require('@utilities/redisClient');
 
 /**
@@ -100,7 +100,7 @@ class MQTTController{
                 throw new Error('MQTT::InvalidPayloadFormat');
             }
             const device = await this.getDevice(stduid);
-            await this.processMessage(stduid, device, distance);
+            this.processMessage(stduid, device, distance).then(() => {});
         }catch(error){
             console.error(`[SmartTrash Cloud]: Error parsing message: ${error}`);
         }
@@ -120,12 +120,12 @@ class MQTTController{
         const clampedDistance = Math.max(0, Math.min(distance, device.height));
         const usagePercentage = Math.floor(100 - ((clampedDistance / device.height) * 100));
         
-        await deviceQueue.add({
+        deviceLogQueue.enqueue({
             height: device.height,
             usagePercentage,
             distance,
             stduid
-        });
+        }).then(() => {});
 
         // Notify handlers (CHECK THIS CODE FOR PERFOMANCE!?)
         for(const { options, callback } of this.handlers.values()){

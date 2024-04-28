@@ -1,6 +1,19 @@
 const Device = require('@models/device');
 const mqttClient = require('@utilities/mqttClient');
+const { spawn } = require('child_process');
 const { capitalizeToLowerCaseWithDelimitier } = require('@utilities/algorithms');
+
+exports.startCronJobs = async () => {
+    const cronJobProcess = spawn('node', ['cronJobs.js']);
+    console.log('[SmartTrash Cloud]: Starting Cron Jobs...');
+    cronJobProcess.on('spawn', () => {
+        console.log('[SmartTrash Cloud]: Cron Jobs loaded successfully.');
+    });
+
+    cronJobProcess.stderr.on('data', (data) => {
+        console.log(`[SmartTrash Cloud] CronJob: ${data}`);
+    });
+};
 
 exports.startDevicesListening = async () => {
     try{
