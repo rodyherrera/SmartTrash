@@ -18,10 +18,9 @@ exports.startCronJobs = async () => {
 exports.startDevicesListening = async () => {
     try{
         console.log('[SmartTrash Cloud]: Loading linked devices...');
-        const devices = await Device.find().select('stduid -_id');
+        const devices = await Device.find().select('stduid -_id').lean();
         console.log(`[SmartTrash Cloud]: Found ${devices.length} devices.`);
-        await Promise.all(devices.map(async ({ stduid, generateAnalytics }) => {
-            generateAnalytics(stduid);
+        await Promise.all(devices.map(async ({ stduid }) => {
             // stduid: SmartTrash Device's Unique ID.
             await mqttClient.client.subscribeAsync(stduid);
         }));

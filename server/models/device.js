@@ -42,16 +42,41 @@ DeviceSchema.post('remove', async function(doc){
     await redisClient.del(`mqttc-device:${doc.stduid}`);
 });
 
-// TODO: Associate device with log partition!
-// Is id needed as parameter?
-DeviceSchema.methods.generateAnalytics = async function(stduid){
+const getAverageUsagePercentage = (partitions, startDate, endDate) => {
+    const usageSum = partitions.reduce((acc, partition) => {
+        const totalUsagePercentage = partition.logs.reduce((innerAcc, log) => {
+            const logDate = new Date(log.createdAt);
+            if(logDate >= startDate && logDate <= endDate){
+                return innerAcc + log.usagePercentage;
+            }
+            return innerAcc;
+        }, 0);
+        return acc + totalUsagePercentage;
+    }, 0);
+
+    const logsCount = partitions.reduce((acc, partition) => {
+        const count = partition.logs.reduce((innerAcc, log) => {
+            const logDate = new Date(log.createdAt);
+            if(logDate >= startDate && logDate <= endDate){
+                return innerAcc + 1;
+            }
+            return innerAcc;
+        }, 0);
+        return acc + count;
+    }, 0);
+
+    return (logsCount > 0) ? (usageSum / logsCount) : (0);
+};
+
+DeviceSchema.methods.generateAnalytics = async function(stduid) {
     const today = new Date();
+    const lastMonth = new Date(today.getFullYear(), today.getMonth() - 1, today.getDate());
     const lastWeekStart = new Date(today.getFullYear(), today.getMonth(), today.getDate() - 6);
-    const lastWeekEnd = new Date(today.getFullYear(), today.getMonth(), today.getDate());
+    const lastDay = new Date(today.getFullYear(), today.getMonth(), today.getDate() - 1);
     const filter = {
-        name: { 
-            $gte: lastWeekStart.toISOString().substring(0, 10),
-            $lte: lastWeekEnd.toISOString().substring(0, 10)
+        name: {
+            $gte: lastMonth.toISOString().substring(0, 10),
+            $lte: today.toISOString().substring(0, 10)
         },
         stduid
     };
@@ -60,20 +85,24 @@ DeviceSchema.methods.generateAnalytics = async function(stduid){
         .select('_id name logs')
         .populate({
             path: 'logs',
-            select: 'usagePercentage'
+            select: 'usagePercentage createdAt'
         })
         .lean();
-    let totalUsageSum = 0;
-    let totalLogsCount = 0;
-    partitions.forEach(({ logs }) => {
-        if(!logs.length) return;
-        const totalUsagePercentage = logs.reduce((acc, log) => acc + log.usagePercentage, 0);
-        totalUsageSum += totalUsagePercentage;
-        totalLogsCount += logs.length;
-    });
-    const globalAverageUsagePercentage = (totalLogsCount > 0) ? (totalUsageSum / totalLogsCount) : (0);
-    console.log(globalAverageUsagePercentage);
-    return partitions;
+
+    const lastMonthUsage = getAverageUsagePercentage(partitions, lastMonth, today);
+    const lastWeekUsage = getAverageUsagePercentage(partitions, lastWeekStart, today);
+    const lastDayUsage = getAverageUsagePercentage(partitions, lastDay, today);
+    const hourlyUsage = getAverageUsagePercentage(
+        partitions,
+        new Date(today.getFullYear(), today.getMonth(), today.getDate(), today.getHours()),
+        new Date(today.getFullYear(), today.getMonth(), today.getDate(), today.getHours() + 1)
+    );
+    return {
+        lastMonthUsage,
+        lastWeekUsage,
+        lastDayUsage,
+        hourlyUsage
+    };
 };
 
 const Device = mongoose.model('Device', DeviceSchema);
