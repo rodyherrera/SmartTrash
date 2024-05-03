@@ -44,7 +44,7 @@ DeviceSchema.post('remove', async function(doc){
 
 // TODO: Associate device with log partition!
 // Is id needed as parameter?
-DeviceSchema.methods.generateAnalytics = async function(id){
+DeviceSchema.methods.generateAnalytics = async function(stduid){
     const today = new Date();
     const lastWeekStart = new Date(today.getFullYear(), today.getMonth(), today.getDate() - 6);
     const lastWeekEnd = new Date(today.getFullYear(), today.getMonth(), today.getDate());
@@ -52,10 +52,28 @@ DeviceSchema.methods.generateAnalytics = async function(id){
         name: { 
             $gte: lastWeekStart.toISOString().substring(0, 10),
             $lte: lastWeekEnd.toISOString().substring(0, 10)
-        }
+        },
+        stduid
     };
-    const partitions = await mongoose.model('DeviceLogPartition').find(filter, { _id: 1, name: 1});
-    console.log(partitions);
+    const partitions = await mongoose.model('DeviceLogPartition')
+        .find(filter)
+        .select('_id name logs')
+        .populate({
+            path: 'logs',
+            select: 'usagePercentage'
+        })
+        .lean();
+    let totalUsageSum = 0;
+    let totalLogsCount = 0;
+    partitions.forEach(({ logs }) => {
+        if(!logs.length) return;
+        const totalUsagePercentage = logs.reduce((acc, log) => acc + log.usagePercentage, 0);
+        totalUsageSum += totalUsagePercentage;
+        totalLogsCount += logs.length;
+    });
+    const globalAverageUsagePercentage = (totalLogsCount > 0) ? (totalUsageSum / totalLogsCount) : (0);
+    console.log(globalAverageUsagePercentage);
+    return partitions;
 };
 
 const Device = mongoose.model('Device', DeviceSchema);

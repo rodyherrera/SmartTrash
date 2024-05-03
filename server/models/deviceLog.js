@@ -6,10 +6,6 @@ const DeviceLogSchema = new mongoose.Schema({
         ref: 'Device',
         required: true
     },
-    timePartition: {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: 'deviceLogPartition'
-    },
     distance: {
         type: Number,
         required: true

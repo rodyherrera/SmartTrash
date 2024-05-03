@@ -15,7 +15,8 @@ const processQueue = async () => {
     // const ids = Object.values(result.insertedIds);
     for(const { insertOne } of batch){
         const { document } = insertOne;
-        deviceLogPartitionQueue.enqueue(document).then(() => {});
+        const { _id, stduid } = document;
+        deviceLogPartitionQueue.enqueue({ _id, stduid }).then(() => {});
     }
 };
 
