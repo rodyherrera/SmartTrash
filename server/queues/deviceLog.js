@@ -10,10 +10,12 @@ const processQueue = async () => {
     const items = await redisClient.lRange('queue/device-log', 0, -1);
     await redisClient.lTrim('queue/device-log', items.length, -1);
     const batch = items.map((item) => ({ insertOne: { document: JSON.parse(item) } }));
-    const result = await DeviceLog.bulkWrite(batch);
-    const ids = Object.values(result.insertedIds);
-    for(const id of ids){
-        deviceLogPartitionQueue.enqueue({ id: id.toString() }).then(() => {});
+    await DeviceLog.bulkWrite(batch);
+    // TODO: Verify if is really inserted 
+    // const ids = Object.values(result.insertedIds);
+    for(const { insertOne } of batch){
+        const { document } = insertOne;
+        deviceLogPartitionQueue.enqueue(document).then(() => {});
     }
 };
 

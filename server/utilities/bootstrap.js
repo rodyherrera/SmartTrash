@@ -20,7 +20,8 @@ exports.startDevicesListening = async () => {
         console.log('[SmartTrash Cloud]: Loading linked devices...');
         const devices = await Device.find().select('stduid -_id');
         console.log(`[SmartTrash Cloud]: Found ${devices.length} devices.`);
-        await Promise.all(devices.map(async ({ stduid }) => {
+        await Promise.all(devices.map(async ({ stduid, generateAnalytics }) => {
+            generateAnalytics(stduid);
             // stduid: SmartTrash Device's Unique ID.
             await mqttClient.client.subscribeAsync(stduid);
         }));

@@ -119,13 +119,13 @@ class MQTTController{
         }
         const clampedDistance = Math.max(0, Math.min(distance, device.height));
         const usagePercentage = Math.floor(100 - ((clampedDistance / device.height) * 100));
-        
-        deviceLogQueue.enqueue({
+
+        await deviceLogQueue.enqueue({
             height: device.height,
             usagePercentage,
             distance,
             stduid
-        }).then(() => {});
+        });
 
         // Notify handlers (CHECK THIS CODE FOR PERFOMANCE!?)
         for(const { options, callback } of this.handlers.values()){

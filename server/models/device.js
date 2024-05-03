@@ -42,6 +42,22 @@ DeviceSchema.post('remove', async function(doc){
     await redisClient.del(`mqttc-device:${doc.stduid}`);
 });
 
+// TODO: Associate device with log partition!
+// Is id needed as parameter?
+DeviceSchema.methods.generateAnalytics = async function(id){
+    const today = new Date();
+    const lastWeekStart = new Date(today.getFullYear(), today.getMonth(), today.getDate() - 6);
+    const lastWeekEnd = new Date(today.getFullYear(), today.getMonth(), today.getDate());
+    const filter = {
+        name: { 
+            $gte: lastWeekStart.toISOString().substring(0, 10),
+            $lte: lastWeekEnd.toISOString().substring(0, 10)
+        }
+    };
+    const partitions = await mongoose.model('DeviceLogPartition').find(filter, { _id: 1, name: 1});
+    console.log(partitions);
+};
+
 const Device = mongoose.model('Device', DeviceSchema);
 
 module.exports = Device;

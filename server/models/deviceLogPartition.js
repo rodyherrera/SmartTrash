@@ -8,6 +8,11 @@ const DeviceLogPartitionSchema = new mongoose.Schema({
         trim: true,
         unique: true
     },
+    stduid: {
+        type: String,
+        ref: 'Device',
+        required: [true, 'DeviceLogPartition::STDUID::Required']
+    },
     logs: [{
         type: mongoose.Schema.Types.ObjectId,
         ref: 'DeviceLog'
@@ -18,7 +23,7 @@ const DeviceLogPartitionSchema = new mongoose.Schema({
     }
 });
 
-DeviceLogPartitionSchema.index({ name: 'text' });
+DeviceLogPartitionSchema.index({ name: 'text', device: 'text' });
 
 const DeviceLogPartition = mongoose.model('DeviceLogPartition', DeviceLogPartitionSchema);
 
