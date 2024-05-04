@@ -47,8 +47,7 @@ const DeviceUsage = () => {
     const chartData = {
         labels: ['Hourly', 'Daily', 'Weekly', 'Monthly'],
         datasets: [{
-            //data: [analytics.averageUsage.hourly, analytics.averageUsage.daily, analytics.averageUsage.weekly, analytics.averageUsage.monthly],
-            data: [19, 37, 47, 99],
+            data: [analytics.hourlyUsage, analytics.lastDayUsage, analytics.lastWeekUsage, analytics.lastMonthUsage],
             borderRadius: 50,
             backgroundColor: '#F5F5F5'
         }]

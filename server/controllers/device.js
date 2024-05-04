@@ -107,8 +107,9 @@ exports.getDeviceAnalytics = catchAsync(async (req, res) => {
         res.status(200).json({ status: 'success', data: count });
         return;
     }
+    const usage = await device.generateAnalytics(device.stduid);
     res.status(200).json({
         status: 'success',
-        data: {}
+        data: usage
     });
 });

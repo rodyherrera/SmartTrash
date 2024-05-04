@@ -68,7 +68,7 @@ const getAverageUsagePercentage = (partitions, startDate, endDate) => {
     return (logsCount > 0) ? (usageSum / logsCount) : (0);
 };
 
-DeviceSchema.methods.generateAnalytics = async function(stduid) {
+DeviceSchema.methods.generateAnalytics = async function(stduid){
     const today = new Date();
     const lastMonth = new Date(today.getFullYear(), today.getMonth() - 1, today.getDate());
     const lastWeekStart = new Date(today.getFullYear(), today.getMonth(), today.getDate() - 6);
@@ -80,6 +80,7 @@ DeviceSchema.methods.generateAnalytics = async function(stduid) {
         },
         stduid
     };
+    
     const partitions = await mongoose.model('DeviceLogPartition')
         .find(filter)
         .select('_id name logs')
