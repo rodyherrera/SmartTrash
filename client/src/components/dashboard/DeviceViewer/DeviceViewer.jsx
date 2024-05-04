@@ -2,6 +2,7 @@ import React, { Suspense, lazy, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { GoChevronRight, GoChevronLeft } from 'react-icons/go';
 import { RxHeight } from 'react-icons/rx';
+import { IoTodayOutline } from 'react-icons/io5';
 import { PiDatabaseLight } from 'react-icons/pi';
 import { getDeviceAnalytics, countDeviceLogs } from '@services/device/operations';
 import StatCard from '@components/general/StatCard';
@@ -16,16 +17,12 @@ const TrashCanModel = lazy(() => import('@components/general/TrashCanModel'));
 const DeviceViewer = ({ _id, name, height }) => {
     const dispatch = useDispatch();
     const { usagePercentage, distance } = useDeviceMeasurement(_id);
-    const { isAnalyticsLoading, analytics, isDeviceLogsCountLoading, deviceLogsCount } = useSelector((state) => state.device);
+    const { isDeviceLogsCountLoading, deviceLogsCount } = useSelector((state) => state.device);
 
     useEffect(() => {
         dispatch(getDeviceAnalytics(_id));
         dispatch(countDeviceLogs(_id));
     }, []);
-
-    useEffect(() => {
-        console.log(isAnalyticsLoading, analytics);
-    }, [isAnalyticsLoading, analytics]);
 
     return (
         <main className='Device-Viewer-Container'>
@@ -33,7 +30,8 @@ const DeviceViewer = ({ _id, name, height }) => {
                 <article className='Device-Viewer-Left-Header-Container'>
                     <div className='Device-Stats-Container'>
                         <StatCard Icon={RxHeight} title='Garbage Container Height' content={height + ' cm'} />
-                        <StatCard Icon={PiDatabaseLight} title='Stored Device Logs' content={deviceLogsCount} />
+                        <StatCard Icon={PiDatabaseLight} title='Stored Device Logs' content={deviceLogsCount.logs} />
+                        <StatCard Icon={IoTodayOutline} title='Estimated Uptime Days' content={deviceLogsCount.logsPartition} />
                     </div>
                 </article>
                 <article className='Device-Viewer-Left-Bottom-Container'>

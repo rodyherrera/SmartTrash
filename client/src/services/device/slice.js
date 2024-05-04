@@ -8,7 +8,7 @@ const state = {
     isAnalyticsLoading: true,
     analytics: {},
     isDeviceLogsCountLoading: true,
-    deviceLogsCount: 0
+    deviceLogsCount: {}
 };
 
 const deviceSlice = createSlice({

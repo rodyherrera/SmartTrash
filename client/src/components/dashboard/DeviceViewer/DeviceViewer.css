@@ -14,7 +14,8 @@
 
 .Device-Stats-Container{
     display: flex;
-    gap: 4rem;
+    gap: 3rem;
+    flex-wrap: wrap;
 }
 
 .Device-Viewer-3D-Model-Container{

@@ -1,6 +1,7 @@
 const HandlerFactory = require('@controllers/handlerFactory');
 const Device = require('@models/device');
 const DeviceLog = require('@models/deviceLog');
+const DeviceLogPartition = require('@models/deviceLogPartition');
 const RuntimeError = require('@utilities/runtimeError');
 const mqttClient = require('@utilities/mqttClient');
 const User = require('@models/user');
@@ -103,8 +104,11 @@ exports.getDeviceAnalytics = catchAsync(async (req, res) => {
     const { id } = req.params;
     const device = await Device.findById(id).select('stduid');
     if(req.query?.type === 'countDeviceLogs'){
-        const count = await DeviceLog.countDocuments({ stduid: device.stduid });
-        res.status(200).json({ status: 'success', data: count });
+        const { stduid } = device;
+        const logs = await DeviceLog.countDocuments({ stduid });
+        const logsPartition = await DeviceLogPartition.countDocuments({ stduid });
+        const data = { logs, logsPartition };
+        res.status(200).json({ status: 'success', data });
         return;
     }
     const usage = await device.generateAnalytics(device.stduid);
