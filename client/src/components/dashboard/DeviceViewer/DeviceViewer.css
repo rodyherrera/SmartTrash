@@ -14,13 +14,13 @@
 
 .Device-Stats-Container{
     display: flex;
-    gap: 3rem;
+    gap: 4rem;
     flex-wrap: wrap;
 }
 
 .Device-Viewer-3D-Model-Container{
     width: 300px;
-    height: 470px;
+    height: 75vh;
     margin: 0 auto;
     position: relative;
     z-index: 100;
@@ -31,15 +31,6 @@
     position: relative;
     top: .5rem;
     opacity: .7;
-}
-
-.Device-Viewer-Name{
-    font-weight: 350;
-    background-color: #0f62fe;
-    color: #FFFFFF;
-    padding: .3rem 1rem;
-    font-size: .9rem;
-    border-radius: 2rem;
 }
 
 .Device-Viewer-Caption-Name-Container{
@@ -58,6 +49,27 @@
 .Device-Viewer-Navigation-Helper-Text{
     font-size: .75rem;
 }
+
+.Device-Viewer-Caption-Name-Container .Input-Node-Container input::placeholder{
+    color: #FFF !important;
+}
+
+.Device-Viewer-Caption-Name-Container .Input-Node-Container{
+    box-shadow: unset !important;
+}
+
+.Device-Viewer-Caption-Name-Container .Input-Container{
+    max-width: 230px;
+}
+
+.Device-Viewer-Caption-Name-Container .Input-Node-Container input{
+    background-color: #0f62fe;
+    color: #FFFFFF;
+    font-size: .9rem;
+    border-radius: 2rem;
+    text-align: center;
+}
+
 
 .Device-Viewer-Previous-Icon-Container,
 .Device-Viewer-Next-Icon-Container{
@@ -78,11 +90,6 @@
     flex-direction: column;
 }
 
-.Device-Viewer-Right-Bottom-Container,
-.Device-Viewer-Left-Bottom-Container{
-    padding: 1rem;
-}
-
 .Device-Viewer-Left-Header-Container{
     padding: 1rem;
 }
@@ -91,6 +98,18 @@
     display: flex;
     flex-direction: column;
     gap: .3rem;
+}
+
+.Device-Viewer-Right-Container{
+    gap: 1.5rem;
+}
+
+.Device-Viewer-Right-Bottom-Container{
+    justify-content: flex-end;
+    gap: 2rem;
+    display: flex;
+    height: 100%;
+    flex-direction: column;
 }
 
 @media screen and (max-width: 768px){
@@ -126,10 +145,12 @@
 
     .Device-Viewer-Left-Container{
         order: 2;
+        gap: 1rem;
     }
 
     .Device-Viewer-Right-Container{
         order: 3;
+        gap: 2rem;
     }
 
     .Device-Viewer-Caption-Container{
@@ -138,6 +159,10 @@
 
     .Device-Viewer-Caption-Name-Container{
         gap: 1rem;
+    }
+
+    .Device-Viewer-Right-Bottom-Container{
+        gap: 2.5rem;
     }
 
     .Device-Viewer-Navigation-Helper-Text{

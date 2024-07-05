@@ -2,10 +2,10 @@ import React from 'react';
 import { HiOutlineArrowUpRight } from 'react-icons/hi2';
 import './StatCard.css';
 
-const StatCard = ({ Icon, title, content }) => {
+const StatCard = ({ Icon, title, content, ...props }) => {
 
     return (
-        <div className='Stat-Card-Container'>
+        <div className='Stat-Card-Container' {...props}>
             <div className='Stat-Card-Header-Container'>
                 <i className='Stat-Card-Header-Icon-Container'>
                     <Icon />

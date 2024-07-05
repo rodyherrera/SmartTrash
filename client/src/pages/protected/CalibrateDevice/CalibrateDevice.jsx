@@ -1,13 +1,22 @@
 import React from 'react';
 import Button from '@components/general/Button';
 import useDeviceMeasurement from '@hooks/useDeviceMeasurement';
-import { useParams } from 'react-router-dom';
+import { useParams, useNavigate } from 'react-router-dom';
 import { HiOutlineArrowNarrowRight } from 'react-icons/hi';
+import { updateMyDevice } from '@services/device/operations';
+import { useDispatch, useSelector } from 'react-redux';
 import './CalibrateDevice.css';
 
 const CalibrateDevice = () => {
     const { deviceId } = useParams();
     const { distance } = useDeviceMeasurement(deviceId);
+    const { isUpdateLoading } = useSelector((state) => state.device);
+    const dispatch = useDispatch();
+    const navigate = useNavigate();
+
+    const saveCalibrationHandler = () => {
+        dispatch(updateMyDevice(deviceId, { height: distance }, () => navigate('/dashboard')));
+    };
 
     return (
         <main id='Calibrate-Device-Main'>
@@ -22,7 +31,9 @@ const CalibrateDevice = () => {
 
             <section id='Calibrate-Device-Footer-Container'>
                 <Button 
+                    onClick={saveCalibrationHandler}
                     IconRight={HiOutlineArrowNarrowRight}
+                    isLoading={isUpdateLoading}
                     variant='Form-Contained Rounded'>The distance is correct, save and continue</Button>
             </section>
         </main>

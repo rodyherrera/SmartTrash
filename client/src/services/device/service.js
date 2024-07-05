@@ -19,6 +19,11 @@ import APIRequestBuilder from '@utilities/apiRequestBuilder';
 */
 export const DeviceAPI = new APIRequestBuilder('/device');
 
+export const updateMyDevice = DeviceAPI.register({
+    path: '/me/:id/',
+    method: 'PATCH'
+});
+
 export const createDevice = DeviceAPI.register({
     path: '/',
     method: 'POST'

@@ -1,0 +1,44 @@
+.Device-Calibration-Title,
+.Device-Calibration-Description{
+    font-weight: 300;
+}
+
+.Device-Calibration-Title-Container:hover{
+    color: #0f62fe;
+    gap: 1.5rem;
+}
+
+.Device-Calibration-Title-Container{
+    display: flex;
+    transition: .2s;
+    cursor: pointer;
+    font-size: 1.2rem;
+    align-items: flex-end;
+    gap: 1rem;
+}
+
+.Device-Calibration-Header-Container{
+    display: flex;
+    gap: .5rem;
+    flex-direction: column;
+}
+
+.Device-Calibration-Description{
+    font-size: .9rem;
+    line-height: 1.2rem;
+}
+
+@media screen and (max-width: 768px){
+    .Device-Calibration-Title-Container{
+        font-size: 2.5rem;
+        line-height: 4.5rem;
+    }
+
+    .Device-Calibration-Header-Container{
+        gap: .5rem;
+    }
+
+    .Device-Calibration-Description{
+        font-size: .95rem;
+    }
+}

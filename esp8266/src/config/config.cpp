@@ -24,8 +24,8 @@ const char* CREDENTIALS_FILE = "/WiFiCredentials.json";
 
 // MQTT Configuration
 const char* MQTT_SERVER = "mqtt.rodyherrera.com";
-const char* MQTT_USERNAME = "";
-const char* MQTT_PASSWORD = "";
+const char* MQTT_USERNAME = "rodoherrera";
+const char* MQTT_PASSWORD = "55563019";
 const uint16_t MQTT_SERVER_PORT = 1883;
 const uint8_t MEDIAN_SAMPLES = 7;
 

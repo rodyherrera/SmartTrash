@@ -1,0 +1,115 @@
+.Device-Notification-Settings-Container{
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.Device-Notification-Settings-Title{
+    font-weight: 300;
+    font-size: 1.3rem;
+}
+
+.Device-Notification-Settings-Title-Highlighted{
+    color: #FFF;
+    font-size: 1rem;
+    border-radius: 1rem;
+    padding: .3rem .8rem;
+    background-color: #0f62fe;
+}
+
+.Device-Notification-Settings-Body-Container{
+    display: flex;
+    overflow-x: scroll;
+    padding-bottom: .5rem;
+    gap: 1rem;
+}
+
+.Device-Notification-Option{
+    font-size: .75rem;
+}
+
+.Device-Notification-Settings-Title-Container{
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.Device-Notification-Settings-Description{
+    font-size: .9rem;
+    line-height: 1.3rem;
+    font-weight: 350;
+}
+
+.Device-Notification-Option-Container{
+    border: 1px solid #c9c9c9;
+    position: relative;
+    border-radius: 2rem;
+    padding: .2rem .8rem;
+    transition: .2s;
+    cursor: pointer;
+}
+
+.Device-Notification-Option-Container[data-isactive='true']{
+    background-color: #0f62fe;
+    color: #FFF;
+    border: 1px solid #0f62fe;
+}
+
+.Device-Notification-Option-Container:hover{
+    opacity: .8;
+}
+
+.Device-Notification-Option-Container:not([data-isactive='true']):hover{
+    color: #0f62fe;
+    border: 1px solid #0f62fe;
+}
+
+.Device-Notification-Option-Container:active{
+    opacity: 1;
+    transform: scale(.95);
+}
+
+@media screen and (max-width: 768px){
+    .Device-Notification-Settings-Description{
+        font-size: .9rem;
+    }   
+
+    .Device-Notification-Settings-Title-Container{
+        gap: 1.2rem;
+    }
+
+    .Device-Notification-Settings-Title{
+        font-size: 1.2rem;
+    }
+
+    .Device-Notification-Settings-Container{
+        border-radius: 1rem;
+        gap: 2rem;
+        background-color: #0f62fe;
+        padding: 1rem;
+        color: #FFF;
+    }
+
+    .Device-Notification-Settings-Body-Container{
+        padding: 0;
+        padding-bottom: .5rem;
+    }
+
+
+    .Device-Notification-Option-Container:not([data-isactive='true']):hover{
+        color: #FFF;
+        border: 1px solid #FFF;
+    }
+
+    .Device-Notification-Option-Container[data-isactive='true']{
+        background-color: #FFF;
+        color: #0f62fe;
+    }
+
+    .Device-Notification-Settings-Title-Highlighted{
+        background-color: #FFF;
+        color: #0f62fe;
+        margin-right: 8px;
+        font-size: 1rem;
+    }
+}

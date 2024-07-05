@@ -48,6 +48,7 @@ const Header = () => {
                 <article className='Header-Brand-Container' onClick={() => navigate('/')}>
                     <h3 className='Header-Brand-Title'>ST</h3>
                 </article>
+                <span className='Header-Software-Version'>BETA</span>
             </section>
 
             <ul className='Header-Brand-Center-Navigation-Container' ref={navLeftRef}>

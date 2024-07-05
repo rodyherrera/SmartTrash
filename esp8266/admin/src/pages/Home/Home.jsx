@@ -24,7 +24,7 @@ const HomePage = () => {
                     </div>
 
                     <div id='Home-Product-Bottom-Container'>
-                        <p id='Home-Product-Description'>Now with <span className='Highlight-Color'>© SmartTrash Historical Analytics</span> explore the behavior and performance of <span className='Highlight-Color'>your recycling points,</span> identify usage patterns and activity peaks.</p>
+                        <p id='Home-Product-Description'>This is your <span className='Highlight-Color'>© SmartTrash Integrated Control Panel</span> here, you can connect to the internet and <span className='Highlight-Color'>link to the cloud,</span> among other things, for now.</p>
                     </div>
                 </article>
                 

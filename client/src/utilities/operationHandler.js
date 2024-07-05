@@ -61,9 +61,10 @@ class OperationHandler{
     async use({ api, loaderState, responseState, query = {} }){
         try{
             if(loaderState) this.dispatch(loaderState(true));
-            const { data } = await api(query);
-            this.emit('response', data);
-            if(responseState) this.dispatch(responseState(data));
+            const response = await api(query);
+            this.emit('fullResponse', response);
+            this.emit('response', response.data);
+            if(responseState) this.dispatch(responseState(response.data));
         }catch(error){
             this.dispatch(globalErrorHandler(error, this.slice));
             this.emit('error', error);

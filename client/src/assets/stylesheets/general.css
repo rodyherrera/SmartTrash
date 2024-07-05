@@ -47,6 +47,12 @@ body{
     text-decoration: overline;
 }
 
+.Optimized-For-Animation{
+    will-change: transform, opacity;
+    transform: translateZ(0) scale(1);
+    filter: blur(0px);
+}
+
 .Underline{
     text-decoration: underline;
 }

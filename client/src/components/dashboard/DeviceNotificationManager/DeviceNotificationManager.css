@@ -5,14 +5,92 @@
     align-items: center;
 }
 
+.Device-Notification-Manager-Add-Icons-Container{
+    position: absolute;
+    right: 1rem;
+    display: flex;
+    align-items: center;
+    gap: .8rem;
+    bottom: 1rem;
+}
+
+.Device-Notification-Manager-Remove-Container{
+    background-color: #FFF;
+    color: #0f62fe;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: .4rem .8rem;
+    border-radius: .25rem;
+    visibility: hidden;
+    cursor: pointer;
+}
+
+
+.Device-Notification-Manager-Remove-Container:active{
+    transform: scale(.95);
+}
+
+.Device-Notification-Manager-Remove-Text{
+    font-size: .65rem;
+    font-weight: 400;
+    text-transform: uppercase;
+    letter-spacing: 0.04rem;
+}
+
+.Device-Notification-Manager-Address-Container:hover .Device-Notification-Manager-Remove-Container{
+    visibility: unset;
+}
+
+.Device-Notification-Manager-Add-Icon-Container{
+    font-size: 1.2rem;
+    width: 1.5rem;
+    height: 1.5rem;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.Device-Notification-Manager-Body-Container{
+    display: flex;
+    overflow-x: hidden;
+    flex-direction: column;
+    gap: 1rem;
+    max-height: 40vh;
+    overflow-y: scroll;
+}
+
+.Device-Notification-Manager-Add-Icon-Container:hover{
+    opacity: .9;
+    cursor: pointer;
+}
+
+.Device-Notification-Manager-Container .Input-Node-Container input::placeholder{
+    color: #FFF !important;
+}
+
+.Device-Notification-Manager-Container .Input-Container.Small{
+    padding: 0;
+}
+
+.Device-Notification-Manager-Container .Input-Node-Container input{
+    padding: 0;
+}
+
+.Device-Notification-Manager-Add-Icon-Container:active{
+    transform: scale(1.01);
+    opacity: 1;
+}
+
 .Device-Notification-Manager-Container{
     display: flex;
     flex-direction: column;
+    position: relative;
     background-color: #0f62fe;
     color: #FFF;
     gap: 1.5rem;
     padding: 1rem;
-    border-radius: 1.5rem;
+    border-radius: 1rem;
 }
 
 .Device-Notification-Manager-Icon-Container{
@@ -42,12 +120,14 @@
 
 .Device-Notification-Manager-Address-Container{
     display: flex;
+    width: 92%;;
     gap: .5rem;
     align-items: center;
 }
 
 .Device-Notification-Manager-Address-Data-Container{
     display: flex;
+    width: 70%;
     flex-direction: column;
     gap: .2rem;
 }

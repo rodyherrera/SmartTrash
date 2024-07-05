@@ -6,6 +6,7 @@ import AdministratorOptionsImage from '@images/Administrator-Options.png';
 import ArticleItem from '@components/general/ArticleItem';
 import { IoSendOutline } from 'react-icons/io5';
 import { gsap } from 'gsap/all';
+import { useNavigate } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import { createDevice } from '@services/device/operations';
 import './LinkDevice.css';
@@ -15,14 +16,16 @@ const LinkDevice = () => {
     const [stduid, setStduid] = useState('');
     const dispatch = useDispatch();
     const { user } = useSelector((state) => state.auth);
-    const { isLoading } = useSelector((state) => state.device);
+    const { isDeviceCreating } = useSelector((state) => state.device);
+    const navigate = useNavigate();
 
     const submitHandler = () => {
-        dispatch(createDevice({
+        const body = {
             stduid,
             name: stduid,
             user: user._id
-        }));
+        };
+        dispatch(createDevice(body, (res) => navigate('/device/' + res._id + '/calibrate')));
     };
 
     useEffect(() => {
@@ -49,7 +52,7 @@ const LinkDevice = () => {
                         value={stduid}
                         required={true}
                         placeholder={`Enter your device's unique id, e.g "st/3C41BD213DBF"`}
-                        isLoading={isLoading}
+                        isLoading={isDeviceCreating}
                         submitHandler={submitHandler}
                         RightIcon={IoSendOutline}
                     />

@@ -13,5 +13,5 @@
 #include "hardware.hpp"
 
 const uint8_t TRIGGER_PIN = D7;
-const uint8_t ECHO_PIN = D8;
+const uint8_t ECHO_PIN = D6;
 const uint8_t ESP8266_LED_PIN = D4;

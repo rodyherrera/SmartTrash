@@ -13,11 +13,12 @@ import * as deviceSlice from '@services/device/slice';
 import * as deviceService from '@services/device/service';
 import OperationHandler from '@utilities/operationHandler';
 
-export const createDevice = (body) => async (dispatch) => {
+export const createDevice = (body, callback) => async (dispatch) => {
     const operation = new OperationHandler(deviceSlice, dispatch);
+    operation.on('response', callback);
     operation.use({
         api: deviceService.createDevice,
-        loaderState: deviceSlice.setIsLoading,
+        loaderState: deviceSlice.setIsDeviceCreating,
         responseState: deviceSlice.setDevice,
         query: { body }
     });
@@ -29,6 +30,17 @@ export const getMyDevices = () => (dispatch) => {
         api: deviceService.getMyDevices,
         loaderState: deviceSlice.setIsLoading,
         responseState: deviceSlice.setDevices
+    });
+};
+
+export const updateMyDevice = (id, body, callback) => (dispatch) => {
+    const operation = new OperationHandler(deviceSlice, dispatch);
+    operation.on('response', callback);
+    operation.use({
+        api: deviceService.updateMyDevice,
+        loaderState: deviceSlice.setIsUpdateLoading,
+        responseState: deviceSlice.setDevice,
+        query: { query: { params: { id } }, body }
     });
 };
 

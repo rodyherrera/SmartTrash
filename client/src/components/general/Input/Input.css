@@ -71,6 +71,29 @@
     box-shadow: 0 0px 11px 0 #e4e4e4;
 }
 
+.Input-Container.Small{
+    padding: .3rem 1rem;
+}
+
+.Input-Container.Text .Input-Node-Container{
+    border: none;
+    background-color: transparent;
+    padding: 0;
+}
+
+.Input-Container.No-Focus .Input-Node-Container:has(input:focus){
+    box-shadow: unset;
+}
+
+.Input-Container.Small .Input-Node-Container, 
+.Input-Node-Container input{
+    height: 15px;
+}
+
+.Input-Container.Small .Input-Node-Container input::placeholder{
+    font-size: .8rem;
+}
+
 @media screen and (max-width: 768px){
     .Input-Container{
         width: 100%;

@@ -27,6 +27,19 @@
     font-weight: 300;
 }
 
+.Header-Brand-Related-Container{
+    display: flex;
+    align-items: flex-end;
+    gap: .8rem;
+}
+
+.Header-Software-Version{
+    font-weight: 300;
+    text-decoration: underline;
+    text-underline-offset: 2px;
+    font-size: .85rem;
+}
+
 .Header-Brand-Right-Navigation-Container{
     display: flex;
     align-items: center;
@@ -46,6 +59,10 @@
 
     .Header-Brand-Right-Navigation-Container{
         gap: 1rem;
+    }
+
+    .Header-Software-Version{
+        display: none;
     }
 
     .Header-Container{
