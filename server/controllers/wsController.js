@@ -56,7 +56,7 @@ module.exports = (io) => {
         if(action === 'Device::Measurement'){
             await tokenOwnership(socket, (error) => {
                 if(error){
-                    console.log('[SmartTrash Cloud]: Critical Error (@controllers/wsController)', error);
+                    console.log('[SmartTrash Cloud]: Critical Error (@controllers/wsController)', error.message);
                 }else{
                     deviceMeasurementHandler(socket);
                 }

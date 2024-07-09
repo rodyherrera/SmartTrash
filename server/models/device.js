@@ -18,6 +18,23 @@ const DeviceSchema = new mongoose.Schema({
         type: Number,
         default: 0
     },
+    notificationsSent: {
+        type: Number,
+        default: 0,
+    },
+    notificationPercentages: [{
+        type: Number,
+        max: 100,
+        min: 0
+    }],
+    notificationEmails: [{
+        email: {
+            type: String,
+        },
+        fullname: {
+            type: String
+        }
+    }],
     stduid: {
         type: String,
         maxlength: [32, 'Device::STDUID::MaxLength'],
@@ -34,7 +51,15 @@ DeviceSchema.index({ name: 'text' });
 DeviceSchema.index({ _id: 1, users: 1 });
 DeviceSchema.index({ stduid: 1 }, { unique: true }); 
 
-DeviceSchema.post('save', async function(doc){
+DeviceSchema.pre('save', async function(next){
+    if(this.isNew){
+        const { email, fullname } = await mongoose.model('User').findById(this.users[0]).select('email, fullname').lean();
+        this.notificationEmails.push({ email, fullname });
+    }
+    next();
+});
+
+DeviceSchema.post('updateOne', async function(doc){
     await redisClient.del(`mqttc-device:${doc.stduid}`);
 });
 

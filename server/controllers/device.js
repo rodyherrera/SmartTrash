@@ -19,6 +19,9 @@ const DeviceFactory = new HandlerFactory({
         'name',
         'user',
         'stduid',
+        'notificationPercentages',
+        'notificationsSent',
+        'notificationEmails',
         'height'
     ]
 });

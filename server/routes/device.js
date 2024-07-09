@@ -5,6 +5,7 @@ const deviceController = require('@controllers/device');
 
 router.use(authenticationMiddleware.protect);
 
+router.patch('/me/:id/', deviceController.updateMyDevice);
 router.get('/me/', deviceController.getMyDevices)
 router.get('/:id/analytics/', deviceController.getDeviceAnalytics);
 router.post('/', deviceController.createDevice);

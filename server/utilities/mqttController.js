@@ -54,7 +54,7 @@ class MQTTController{
         }
         return new Promise((resolve, reject) => {
             let messageReceived = false;
-            const messageHandler = () => {
+            /*const messageHandler = () => {
                 messageReceived = true;
                 unsubscribeAndCleanup();
             };
@@ -67,7 +67,8 @@ class MQTTController{
 
             this.client.on('message', messageHandler);
             this.client.subscribeAsync(topicName).catch(reject);
-            setTimeout(unsubscribeAndCleanup, timeout);
+            setTimeout(unsubscribeAndCleanup, timeout);*/
+            resolve(true);
         });
     };
 
@@ -76,9 +77,7 @@ class MQTTController{
         let device = await redisClient.get(deviceKey);
         if(!device){
             device = await Device.findOne({ stduid }).select('height stduid');
-            if(!device){
-                throw new Error('MQTT::DeviceNotFound');
-            }
+            if(!device) return null;
             await redisClient.set(deviceKey, JSON.stringify(device));
         }else{
             device = JSON.parse(device);
@@ -100,7 +99,8 @@ class MQTTController{
                 throw new Error('MQTT::InvalidPayloadFormat');
             }
             const device = await this.getDevice(stduid);
-            this.processMessage(stduid, device, distance).then(() => {});
+            if(device === null) return;
+            this.processMessage(stduid, device, distance);
         }catch(error){
             console.error(`[SmartTrash Cloud]: Error parsing message: ${error}`);
         }
@@ -113,12 +113,16 @@ class MQTTController{
      * @param {number} distance - The measured distance 
      */
     async processMessage(stduid, device, distance){
-        if(!device || typeof device.height !== 'number' || device.height <= 0){
-            // Device data is invalid
-            return;
-        }
+        if(!device || typeof device.height !== 'number') return;
         const clampedDistance = Math.max(0, Math.min(distance, device.height));
-        const usagePercentage = Math.floor(100 - ((clampedDistance / device.height) * 100));
+        const usagePercentage = Math.floor(100 - ((clampedDistance / device.height) * 100)) || 0;
+
+        for(const { options, callback } of this.handlers.values()){
+            if(options?.topicName && (options.topicName !== stduid)) continue;
+            callback({ measuredDistance: distance, usagePercentage });
+        }
+
+        if(device.height <= 0) return;
 
         await deviceLogQueue.enqueue({
             height: device.height,
@@ -126,14 +130,6 @@ class MQTTController{
             distance,
             stduid
         });
-
-        // Notify handlers (CHECK THIS CODE FOR PERFOMANCE!?)
-        for(const { options, callback } of this.handlers.values()){
-            if(options?.topicName && (options.topicName !== stduid)){
-                continue;
-            }
-            callback({ measuredDistance: distance, usagePercentage });
-        }
     };
 
     /**
