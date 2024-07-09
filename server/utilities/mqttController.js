@@ -2,6 +2,7 @@ const mqtt = require('mqtt');
 const Device = require('@models/device');
 const deviceLogQueue = require('@queues/deviceLog');
 const { redisClient } = require('@utilities/redisClient');
+const { sendEmail } = require('@utilities/emailHandler');
 
 /**
  * Manages communication with the MQTT server, handling messages,
@@ -22,6 +23,7 @@ class MQTTController{
          * @type {Map<string, {options: Object, callback: function}>} 
         */
         this.handlers = new Map();
+        this.emailInterval = 600000;
     };
 
     /**
@@ -76,13 +78,66 @@ class MQTTController{
         const deviceKey = `mqttc-device:${stduid}`;
         let device = await redisClient.get(deviceKey);
         if(!device){
-            device = await Device.findOne({ stduid }).select('height stduid');
+            device = await Device.findOne({ stduid }).select('height stduid notificationPercentages notificationEmails name');
             if(!device) return null;
             await redisClient.set(deviceKey, JSON.stringify(device));
         }else{
             device = JSON.parse(device);
         }
         return device;
+    };
+
+    async sendUsageStatusEmail(usagePercentage, stduid, device){
+        const emojis = ['😢', '🤨', '😑', '🤥', '😬', '😏', '🤧', '🥴', '😵', '🧐', '🙁', '😟', '🥺', '😭', '😱', '😖', '😣', '😞', '😓', '😩'];
+        const getRandomEmoji = () => emojis[Math.floor(Math.random() * emojis.length)];
+    
+        function getEmailContent(fullname, usagePercentage, deviceName) {
+            const emoji = getRandomEmoji();
+            let subject;
+            let html;
+            switch (usagePercentage) {
+                case 0:
+                    subject = `${deviceName} is now clean! ${emoji}`;
+                    html = `Dear ${fullname},<br/><br/>
+                            Your "${deviceName}" device is available so you can take advantage of its maximum capacity. 
+                            We are monitoring the status of your trash can to notify you about it, good job ;). <br/><br/>
+                            Let's make the world a better place!<br/><br/>
+                            Sincerely,<br/> The SmartTrash Team.`;
+                    break;
+                case 50:
+                    subject = `${deviceName} just surpassed 50% capacity ${emoji}`;
+                    html = `Dear ${fullname},<br/><br/>
+                            Your "${deviceName}" device has just exceeded 50% capacity, don't worry, you don't have to remove anything. 
+                            We are monitoring your device so that when the time is right, we will notify you to pick up. <br/><br/>
+                            Let's make the world a better place!<br/><br/>
+                            Sincerely,<br/> The SmartTrash Team.`;
+                    break;
+                default:
+                    subject = `${deviceName} is at ${usagePercentage}% ${emoji}`;
+                    html = `Dear ${fullname},<br/><br/>
+                            Your "${deviceName}" device has reached ${usagePercentage}% of its total usage. Please remember to empty it, otherwise we will notify you about it.<br/><br/>
+                            You can see the status of all your devices by logging into your account with your SmartTrash Cloud ID.<br/><br/>
+                            Let's make the world a better place!<br/><br/>
+                            Sincerely,<br/> The SmartTrash Team.`;
+                    break;
+            }
+            return { subject, html };
+        }
+    
+        const promises = device.notificationEmails.map(({ fullname, email }) => {
+            const { subject, html } = getEmailContent(fullname, usagePercentage, device.name);
+            return sendEmail({ to: email, subject, html });
+        });
+    
+        await Device.updateOne({ stduid }, { $inc: { notificationsSent: 1 } });
+        await Promise.all(promises);
+    };
+    
+    generateThresholds(percentages){
+        return percentages.map((percentage) => ({
+            percentage,
+            action: (stduid, device) => this.sendUsageStatusEmail(percentage, stduid, device)
+        }));
     };
 
     /**
@@ -104,6 +159,17 @@ class MQTTController{
         }catch(error){
             console.error(`[SmartTrash Cloud]: Error parsing message: ${error}`);
         }
+    };
+
+    async shouldSendEmail(usagePercentage, stduid){
+        const now = Date.now();
+        const emailKey = `mqttc-device:${stduid}:email-sent:${usagePercentage}`;
+        const lastSent = await redisClient.get(emailKey);
+        if(!lastSent || (now - parseInt(lastSent)) > this.emailInterval){
+            await redisClient.set(emailKey, now);
+            return true;
+        }
+        return false;
     };
 
     /**
@@ -130,6 +196,13 @@ class MQTTController{
             distance,
             stduid
         });
+
+        const thresholds = this.generateThresholds(device.notificationPercentages);
+        for(const { percentage, action } of thresholds){
+            if(usagePercentage >= percentage && await this.shouldSendEmail(percentage, stduid)){
+                await action(stduid, device);
+            }
+        }
     };
 
     /**

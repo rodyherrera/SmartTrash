@@ -30,9 +30,12 @@ const DeviceSchema = new mongoose.Schema({
     notificationEmails: [{
         email: {
             type: String,
+            match: [/.+@.+\..+/, 'Device::NotificationEmail::InvalidFormat'],
+            required: false
         },
         fullname: {
-            type: String
+            type: String,
+            required: false
         }
     }],
     stduid: {
@@ -52,15 +55,25 @@ DeviceSchema.index({ _id: 1, users: 1 });
 DeviceSchema.index({ stduid: 1 }, { unique: true }); 
 
 DeviceSchema.pre('save', async function(next){
-    if(this.isNew){
-        const { email, fullname } = await mongoose.model('User').findById(this.users[0]).select('email, fullname').lean();
+    if(!this.isNew) next();
+    // If the device registration is new, there will only be one user 
+    // in the "users" property, we add this by default to the email 
+    // list where alerts will be sent.
+    const user = await mongoose.model('User').findById(this.users[0]).select('email fullname');
+    if(user && user.email && user.fullname){
+        const { email, fullname } = user;
         this.notificationEmails.push({ email, fullname });
+        this.save();
     }
     next();
 });
 
 DeviceSchema.post('updateOne', async function(doc){
     await redisClient.del(`mqttc-device:${doc.stduid}`);
+});
+
+DeviceSchema.post('save', async function(doc){
+    await redisClient.del(`mqttc-device:${doc.stduid}`, doc);
 });
 
 DeviceSchema.post('remove', async function(doc){
