@@ -150,5 +150,3 @@ Am I in the right place? Idealism is a good thing. It remains an anecdote, anywa
 
 ## License
 MIT
-**Free Software, Hell Yeah!**
-
