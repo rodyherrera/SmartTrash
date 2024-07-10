@@ -3,7 +3,7 @@ With SmartTrash, you can monitor the trash points of your entire infrastructure 
 
 ![SmartTrash Cloud Platform Dashboard](/screenshots/SmartTrash-Cloud-Platform-Dashboard.png)
 
-The device in relation to when you want it to notify you, for example when the device is over 80%, if it is not cleaned in the next 10 minutes, it will send you a notification again, and so on until the usage percentage drops below 80%. Personally, this approach is cool because I use this product every day and it forces me to clean it if I don't want to be filled with notifications every 10 minutes.
+The device in relation to when you want it to notify you, for example when the device is over 80%, if it is not cleaned in the next 10 minutes, it will send you a notification again, and so on until the usage percentage drops below 80%. Personally, this approach is cool because I use this product every day and it forces me to clean it if I don't want to be filled with notifications every 10 minutes. (The dashboard has a `3d model` of the prototype garbage container.)
 
 ![Email Notification](/screenshots/Email-Notification.png)
 
@@ -136,6 +136,12 @@ The unique code (also called SmartTrash Unique ID (STUID)) is generated through 
 The technologies used to be able to mount this software in production and on a real scale of hundreds of thousands of devices are mainly: Redis, MongoDB and MQTT. Everything is written in JavaScript using Node.js. Express.js is used as a web server and React.js for the development of user interfaces.
 
 You must have a MongoDB database and a Redis instance as well as an MQTT instance to be able to build the back-end, in addition to configuring the MQTT server in the NodeMCU `esp8266/src/config.cpp`. Maybe it will be useful in future versions to dockerize this.
+
+## How did this come about?
+Currently, I am studying my first semester of Industrial Engineering, and we have a course called "Introduction to Engineering", within the first classes, we were given the possibility of doing a project which we had to present at the end of the semester. Since I knew how to program since I was little, I didn't hesitate to do something combining programming with electronics. At first SmartTrash was more ambitious, but due to time constraints I couldn't dedicate 100% to the development of this. It's a bit curious because, even though the vast majority of us are 18 years old and no one knows how to program, my professor, who is also the head of the career at the university, in one of the reports that we prepared together with my group, called us "idealists", for doing something that others couldn't and for believing that our project was very ambitious, consequently they gave us the lowest grade, in Chile the maximum grade is 7.0, to pass you need a 4.0, I got 2.7 . Am I in the right place? Idealism is a good thing. It remains an anecdote, anyway I passed all the courses haha ​​:)!
+
+
+![Linking Device to SmartTrash Cloud Platform](/screenshots/The-Device.jpeg)
 
 
 ## License
