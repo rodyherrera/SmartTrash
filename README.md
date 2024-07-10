@@ -1,7 +1,11 @@
 # The IoT-based solution for your recycling points and garbage containers. 
 With SmartTrash, you can monitor the trash points of your entire infrastructure whenever and wherever you want. You can adjust when you want notifications to arrive, 90% of usage? Maybe 80% is better. You can add as many emails as you want to notify about the container's usability as you have adjusted and, see in real time how the updates of all your containers are processed and saved in the system.
 
+![SmartTrash Cloud Platform Dashboard](/screenshots/SmartTrash-Cloud-Platform-Dashboard.png)
+
 The device in relation to when you want it to notify you, for example when the device is over 80%, if it is not cleaned in the next 10 minutes, it will send you a notification again, and so on until the usage percentage drops below 80%. Personally, this approach is cool because I use this product every day and it forces me to clean it if I don't want to be filled with notifications every 10 minutes.
+
+![Email Notification](/screenshots/Email-Notification.png)
 
 We use Redis to guarantee performance, since there can be thousands of hundreds of containers simultaneously sending data to the server without causing performance problems on this. The sensor readings that are sent to the back-end are sent to Redis where there is a queue that contains them, where they are all periodically processed and stored with a bulkWrite in MongoDB. This approach prevents all those hundreds of thousands of containers sending data to the server from translating into operations that must be done for each one in the database and at the instruction level on the server. It is processed by queue and using batches.
 
@@ -33,6 +37,8 @@ Inside the `esp8266/` directory there is another directory called `data/`, which
 `NOTE`: You should be careful with that, the NodeMCU LittleFS Filesystem Uploader plugin does not work with modern versions of the Arduino IDE, only on Arduino 1.8. So if you do not have that version installed, you will have to download it to do this step.
 
 I will leave you a `tutorial` that I found in a Github repository, it is brief, just follow the instructions. [View Tutorial](https://github.com/esp8266/arduino-esp8266fs-plugin)
+
+![SmartTrash Panel Control](/screenshots/SmartTrash-Panel-Control.png)
 
 ### After flashing the NodeMCU
 We have the last steps left, and that is that you must configure the environment variables that are found in both the front-end and the back-end.
@@ -110,10 +116,14 @@ Once you have flashed the software found within `esp8266` on the device and it i
 
 Once you have connected, you must open your preferred browser and go to `192.168.1.1`, where you can access the `NodeMCU Control Panel` to connect it to the Internet. The device will connect automatically when it detects the network when turned on. Otherwise you will have to configure it again.
 
+![Connecting SmartTrash To WiFi](/screenshots/Connecting-SmartTrash-To-WiFi.png)
+
 ## How does the NodeMCU connect to the cloud?
 Once you have flashed the software inside your NodeMCU, you will be able to enter the web server that starts once it is turned on, with the address at "192.168.1.1". There, you will have among the options available, one called `Connect to the Cloud`, where if you click on it it will take you to another page where you will have a unique code, which allows you to identify the device to others on the network.
 
 `And what should I do with this code?` Well, now, you must copy this code and go to the front-end of the platform, where after having created an account and logging in, you will have an option in the menu called `Link device to the Cloud`, there you can place this code that you have previously copied to be able to link the device with your account.
+
+![Linking Device to SmartTrash Cloud Platform](/screenshots/Linking-Device-To-SmartTrash-Cloud-Platform.png)
 
 ### Device Calibration
 After you pair the device with your SmartTrash Cloud ID, you will be redirected to now calibrate your device. Well, the metrics that are generated in relation to the use of your container are in relation to the height it has, and to know its height it is necessary that we calibrate it. We assume that the sensor is located at the top of the container, and that it is pointing downwards, which represents the bottom of the container when empty. This measured distance will be displayed on the screen, and you must confirm if it is the correct height of the container. container. You can calibrate as many times as you want.
