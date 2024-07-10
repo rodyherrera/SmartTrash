@@ -63,20 +63,11 @@ DeviceSchema.pre('save', async function(next){
     if(user && user.email && user.fullname){
         const { email, fullname } = user;
         this.notificationEmails.push({ email, fullname });
-        this.save();
     }
     next();
 });
 
-DeviceSchema.post('updateOne', async function(doc){
-    await redisClient.del(`mqttc-device:${doc.stduid}`);
-});
-
-DeviceSchema.post('save', async function(doc){
-    await redisClient.del(`mqttc-device:${doc.stduid}`, doc);
-});
-
-DeviceSchema.post('remove', async function(doc){
+DeviceSchema.post(['findOneAndUpdate', 'save', 'remove'], async function(doc){
     await redisClient.del(`mqttc-device:${doc.stduid}`);
 });
 

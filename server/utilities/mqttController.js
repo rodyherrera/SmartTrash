@@ -89,41 +89,31 @@ class MQTTController{
 
     async sendUsageStatusEmail(usagePercentage, stduid, device){
         const emojis = ['😢', '🤨', '😑', '🤥', '😬', '😏', '🤧', '🥴', '😵', '🧐', '🙁', '😟', '🥺', '😭', '😱', '😖', '😣', '😞', '😓', '😩'];
-        const getRandomEmoji = () => emojis[Math.floor(Math.random() * emojis.length)];
-    
-        function getEmailContent(fullname, usagePercentage, deviceName) {
-            const emoji = getRandomEmoji();
-            let subject;
-            let html;
-            switch (usagePercentage) {
-                case 0:
-                    subject = `${deviceName} is now clean! ${emoji}`;
-                    html = `Dear ${fullname},<br/><br/>
-                            Your "${deviceName}" device is available so you can take advantage of its maximum capacity. 
-                            We are monitoring the status of your trash can to notify you about it, good job ;). <br/><br/>
-                            Let's make the world a better place!<br/><br/>
-                            Sincerely,<br/> The SmartTrash Team.`;
-                    break;
-                case 50:
-                    subject = `${deviceName} just surpassed 50% capacity ${emoji}`;
-                    html = `Dear ${fullname},<br/><br/>
-                            Your "${deviceName}" device has just exceeded 50% capacity, don't worry, you don't have to remove anything. 
-                            We are monitoring your device so that when the time is right, we will notify you to pick up. <br/><br/>
-                            Let's make the world a better place!<br/><br/>
-                            Sincerely,<br/> The SmartTrash Team.`;
-                    break;
-                default:
-                    subject = `${deviceName} is at ${usagePercentage}% ${emoji}`;
-                    html = `Dear ${fullname},<br/><br/>
-                            Your "${deviceName}" device has reached ${usagePercentage}% of its total usage. Please remember to empty it, otherwise we will notify you about it.<br/><br/>
-                            You can see the status of all your devices by logging into your account with your SmartTrash Cloud ID.<br/><br/>
-                            Let's make the world a better place!<br/><br/>
-                            Sincerely,<br/> The SmartTrash Team.`;
-                    break;
-            }
-            return { subject, html };
+        const emoji = emojis[Math.floor(Math.random() * emojis.length)];
+        let subject;
+        let html;
+        if(usagePercentage === 0){
+            subject = `${deviceName} is now clean! ${emoji}`;
+            html = `Dear ${fullname},<br/><br/>
+                    Your "${deviceName}" device is available so you can take advantage of its maximum capacity. 
+                    We are monitoring the status of your trash can to notify you about it, good job ;). <br/><br/>
+                    Let's make the world a better place!<br/><br/>
+                    Sincerely,<br/> The SmartTrash Team.`;
+        }else if(usagePercentage === 50){
+            subject = `${deviceName} just surpassed 50% capacity ${emoji}`;
+            html = `Dear ${fullname},<br/><br/>
+                    Your "${deviceName}" device has just exceeded 50% capacity, don't worry, you don't have to remove anything. 
+                    We are monitoring your device so that when the time is right, we will notify you to pick up. <br/><br/>
+                    Let's make the world a better place!<br/><br/>
+                    Sincerely,<br/> The SmartTrash Team.`;
+        }else{
+            subject = `${deviceName} is at ${usagePercentage}% ${emoji}`;
+            html = `Dear ${fullname},<br/><br/>
+                    Your "${deviceName}" device has reached ${usagePercentage}% of its total usage. Please remember to empty it, otherwise we will notify you about it.<br/><br/>
+                    You can see the status of all your devices by logging into your account with your SmartTrash Cloud ID.<br/><br/>
+                    Let's make the world a better place!<br/><br/>
+                    Sincerely,<br/> The SmartTrash Team.`;
         }
-    
         const promises = device.notificationEmails.map(({ fullname, email }) => {
             const { subject, html } = getEmailContent(fullname, usagePercentage, device.name);
             return sendEmail({ to: email, subject, html });
@@ -187,7 +177,6 @@ class MQTTController{
             if(options?.topicName && (options.topicName !== stduid)) continue;
             callback({ measuredDistance: distance, usagePercentage });
         }
-
         if(device.height <= 0) return;
 
         await deviceLogQueue.enqueue({
